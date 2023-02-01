@@ -3,7 +3,7 @@
 # PROJECT_ROOT is inferred and set by pyrootutils package in `train.py` and `eval.py`
 root_dir: ${oc.env:PROJECT_ROOT}
 
-scratch_dir: /home/mila/a/alexander.tong/scratch/trajectory-inference
+scratch_dir: ${oc.env:PROJECT_ROOT}
 
 # path to data directory
 data_dir: ${local.scratch_dir}/data/
