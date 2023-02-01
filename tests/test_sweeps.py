@@ -17,7 +17,7 @@ def test_experiments(tmp_path):
             startfile,
             "-m",
             "experiment=glob(*)",
-            "++trainer.fast_dev_run=true",
+            # "++trainer.fast_dev_run=true",
         ]
         + overrides
         + [f"{d}={tmp_path}" for d in dir_overrides]

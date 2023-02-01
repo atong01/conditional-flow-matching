@@ -507,7 +507,6 @@ class CNFLitModule(CFMLitModule):
             if self.hparams.leaveout_timepoint == t:
                 continue
             ts, x = reversed_ts[t:], obs[:, len(even_ts) - t - 1, :]
-            # ts, x = self.aug(reversed_ts[t:], obs[:, len(even_ts) - t - 1, :])
             _, x = self.aug_node(x, ts)
             x = x[-1]
             # Assume log prob is in zero spot
