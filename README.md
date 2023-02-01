@@ -66,8 +66,6 @@ You can override any parameter from command line like this
 python src/train.py trainer.max_epochs=20 datamodule.batch_size=64
 ```
 
-<div align="center">
-
 ## Project Structure
 
 The directory structure of new project looks like this:
