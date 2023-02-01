@@ -36,7 +36,8 @@ def test_experiments(tmp_path):
         [
             startfile,
             "-m",
-            "experiment=cfm,icnn",
+            "experiment=cfm",
+            "model=cfm,otcfm,sbcfm,fm",
             "++trainer.fast_dev_run=true",
         ]
         + overrides
@@ -96,7 +97,7 @@ def test_optuna_sweep(tmp_path):
             "-m",
             "hparams_search=optuna",
             "hydra.sweep.dir=" + str(tmp_path),
-            "hydra.sweeper.n_trials=5",
+            "hydra.sweeper.n_trials=3",
             "hydra.sweeper.sampler.n_startup_trials=2",
             # "++trainer.fast_dev_run=true",
         ]

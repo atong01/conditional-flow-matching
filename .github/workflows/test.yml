@@ -7,17 +7,16 @@ on:
     branches: [main, "release/*"]
 
 jobs:
-  run_tests_ubuntu:
+  run_tests:
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest"]
-        python-version: ["3.10"]
-        #python-version: ["3.7", "3.8", "3.9", "3.10"]
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
 
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -46,6 +45,8 @@ jobs:
   # upload code coverage report
   code-coverage:
     runs-on: ubuntu-latest
+
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
