@@ -3,7 +3,11 @@ from pathlib import Path
 import pytest
 import torch
 
-from src.datamodules.distribution_datamodule import TwoDimDataModule, SKLearnDataModule, TorchDynDataModule
+from src.datamodules.distribution_datamodule import (
+    SKLearnDataModule,
+    TorchDynDataModule,
+    TwoDimDataModule,
+)
 
 
 @pytest.mark.parametrize("batch_size", [32, 128])
@@ -12,7 +16,9 @@ from src.datamodules.distribution_datamodule import TwoDimDataModule, SKLearnDat
 def test_datamodule(batch_size, train_val_test_split, datamodule):
     data_dir = "data/"
 
-    dm = datamodule(data_dir=data_dir, batch_size=batch_size, train_val_test_split=train_val_test_split)
+    dm = datamodule(
+        data_dir=data_dir, batch_size=batch_size, train_val_test_split=train_val_test_split
+    )
 
     assert dm.data_train and dm.data_val and dm.data_test
     assert dm.train_dataloader() and dm.val_dataloader() and dm.test_dataloader()

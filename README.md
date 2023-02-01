@@ -1,8 +1,10 @@
 <div align="center">
 
 # Conditional Flow Matching
-[![Paper](http://img.shields.io/badge/paper-arxiv.1001.2234-B31B1B.svg)](https://www.nature.com/articles/nature14539)
-<!---[![Conference](http://img.shields.io/badge/AnyConference-year-4b44ce.svg)](https://papers.nips.cc/paper/2020) -->
+
+<!---[![Conference](http://img.shields.io/badge/AnyConference-year-4b44ce.svg)](https://papers.nips.cc/paper/2020)
+[![Paper](http://img.shields.io/badge/paper-arxiv.1001.2234-B31B1B.svg)](https://www.nature.com/articles/nature14539) -->
+
 [![python](https://img.shields.io/badge/-Python_3.7_%7C_3.8_%7C_3.9_%7C_3.10-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![pytorch](https://img.shields.io/badge/PyTorch_1.8+-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org/get-started/locally/)
 [![lightning](https://img.shields.io/badge/-Lightning_1.6+-792ee5?logo=pytorchlightning&logoColor=white)](https://pytorchlightning.ai/)
@@ -14,6 +16,7 @@
 [![code-quality](https://github.com/ashleve/lightning-hydra-template/actions/workflows/code-quality-main.yaml/badge.svg)](https://github.com/ashleve/lightning-hydra-template/actions/workflows/code-quality-main.yaml)
 [![license](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](https://github.com/ashleve/lightning-hydra-template#license)
 <a href="https://github.com/ashleve/lightning-hydra-template"><img alt="Template" src="https://img.shields.io/badge/-Lightning--Hydra--Template-017F2F?style=flat&logo=github&labelColor=gray"></a><br>
+[![contributors](https://img.shields.io/github/contributors/ashleve/lightning-hydra-template.svg)](https://github.com/atong01/conditional-flow-matching/graphs/contributors)
 
 </div>
 
@@ -54,7 +57,7 @@ python src/train.py trainer=gpu
 Train model with chosen experiment configuration from [configs/experiment/](configs/experiment/)
 
 ```bash
-python src/train.py experiment=experiment_name.yaml
+python src/train.py experiment=experiment_name
 ```
 
 You can override any parameter from command line like this
@@ -62,105 +65,8 @@ You can override any parameter from command line like this
 ```bash
 python src/train.py trainer.max_epochs=20 datamodule.batch_size=64
 ```
+
 <div align="center">
-
-# Lightning-Hydra-Template
-
-[![python](https://img.shields.io/badge/-Python_3.7_%7C_3.8_%7C_3.9_%7C_3.10-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![pytorch](https://img.shields.io/badge/PyTorch_1.8+-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org/get-started/locally/)
-[![lightning](https://img.shields.io/badge/-Lightning_1.6+-792ee5?logo=pytorchlightning&logoColor=white)](https://pytorchlightning.ai/)
-[![hydra](https://img.shields.io/badge/Config-Hydra_1.2-89b8cd)](https://hydra.cc/)
-[![black](https://img.shields.io/badge/Code%20Style-Black-black.svg?labelColor=gray)](https://black.readthedocs.io/en/stable/)
-[![pre-commit](https://img.shields.io/badge/Pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![tests](https://github.com/ashleve/lightning-hydra-template/actions/workflows/test.yml/badge.svg)](https://github.com/ashleve/lightning-hydra-template/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/ashleve/lightning-hydra-template/branch/main/graph/badge.svg)](https://codecov.io/gh/ashleve/lightning-hydra-template)
-[![code-quality](https://github.com/ashleve/lightning-hydra-template/actions/workflows/code-quality-main.yaml/badge.svg)](https://github.com/ashleve/lightning-hydra-template/actions/workflows/code-quality-main.yaml)
-[![license](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](https://github.com/ashleve/lightning-hydra-template#license)
-[![contributors](https://img.shields.io/github/contributors/ashleve/lightning-hydra-template.svg)](https://github.com/ashleve/lightning-hydra-template/graphs/contributors)
-
-<!-- <a href="https://www.python.org/"><img alt="Python" src="https://img.shields.io/badge/-Python 3.7+-blue?style=for-the-badge&logo=python&logoColor=white"></a> -->
-
-<!-- <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/-PyTorch 1.8+-ee4c2c?style=for-the-badge&logo=pytorch&logoColor=white"></a>
-<a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning 1.6+-792ee5?style=for-the-badge&logo=pytorchlightning&logoColor=white"></a>
-<a href="https://hydra.cc/"><img alt="Config: hydra" src="https://img.shields.io/badge/config-hydra 1.2-89b8cd?style=for-the-badge&labelColor=gray"></a>
-<a href="https://black.readthedocs.io/en/stable/"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-black.svg?style=for-the-badge&labelColor=gray"></a> -->
-
-A clean and scalable template to kickstart your deep learning project 🚀⚡🔥<br>
-Click on [<kbd>Use this template</kbd>](https://github.com/ashleve/lightning-hydra-template/generate) to initialize new repository.
-
-_Suggestions are always welcome!_
-
-</div>
-
-<br>
-
-## 📌  Introduction
-
-**Why you should use it:**
-
-- Convenient all-in-one technology stack for deep learning prototyping - allows you to rapidly iterate over new models, datasets and tasks on different hardware accelerators like CPUs, multi-GPUs or TPUs.
-- A collection of best practices for efficient workflow and reproducibility.
-- Thoroughly commented - you can use this repo as a reference and educational resource.
-
-**Why you shouldn't use it:**
-
-- Lightning and Hydra are still evolving and integrate many libraries, which means sometimes things break - for the list of currently known problems visit [this page](https://github.com/ashleve/lightning-hydra-template/labels/bug).
-- Template is not really adjusted for data science and building data pipelines that depend on each other (it's much more useful for model prototyping on ready-to-use data).
-- The configuration setup is built with simple lightning training in mind (you might need to put some effort to adjust it for different use cases, e.g. lightning lite).
-- Limits you as much as pytorch lightning limits you.
-
-_\*keep in mind this is unofficial community project_
-
-<br>
-
-<!-- ## Table Of Contents
-
-- [📌&nbsp;&nbsp;Introduction](#introduction)
-- [Main Technologies](#main-technologies)
-- [Main Ideas Of This Template](#main-ideas-of-this-template)
-- [Project Structure](#project-structure)
-- [🚀&nbsp;&nbsp;Quickstart](#quickstart)
-- [⚡&nbsp;&nbsp;Your Superpowers](#your-superpowers)
-- [❤️&nbsp;&nbsp;Contributions](#️contributions)
-- [How It Works](#how-it-works)
-- [Main Config](#main-config)
-- [Experiment Config](#experiment-config)
-- [Workflow](#workflow)
-- [Logs](#logs)
-- [Experiment Tracking](#experiment-tracking)
-- [Tests](#tests)
-- [Hyperparameter Search](#hyperparameter-search)
-- [Continuous Integration](#continuous-integration)
-- [Distributed Training](#distributed-training)
-- [Best Practices](#best-practices)
-- [Resources](#resources)
-
-<br> -->
-
-## Main Technologies
-
-[PyTorch Lightning](https://github.com/PyTorchLightning/pytorch-lightning) - a lightweight PyTorch wrapper for high-performance AI research. Think of it as a framework for organizing your PyTorch code.
-
-[Hydra](https://github.com/facebookresearch/hydra) - a framework for elegantly configuring complex applications. The key feature is the ability to dynamically create a hierarchical configuration by composition and override it through config files and the command line.
-
-<br>
-
-## Main Ideas Of This Template
-
-- **Predefined Structure**: clean and scalable so that work can easily be extended [# Project Structure](#project-structure)
-- **Rapid Experimentation**: thanks to hydra command line superpowers | [# Your Superpowers](#your-superpowers)
-- **Little Boilerplate**: thanks to automating pipelines with config instantiation | [# How It Works](#how-it-works)
-- **Main Configs**: specify default training configuration | [# Main Config](#main-config)
-- **Experiment Configs**: override chosen hyperparameters | [# Experiment Config](#experiment-config)
-- **Workflow**: comes down to 4 simple steps | [# Workflow](#workflow)
-- **Experiment Tracking**: Tensorboard, W&B, Neptune, Comet, MLFlow and CSVLogger | [# Experiment Tracking](#experiment-tracking)
-- **Logs**: all logs (checkpoints, configs, etc.) are stored in a dynamically generated folder structure | [# Logs](#logs)
-- **Hyperparameter Search**: made easier with Hydra plugins like Optuna Sweeper | [# Hyperparameter Search](#hyperparameter-search)
-- **Tests**: generic, easy-to-adapt tests for speeding up the development | [# Tests](#tests)
-- **Continuous Integration**: automatically test your repo with Github Actions | [# Continuous Integration](#continuous-integration)
-- **Best Practices**: a couple of recommended tools, practices and standards | [# Best Practices](#best-practices)
-
-<br>
 
 ## Project Structure
 
@@ -213,35 +119,6 @@ The directory structure of new project looks like this:
 ├── setup.py                  <- File for installing project as a package
 └── README.md
 ```
-
-<br>
-
-## 🚀  Quickstart
-
-```bash
-# clone project
-git clone https://github.com/ashleve/lightning-hydra-template
-cd lightning-hydra-template
-
-# [OPTIONAL] create conda environment
-conda create -n myenv python=3.9
-conda activate myenv
-
-# install pytorch according to instructions
-# https://pytorch.org/get-started/
-
-# install requirements
-pip install -r requirements.txt
-```
-
-Template contains example with MNIST classification.<br>
-When running `python src/train.py` you should see something like this:
-
-<div align="center">
-
-![](https://github.com/ashleve/lightning-hydra-template/blob/resources/terminal.png)
-
-</div>
 
 ## ⚡  Your Superpowers
 
@@ -1238,33 +1115,14 @@ hydra:
 
 <br>
 
-## Resources
-
-This template was inspired by:
-
-- [PyTorchLightning/deep-learninig-project-template](https://github.com/PyTorchLightning/deep-learning-project-template)
-- [drivendata/cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science)
-- [lucmos/nn-template](https://github.com/lucmos/nn-template)
-
-Other useful repositories:
-
-- [jxpress/lightning-hydra-template-vertex-ai](https://github.com/jxpress/lightning-hydra-template-vertex-ai) - lightning-hydra-template integration with Vertex AI hyperparameter tuning and custom training job
-- [pytorch/hydra-torch](https://github.com/pytorch/hydra-torch) - safely configuring PyTorch classes with Hydra
-- [romesco/hydra-lightning](https://github.com/romesco/hydra-lightning) - safely configuring PyTorch Lightning classes with Hydra
-- [PyTorchLightning/lightning-transformers](https://github.com/PyTorchLightning/lightning-transformers) - official Lightning Transformers repo built with Hydra
-
-</details>
-
-<br>
-
 ## License
 
-Lightning-Hydra-Template is licensed under the MIT License.
+Conditional-Flow-Matching is licensed under the MIT License.
 
 ```
 MIT License
 
-Copyright (c) 2021 ashleve
+Copyright (c) 2023 Alexander Tong
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
