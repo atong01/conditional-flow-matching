@@ -1,11 +1,11 @@
 # @package _global_
 
 defaults:
-  - override /model: icnn.yaml
+  - override /model: icnn
   - override /logger:
-      - csv.yaml
-      - wandb.yaml
-  - override /datamodule: custom_dist.yaml
+      - csv
+      - wandb
+  - override /datamodule: sklearn
 
 name: "icnn"
 seed: 42
