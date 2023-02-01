@@ -12,7 +12,14 @@ from src.datamodules.distribution_datamodule import (
 
 @pytest.mark.parametrize("batch_size", [32, 128])
 @pytest.mark.parametrize("train_val_test_split", [400, [1000, 100, 100]])
-@pytest.mark.parametrize("datamodule,system", [(SKLearnDataModule, "scurve"), (SKLearnDataModule, "moons"), (TorchDynDataModule, "gaussians")])
+@pytest.mark.parametrize(
+    "datamodule,system",
+    [
+        (SKLearnDataModule, "scurve"),
+        (SKLearnDataModule, "moons"),
+        (TorchDynDataModule, "gaussians"),
+    ],
+)
 def test_single_datamodule(batch_size, train_val_test_split, datamodule, system):
     dm = datamodule(
         batch_size=batch_size, train_val_test_split=train_val_test_split, system=system
@@ -35,7 +42,12 @@ def test_single_datamodule(batch_size, train_val_test_split, datamodule, system)
 
 @pytest.mark.parametrize("batch_size", [32, 128])
 @pytest.mark.parametrize("train_val_test_split", [300, [200, 50, 50]])
-@pytest.mark.parametrize("datamodule,system", [(TwoDimDataModule, "moon-8gaussians"),])
+@pytest.mark.parametrize(
+    "datamodule,system",
+    [
+        (TwoDimDataModule, "moon-8gaussians"),
+    ],
+)
 def test_trajectory_datamodule(batch_size, train_val_test_split, datamodule, system):
     dm = datamodule(
         batch_size=batch_size, train_val_test_split=train_val_test_split, system=system
