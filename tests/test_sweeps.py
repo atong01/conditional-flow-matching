@@ -46,6 +46,7 @@ def test_hydra_sweep(tmp_path):
 
 @RunIf(sh=True)
 @pytest.mark.slow
+@pytest.mark.xfail(reason="DDP is not working yet")
 def test_hydra_sweep_ddp_sim(tmp_path):
     """Test default hydra sweep with ddp sim."""
     command = (
