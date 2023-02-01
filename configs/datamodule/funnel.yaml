@@ -1,0 +1,12 @@
+_target_: src.datamodules.distribution_datamodule.TorchDynDataModule
+#_target_: src.datamodules.distribution_datamodule.DistributionDataModule
+
+train_val_test_split: [10000, 1000, 1000]
+batch_size: 128
+num_workers: 0
+pin_memory: False
+
+system: "funnel"
+
+system_kwargs:
+  dim: 10

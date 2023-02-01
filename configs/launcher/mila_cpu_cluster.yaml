@@ -1,0 +1,16 @@
+# @package _global_
+#
+defaults:
+  - override /hydra/launcher: submitit_slurm
+
+hydra:
+  launcher:
+    partition: long-cpu
+    cpus_per_task: 1
+    mem_gb: 5
+    timeout_min: 100
+    array_parallelism: 64
+    setup:
+      - "module purge"
+      - "module load miniconda/3"
+      - "conda activate myenv"

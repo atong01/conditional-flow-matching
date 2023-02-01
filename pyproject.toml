@@ -1,0 +1,37 @@
+[tool.pytest.ini_options]
+addopts = [
+  "--color=yes",
+  "--durations=0",
+  "--strict-markers",
+  "--doctest-modules",
+]
+filterwarnings = [
+  "ignore::DeprecationWarning",
+  "ignore::UserWarning",
+]
+log_cli = "True"
+markers = [
+  "slow: slow tests",
+]
+minversion = "6.0"
+testpaths = "tests/"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: nocover",
+    "raise NotImplementedError",
+    "raise NotImplementedError()",
+    "if __name__ == .__main__.:",
+]
+
+[tool.flake8]
+extend-ignore = ["E203", "E402", "E501", "F401", "F841", "E741", "F403"]
+exclude = ["logs/*","data/*"]
+per-file-ignores = [
+    '__init__.py:F401',
+]
+max-line-length = 99
+count = true
+
+[tool.bandit]
+skips = ["B101", "B311"]

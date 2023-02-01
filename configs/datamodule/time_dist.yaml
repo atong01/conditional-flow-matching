@@ -1,0 +1,12 @@
+_target_: src.datamodules.distribution_datamodule.CustomTrajectoryDataModule
+#_target_: src.datamodules.distribution_datamodule.DistributionDataModule
+
+data_dir: ${paths.data_dir} # data_dir is specified in config.yaml
+train_val_test_split: [0.8, 0.1, 0.1]
+batch_size: 128
+num_workers: 0
+pin_memory: False
+max_dim: 5
+whiten: True
+
+system: ${paths.data_dir}/eb_velocity_v5.npz

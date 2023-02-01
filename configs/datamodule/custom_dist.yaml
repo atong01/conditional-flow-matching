@@ -1,0 +1,17 @@
+_target_: src.datamodules.distribution_datamodule.TrajectoryNetDistributionTrajectoryDataModule
+#_target_: src.datamodules.distribution_datamodule.DistributionDataModule
+
+data_dir: ${paths.data_dir} # data_dir is specified in config.yaml
+train_val_test_split: 1000
+batch_size: 100
+num_workers: 0
+pin_memory: False
+
+system: ${paths.data_dir}/embryoid_anndata_small_v2.h5ad
+
+system_kwargs:
+  max_dim: 1e10
+  embedding_name: "phate"
+  #embedding_name: "highly_variable"
+  whiten: True
+  #whiten: False
