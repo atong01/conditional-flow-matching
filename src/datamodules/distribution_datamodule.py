@@ -276,6 +276,7 @@ class TorchDynDataModule(BaseLightningDataModule):
             else sum(train_val_test_split)
         )
         if system == "gaussians":
+            assert N % 8 == 0
             N = N // 8
             system_kwargs["n_gaussians"] = 8
             system_kwargs["radius"] = 5
