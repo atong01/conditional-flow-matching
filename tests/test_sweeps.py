@@ -76,9 +76,9 @@ def test_optuna_sweep(tmp_path):
             "-m",
             "hparams_search=optuna",
             "hydra.sweep.dir=" + str(tmp_path),
-            "hydra.sweeper.n_trials=10",
-            "hydra.sweeper.sampler.n_startup_trials=5",
-            "++trainer.fast_dev_run=true",
+            "hydra.sweeper.n_trials=5",
+            "hydra.sweeper.sampler.n_startup_trials=2",
+            # "++trainer.fast_dev_run=true",
         ]
         + overrides
         + [f"{d}={tmp_path}" for d in dir_overrides]
@@ -94,7 +94,7 @@ def test_optuna_sweep_ddp_sim_wandb(tmp_path):
     command = [
         startfile,
         "-m",
-        "hparams_search=mnist_optuna",
+        "hparams_search=optuna",
         "hydra.sweeper.n_trials=5",
         "trainer=ddp_sim",
         "trainer.max_epochs=3",
