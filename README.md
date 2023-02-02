@@ -21,7 +21,9 @@
 
 ## Description
 
-Conditional Flow Matching is a fast way to train Continuous Normalizing Flow models.
+Conditional Flow Matching is a fast way to train Continuous Normalizing Flow models. CFM is a simulation-free training objective for continuous normalizing flows that allows conditional generative modeling and speeds up training and inference. See [this http link](https://arxiv.org/abs/2302.00482) for the preprint.
+
+Under this general framework we introduce Optimal Transport Conditional Flow Matching (OT-CFM). OT-CFM creates dynamical optimal transport flows between marginal distributions by introducing an optimal transport condition.
 
 ## How to run
 
