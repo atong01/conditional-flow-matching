@@ -32,7 +32,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest
-          pip install sh
 
       - name: List dependencies
         run: |
@@ -41,7 +40,7 @@ jobs:
       - name: Run pytest
         run: |
           pytest -v
-          
+
   run_tests:
     runs-on: ${{ matrix.os }}
 
