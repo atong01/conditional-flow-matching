@@ -26,7 +26,7 @@ Conditional Flow Matching is a fast way to train Continuous Normalizing Flow mod
 
 Under this general framework we introduce Optimal Transport Conditional Flow Matching (OT-CFM). OT-CFM creates dynamical optimal transport flows between marginal distributions by introducing an optimal transport condition.
 
-For a simple 2D example see `notebooks/example-training.ipynb`.
+For a simple standalone minimal example [![Run in Google Colab](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/notebooks/example-training.ipynb). Or view the notebook in `notebooks/example-training.ipynb`.
 
 ## How to run
 
