@@ -1,6 +1,7 @@
 <div align="center">
 
 # Conditional Flow Matching
+Alexander Tong, Nikolay Malkin, Guillaume Huguet, Yanlei Zhang, Jarrid Rector-Brooks, Kilian Fatras, Guy Wolf, Yoshua Bengio
 
 <!---[![Conference](http://img.shields.io/badge/AnyConference-year-4b44ce.svg)](https://papers.nips.cc/paper/2020) -->
 
@@ -20,7 +21,7 @@
 
 </div>
 
-![My Image](assets/gaussian-to-moons.gif)
+![My Image](assets/8gaussians-to-moons.gif)
 
 ## Description
 
@@ -29,7 +30,8 @@ Conditional Flow Matching is a fast way to train Continuous Normalizing Flow mod
 Under this general framework we introduce Optimal Transport Conditional Flow Matching (OT-CFM). OT-CFM creates dynamical optimal transport flows between marginal distributions by introducing an optimal transport condition.
 
 ## Examples
-![My Image](assets/8gaussians-to-moons.gif)
+
+![My Image](assets/gaussian-to-moons.gif)
 
 ## How to run
 
