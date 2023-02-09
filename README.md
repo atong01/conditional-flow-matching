@@ -1,6 +1,7 @@
 <div align="center">
 
 # Conditional Flow Matching
+
 Alexander Tong, Nikolay Malkin, Guillaume Huguet, Yanlei Zhang, Jarrid Rector-Brooks, Kilian Fatras, Guy Wolf, Yoshua Bengio
 
 <!---[![Conference](http://img.shields.io/badge/AnyConference-year-4b44ce.svg)](https://papers.nips.cc/paper/2020) -->
@@ -32,6 +33,15 @@ Under this general framework we introduce Optimal Transport Conditional Flow Mat
 ## Examples
 
 ![My Image](assets/gaussian-to-moons.gif)
+
+## Relevant Related Works
+
+Related work on simulation free training of flow models includes:
+
+- Flow Matching for Generative Modeling (Lipman et al. 2023) ![Paper](https://openreview.net/forum?id=PqvMRDCJT9t)
+- Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow (Liu et al. 2023) ![Paper](https://openreview.net/forum?id=XVjTT1nw5z)
+- Building Normalizing Flows with Stochastic Interpolants (Albergo et al. 2023) ![Paper](https://openreview.net/forum?id=li7qeBbCR1t)
+- Action Matching: Learning Stochastic Dynamics From Samples (Neklyudov et al. 2022) ![Paper](https://arxiv.org/abs/2210.06662) ![Code](https://github.com/necludov/jam)
 
 ## How to run
 
