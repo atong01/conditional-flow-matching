@@ -148,10 +148,8 @@ class CFMLitModule(LightningModule):
             ut[t_select + 1 == self.hparams.leaveout_timepoint] /= 2
             t[t_select + 1 == self.hparams.leaveout_timepoint] *= 2
 
-        # p is the pair-wise conditional probability matrix. Note that this has to be torch.cdist(x, mu) in that order
         # t that network sees is incremented by first timepoint
         t = t + t_select[:, None]
-
         x = mu_t + sigma_t * torch.randn_like(x0)
 
         if self.hparams.avg_size > 0:
@@ -169,9 +167,12 @@ class CFMLitModule(LightningModule):
             p_sum = torch.sum(pt_sub, dim=1, keepdim=True)
             ut = torch.sum(pt_sub[:, :, None] * ut_sub, dim=1) / p_sum
 
-        aug_x = self.aug_net(t[:1], x[:1], augmented_input=False)
+            aug_x = self.aug_net(t[:1], x[:1], augmented_input=False)
+            reg, vt = self.augmentations(aug_x)
+            return torch.mean(reg), self.criterion(vt, ut[:1])
+        aug_x = self.aug_net(t, x, augmented_input=False)
         reg, vt = self.augmentations(aug_x)
-        return torch.mean(reg), self.criterion(vt, ut[:1])
+        return torch.mean(reg), self.criterion(vt, ut)
 
     def training_step(self, batch: Any, batch_idx: int):
         reg, mse = self.step(batch, training=True)
