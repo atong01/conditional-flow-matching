@@ -89,6 +89,7 @@ def test_hydra_sweep_ddp_sim(tmp_path):
 
 @RunIf(sh=True)
 @pytest.mark.slow
+@pytest.mark.skip(reason="Too slow for easy esting, pathway currently not used")
 def test_optuna_sweep(tmp_path):
     """Test optuna sweep."""
     command = (
