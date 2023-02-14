@@ -36,12 +36,13 @@ Under this general framework we introduce Optimal Transport Conditional Flow Mat
 
 ## Relevant Related Works
 
-Related work on simulation free training of flow models includes:
+There are many ineresting related works to check out on simulation free training of flow models including:
 
 - Flow Matching for Generative Modeling (Lipman et al. 2023) [Paper](https://openreview.net/forum?id=PqvMRDCJT9t)
 - Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow (Liu et al. 2023) [Paper](https://openreview.net/forum?id=XVjTT1nw5z)
 - Building Normalizing Flows with Stochastic Interpolants (Albergo et al. 2023) [Paper](https://openreview.net/forum?id=li7qeBbCR1t)
 - Action Matching: Learning Stochastic Dynamics From Samples (Neklyudov et al. 2022) [Paper](https://arxiv.org/abs/2210.06662) [Code](https://github.com/necludov/jam)
+- Riemannian Flow Matching on General Geometries (Chen et al. 2023) [Paper](https://arxiv.org/abs/2302.03660)
 
 ## How to run
 
