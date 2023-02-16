@@ -36,7 +36,7 @@ pytest            # tests
 
 
 # --------- pkg reqs -------- #
-matplotlib
+matplotlib<3.7
 numpy
 # sdeint
 torchdyn
