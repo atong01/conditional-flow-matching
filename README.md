@@ -26,23 +26,29 @@ Alexander Tong, Nikolay Malkin, Guillaume Huguet, Yanlei Zhang, Jarrid Rector-Br
 
 ## Description
 
-Conditional Flow Matching is a fast way to train Continuous Normalizing Flow models. CFM is a simulation-free training objective for continuous normalizing flows that allows conditional generative modeling and speeds up training and inference. See [this http link](https://arxiv.org/abs/2302.00482) for the preprint.
+Conditional Flow Matching is a fast way to train Continuous Normalizing Flow (CNF) models. CFM is a simulation-free training objective for continuous normalizing flows that allows conditional generative modeling and speeds up training and inference. See [this http link](https://arxiv.org/abs/2302.00482) for the preprint.
 
 Under this general framework we introduce Optimal Transport Conditional Flow Matching (OT-CFM). OT-CFM creates dynamical optimal transport flows between marginal distributions by introducing an optimal transport condition.
 
 ## Examples
 
+The density, vector field, and trajectories of simulation-free CNF training schemes. The first two methods variance preserving SDE (VP-SDE) and Flow Matching (FM) require a gaussian source distribution so do not appear in the above example mapping 8 Gaussians to the two moons dataset. Training action matching with the same architecture (3x64 MLP with SeLU activations) underfits however, with a Relu SiLU and SiLU activations as suggested in the [example code](https://github.com/necludov/jam) it seems to fit better under our training setup (Action-Matching (Swish). The models to produce the GIF are stored in `notebooks/models` and can be visualized with this [![notebook](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/notebooks/model-comparison-plotting.ipynb).
+
 ![My Image](assets/gaussian-to-moons.gif)
 
 ## Relevant Related Works
 
-There are many ineresting related works to check out on simulation free training of flow models including:
+There are many interesting related works to check out on simulation free training of flow models including:
 
 - Flow Matching for Generative Modeling (Lipman et al. 2023) [Paper](https://openreview.net/forum?id=PqvMRDCJT9t)
 - Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow (Liu et al. 2023) [Paper](https://openreview.net/forum?id=XVjTT1nw5z)
 - Building Normalizing Flows with Stochastic Interpolants (Albergo et al. 2023) [Paper](https://openreview.net/forum?id=li7qeBbCR1t)
 - Action Matching: Learning Stochastic Dynamics From Samples (Neklyudov et al. 2022) [Paper](https://arxiv.org/abs/2210.06662) [Code](https://github.com/necludov/jam)
 - Riemannian Flow Matching on General Geometries (Chen et al. 2023) [Paper](https://arxiv.org/abs/2302.03660)
+
+## Code Contributions
+
+This repo is extracted from a larger private codebase which loses the original commit history which contains work from other authors on the paper.
 
 ## How to run
 
