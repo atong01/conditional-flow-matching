@@ -111,5 +111,5 @@ repos:
         args:
           [
             "--extend-ignore=E203,E402,E501,F401,F841",
-            "--exclude=logs/*,data/*"
+            "--exclude=logs/*,data/*",
           ]
