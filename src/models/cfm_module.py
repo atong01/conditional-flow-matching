@@ -166,10 +166,9 @@ class CFMLitModule(LightningModule):
             ut_sub = torch.stack([ut[ind[i]] for i in range(batch_size)])
             p_sum = torch.sum(pt_sub, dim=1, keepdim=True)
             ut = torch.sum(pt_sub[:, :, None] * ut_sub, dim=1) / p_sum
-
-            aug_x = self.aug_net(t[:1], x[:1], augmented_input=False)
-            reg, vt = self.augmentations(aug_x)
-            return torch.mean(reg), self.criterion(vt, ut[:1])
+            t = t[:1]
+            x = x[:1]
+            ut = ut[:1]
         aug_x = self.aug_net(t, x, augmented_input=False)
         reg, vt = self.augmentations(aug_x)
         return torch.mean(reg), self.criterion(vt, ut)
