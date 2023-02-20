@@ -46,7 +46,7 @@ There are many ineresting related works to check out on simulation free training
 
 ## How to run
 
-Run a simple minimal example here [![Run in Google Colab](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/notebooks/example-training.ipynb). Or install the more efficient code locally with these steps.
+Run a simple minimal example here [![Run in Google Colab](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/notebooks/training-8gaussians-to-moons.ipynb). Or install the more efficient code locally with these steps.
 
 Install dependencies
 
