@@ -94,6 +94,8 @@ You can override any parameter from command line like this
 python src/train.py trainer.max_epochs=20 datamodule.batch_size=64
 ```
 
+You can also train a large set of models in parallel with SLURM as shown in `scripts/two-dim-cfm.sh` which trains the models used in the first 3 lines of Table 2.
+
 ## Project Structure
 
 The directory structure of new project looks like this:
