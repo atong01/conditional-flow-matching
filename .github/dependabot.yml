@@ -14,3 +14,5 @@ updates:
         update-types: ["version-update:semver-patch"]
       - dependency-name: "torchmetrics"
         update-types: ["version-update:semver-patch"]
+      - dependency-name: "torch"
+        update-types: ["version-update:semver-patch"]
