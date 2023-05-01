@@ -39,7 +39,7 @@ pytest            # tests
 matplotlib
 numpy
 # sdeint
-torchdyn==1.0.3
+torchdyn==1.0.4
 scipy
 scikit-learn
 pot
