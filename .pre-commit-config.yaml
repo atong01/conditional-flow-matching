@@ -1,0 +1,138 @@
+default_language_version:
+  python: python3
+  node: 16.14.2
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      # list of supported hooks: https://pre-commit.com/hooks.html
+      - id: trailing-whitespace
+        exclude: .svg$
+        require_serial: true
+      - id: end-of-file-fixer
+        require_serial: true
+      - id: check-docstring-first
+        require_serial: true
+      - id: check-yaml
+        require_serial: true
+      - id: debug-statements
+        require_serial: true
+      - id: detect-private-key
+        require_serial: true
+      - id: check-executables-have-shebangs
+        require_serial: true
+      - id: check-toml
+        require_serial: true
+      - id: check-case-conflict
+        require_serial: true
+      - id: check-added-large-files
+        require_serial: true
+
+  # python code formatting
+  - repo: https://github.com/psf/black
+    rev: 22.6.0
+    hooks:
+      - id: black
+        require_serial: true
+        args: [--line-length, "99"]
+
+  # python import sorting
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        require_serial: true
+        args: ["--profile", "black", "--filter-files"]
+
+  # python upgrading syntax to newer version
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.32.1
+    hooks:
+      - id: pyupgrade
+        require_serial: true
+        args: [--py38-plus]
+
+  # python docstring formatting
+  - repo: https://github.com/myint/docformatter
+    rev: v1.4
+    hooks:
+      - id: docformatter
+        require_serial: true
+        args: [--in-place, --wrap-summaries=99, --wrap-descriptions=99]
+
+  # python check (PEP8), programming errors and code complexity
+  - repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        require_serial: true
+        entry: pflake8
+        additional_dependencies: ["pyproject-flake8"]
+
+  # python security linter
+  - repo: https://github.com/PyCQA/bandit
+    rev: "1.7.4"
+    hooks:
+      - id: bandit
+        require_serial: true
+        args: ["-c", "pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]
+
+  # yaml formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.7.1
+    hooks:
+      - id: prettier
+        require_serial: true
+        types: [yaml]
+
+  # shell scripts linter
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.8.0.4
+    hooks:
+      - id: shellcheck
+        require_serial: true
+        args: ["-e", "SC2102"]
+
+  # md formatting
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.14
+    hooks:
+      - id: mdformat
+        require_serial: true
+        args: ["--number"]
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-tables
+          - mdformat_frontmatter
+          # - mdformat-toc
+          # - mdformat-black
+
+  # word spelling linter
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.1.0
+    hooks:
+      - id: codespell
+        require_serial: true
+        args:
+          - --skip=logs/**,data/**,*.ipynb
+          - --ignore-words-list=ot,hist
+
+  # jupyter notebook linting
+  - repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.4.0
+    hooks:
+      - id: nbqa-black
+        args: ["--line-length=99"]
+        require_serial: true
+      - id: nbqa-isort
+        args: ["--profile=black"]
+        require_serial: true
+      - id: nbqa-flake8
+        args:
+          [
+            "--extend-ignore=E203,E402,E501,F401,F841",
+            "--exclude=logs/*,data/*,notebooks/*",
+          ]
+        require_serial: true
