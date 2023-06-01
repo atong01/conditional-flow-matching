@@ -28,7 +28,7 @@ class ConditionalFlowMatching:
         del t, xt
         return x1 - x0
 
-    def compute_location_and_target(self, x0, x1):
+    def sample_location_and_conditional_flow(self, x0, x1):
         t = torch.rand(x0.shape[0]).type_as(x0)
         xt = self.sample_xt(x0, x1, t)
         ut = self.compute_conditional_flow(x0, x1, t, xt)
@@ -50,9 +50,9 @@ class ExactOptimalTransportConditionalFlowMatching(ConditionalFlowMatching):
         self.sigma = sigma
         self.ot_sampler = OTPlanSampler(method="exact")
 
-    def compute_location_and_target(self, x0, x1):
+    def sample_location_and_conditional_flow(self, x0, x1):
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
-        return super().compute_location_and_target(x0, x1)
+        return super().sample_location_and_conditional_flow(x0, x1)
 
 
 class TargetConditionalFlowMatching(ConditionalFlowMatching):
@@ -85,9 +85,9 @@ class SchrodingerBridgeConditionalFlowMatching(ConditionalFlowMatching):
         ut = sigma_t_prime_over_sigma_t * (xt - mu_t) + x1 - x0
         return ut
 
-    def compute_location_and_target(self, x0, x1):
+    def sample_location_and_conditional_flow(self, x0, x1):
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
-        return super().compute_location_and_target(x0, x1)
+        return super().sample_location_and_conditional_flow(x0, x1)
 
 
 class VariancePreservingConditionalFlowMatching(ConditionalFlowMatching):
