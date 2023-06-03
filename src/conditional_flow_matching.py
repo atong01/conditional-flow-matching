@@ -18,7 +18,25 @@ from optimal_transport import OTPlanSampler
 #------------------------------------------------------------------------------------
 
 class ConditionalFlowMatching:
+    """
+    Base class for conditional flow matching methods. This class implements the 
+    independant conditional flow matching methods from [1] and serves as a parent class 
+    for all other flow matching methods.
+
+    It implements:
+    - Drawing data from gaussian probability path N(t * x1 + (1 - t) * x0, sigma) function
+    - conditional flow matching ut(x1|x0) = x1 - x0
+    - score function $\nabla log p_t(x|x0, x1)$
+    """
     def __init__(self, sigma: float = 0.0):
+        """
+        Initialize the ConditionalFlowMatching class. It requires the [GIVE MORE DETAILS]
+        hyper-parameter $\sigma$.
+
+        Parameters
+        ----------
+        sigma : float
+        """
         self.sigma = sigma
 
     def compute_mu_t(self, x0, x1, t):
