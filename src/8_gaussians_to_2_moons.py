@@ -1,9 +1,10 @@
+import os
 #################################
-# DIRTY FILE FOR SANITY CHECK
+# TOY FOR SANITY CHECK
 #################################
 
 import math
-import os
+
 import time
 
 import matplotlib.pyplot as plt
@@ -16,12 +17,15 @@ from torchdyn.datasets import generate_moons
 
 from utils import *
 from models import *
-from conditional_flow_macthing import *
+from conditional_flow_matching import *
 
 savedir = "models/8gaussian-moons"
 os.makedirs(savedir, exist_ok=True)
 
-%%time
+#################################
+# Conditional FM
+#################################
+
 sigma = 0.1
 dim = 2
 batch_size = 256
@@ -38,7 +42,7 @@ for k in range(20000):
 
     t, xt, ut = FM.sample_location_and_conditional_flow(x0, x1)
 
-    vt = model(torch.cat([x, t], dim=-1))
+    vt = model(torch.cat([xt, t], dim=-1))
     loss = torch.mean((vt - ut) ** 2)
     
     loss.backward()
@@ -57,4 +61,9 @@ for k in range(20000):
                 t_span=torch.linspace(0, 1, 100),
             )
             plot_trajectories(traj)
+            plt.savefig('results/generated_samples_{}_iter'.format(k))
 torch.save(model, f"{savedir}/cfm_v1.pt")
+
+#################################
+#            OT-CFM
+#################################

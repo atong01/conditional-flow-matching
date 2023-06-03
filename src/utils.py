@@ -3,9 +3,7 @@ import numpy as np
 import torch
 import torchdyn
 from torchdyn.datasets import generate_moons
-
-savedir = "models/8gaussian-moons"
-os.makedirs(savedir, exist_ok=True)
+import matplotlib.pyplot as plt
 
 # Implement some helper functions
 
@@ -51,7 +49,7 @@ class torch_wrapper(torch.nn.Module):
         self.model = model
 
     def forward(self, t, x):
-        return model(torch.cat([x, t.repeat(x.shape[0])[:, None]], 1))
+        return self.model(torch.cat([x, t.repeat(x.shape[0])[:, None]], 1))
 
 
 def plot_trajectories(traj):

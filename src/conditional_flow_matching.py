@@ -11,8 +11,11 @@ import math
 
 import torch
 
-from .optimal_transport import OTPlanSampler
-
+#------------------------------------------------------------------------------------
+##BUG ImportError: attempted relative import with no known parent package
+## TO SOLVE LATER AND COMMENT FOR NOW
+from optimal_transport import OTPlanSampler
+#------------------------------------------------------------------------------------
 
 class ConditionalFlowMatching:
     def __init__(self, sigma: float = 0.0):
@@ -136,7 +139,7 @@ class ConditionalFlowMatching:
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
-        t = torch.rand(x0.shape[0]).type_as(x0)
+        t = torch.rand(x0.shape[0], 1).type_as(x0)
         xt = self.sample_xt(x0, x1, t)
         ut = self.compute_conditional_flow(x0, x1, t, xt)
         return t, xt, ut
