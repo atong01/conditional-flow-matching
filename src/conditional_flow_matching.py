@@ -272,15 +272,85 @@ class SchrodingerBridgeConditionalFlowMatching(ConditionalFlowMatching):
         self.ot_sampler = OTPlanSampler(method="sinkhorn", reg=2 * self.sigma**2)
 
     def compute_sigma_t(self, x0, x1, t):
+        """
+        Compute the mean of the probability path N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2),
+        see (Eq.20) [1].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs, 1)
+
+        Returns
+        -------
+        standard deviation sigma
+
+        References
+        ----------
+        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        """
+        # Potential bug below, should be sigma^2 to be consistent with paper
         return self.sigma * torch.sqrt(t * (1 - t))
 
     def compute_conditional_flow(self, x0, x1, t, xt):
+        """
+        Compute the conditional vector field 
+        ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0,
+        see Eq.(21) [1].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs, 1)
+        xt : Tensor, shape (bs, dim)
+            represents the samples drawn from probability path pt
+
+        Returns
+        -------
+        ut : conditional vector field 
+        ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0
+
+        References
+        ----------
+        [1] Improving and Generalizing Flow-Based Generative Models 
+        with minibatch optimal transport, Preprint, Tong et al.
+        """
         mu_t = self.compute_mu_t(self, x0, x1, t)
         sigma_t_prime_over_sigma_t = (1 - 2 * t) / (2 * t * (1 - t))
         ut = sigma_t_prime_over_sigma_t * (xt - mu_t) + x1 - x0
         return ut
 
     def sample_location_and_conditional_flow(self, x0, x1):
+        """
+        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2 )) 
+        and the conditional vector field ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0,
+        (see Eq.(15) [1]) with respect to the minibatch entropic OT plan.
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+
+
+        Returns
+        -------
+        t : float, shape (bs, 1)
+        xt : Tensor, shape (bs, dim)
+            represents the samples drawn from probability path pt
+        ut : conditional vector field ut(x1|x0) = x1 - x0
+
+        References
+        ----------
+        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        """
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
         return super().sample_location_and_conditional_flow(x0, x1)
 
