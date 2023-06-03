@@ -8,8 +8,10 @@ import torch
 
 
 class OTPlanSampler:
-    """OTPlanSampler implements sampling coordinates according to an squared L2 OT plan with
-    different implementations of the plan calculation."""
+    """
+    OTPlanSampler implements sampling coordinates according to an OT plan (wrt squared Euclidean cost) 
+    with different implementations of the plan calculation.
+    """
 
     def __init__(
         self,
@@ -45,7 +47,7 @@ class OTPlanSampler:
         x1 = x1.reshape(x1.shape[0], -1)
         M = torch.cdist(x0, x1) ** 2
         if self.normalize_cost:
-            M = M / M.max()
+            M = M / M.max() #should not be normalized when using minibatches
         p = self.ot_fn(a, b, M.detach().cpu().numpy())
         if not np.all(np.isfinite(p)):
             print("ERROR: p is not finite")
