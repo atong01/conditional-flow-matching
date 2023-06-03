@@ -211,7 +211,14 @@ class ExactOptimalTransportConditionalFlowMatching(ConditionalFlowMatching):
 
 
 class TargetConditionalFlowMatching(ConditionalFlowMatching):
-    """Lipman et al. 2023 style target OT conditional flow matching."""
+    """
+    Lipman et al. 2023 style target OT conditional flow matching.
+    This class inherits the ConditionalFlowMatching and override the 
+    compute_mu_t, compute_sigma_t and compute_conditional_flow functions
+    in order to compute [2]'s flow matching
+    
+    [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+    """
 
     def compute_mu_t(self, x0, x1, t):
         del x0
