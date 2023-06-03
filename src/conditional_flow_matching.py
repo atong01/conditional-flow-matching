@@ -195,7 +195,22 @@ class ConditionalFlowMatching:
 
 
 class ExactOptimalTransportConditionalFlowMatching(ConditionalFlowMatching):
+    """
+    Child class for optimal transport conditional flow matching method. This class implements the 
+    OT-CFM methods from [1] and inherits the ConditionalFlowMatching parent class.
+
+    It overrides the sample_location_and_conditional_flow.
+    """
     def __init__(self, sigma: float = 0.0):
+        """
+        Initialize the ConditionalFlowMatching class. It requires the [GIVE MORE DETAILS]
+        hyper-parameter $\sigma$.
+
+        Parameters
+        ----------
+        sigma : float
+        ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
+        """
         self.sigma = sigma
         self.ot_sampler = OTPlanSampler(method="exact")
 
