@@ -1,0 +1,25 @@
+_target_: src.models.icnn_module.ICNNLitModule
+_partial_: true
+
+f_net:
+  _target_: src.models.components.icnn_model.ICNN
+  _partial_: true
+  dimh: 64
+  num_hidden_layers: 4
+
+g_net:
+  _target_: src.models.components.icnn_model.ICNN
+  _partial_: true
+  dimh: 64
+  num_hidden_layers: 4
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 0.0001
+  betas: [0.5, 0.9]
+
+reg: 0.1
+
+# Set to integer if want to train with left out timepoint
+leaveout_timepoint: -1

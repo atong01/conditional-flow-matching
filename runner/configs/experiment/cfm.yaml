@@ -1,0 +1,22 @@
+# @package _global_
+
+defaults:
+  - override /model: cfm.yaml
+  - override /logger:
+      - csv.yaml
+      - wandb.yaml
+  - override /datamodule: sklearn.yaml
+
+name: "cfm"
+seed: 42
+
+datamodule:
+  batch_size: 512
+
+model:
+  optimizer:
+    weight_decay: 1e-5
+
+trainer:
+  max_epochs: 1000
+  check_val_every_n_epoch: 10

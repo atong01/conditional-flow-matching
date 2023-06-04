@@ -1,0 +1,22 @@
+# @package _global_
+
+defaults:
+  - override /model: cnf.yaml
+  - override /logger:
+      - csv.yaml
+      - wandb.yaml
+  - override /datamodule: sklearn.yaml
+
+name: "cnf"
+seed: 42
+
+datamodule:
+  batch_size: 1024
+
+model:
+  optimizer:
+    weight_decay: 1e-5
+
+trainer:
+  max_epochs: 1000
+  check_val_every_n_epoch: 10

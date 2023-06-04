@@ -1,0 +1,12 @@
+# path to root directory
+# this requires PROJECT_ROOT environment variable to exist
+# PROJECT_ROOT is inferred and set by pyrootutils package in `train.py` and `eval.py`
+root_dir: ${oc.env:PROJECT_ROOT}
+
+scratch_dir: ${oc.env:PROJECT_ROOT}
+
+# path to data directory
+data_dir: ${local.scratch_dir}/data/
+
+# path to logging directory
+log_dir: ${local.scratch_dir}/logs/

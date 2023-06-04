@@ -1,0 +1,14 @@
+# https://github.com/DiffEqML/torchdyn/blob/master/torchdyn/datasets/static_datasets.py
+_target_: src.datamodules.distribution_datamodule.TorchDynDataModule
+#_target_: src.datamodules.distribution_datamodule.DistributionDataModule
+
+train_val_test_split: [0.8, 0.1, 0.1]
+batch_size: 128
+num_workers: 0
+pin_memory: False
+
+system: ${paths.data_dir}/eb_velocity_v5.npz
+
+system_kwargs:
+  max_dim: 100
+  whiten: False
