@@ -1,5 +1,5 @@
 """
-Implements Conditional Flow Matching Losses
+Implements Conditional Flow Matcher Losses
 """
 
 # Author: Alex Tong
@@ -14,10 +14,10 @@ import torch
 #------------------------------------------------------------------------------------
 ##BUG ImportError: attempted relative import with no known parent package
 ## TO SOLVE LATER AND COMMENT FOR NOW
-from optimal_transport import OTPlanSampler
+from .optimal_transport import OTPlanSampler
 #------------------------------------------------------------------------------------
 
-class ConditionalFlowMatching:
+class ConditionalFlowMatcher:
     """
     Base class for conditional flow matching methods. This class implements the 
     independant conditional flow matching methods from [1] and serves as a parent class 
@@ -30,7 +30,7 @@ class ConditionalFlowMatching:
     """
     def __init__(self, sigma: float = 0.0):
         """
-        Initialize the ConditionalFlowMatching class. It requires the [GIVE MORE DETAILS]
+        Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
         hyper-parameter $\sigma$.
 
         Parameters
@@ -194,16 +194,16 @@ class ConditionalFlowMatching:
         )
 
 
-class ExactOptimalTransportConditionalFlowMatching(ConditionalFlowMatching):
+class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
     """
     Child class for optimal transport conditional flow matching method. This class implements the 
-    OT-CFM methods from [1] and inherits the ConditionalFlowMatching parent class.
+    OT-CFM methods from [1] and inherits the ConditionalFlowMatcher parent class.
 
     It overrides the sample_location_and_conditional_flow.
     """
     def __init__(self, sigma: float = 0.0):
         """
-        Initialize the ConditionalFlowMatching class. It requires the [GIVE MORE DETAILS]
+        Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
         hyper-parameter $\sigma$.
 
         Parameters
@@ -243,10 +243,10 @@ class ExactOptimalTransportConditionalFlowMatching(ConditionalFlowMatching):
         return super().sample_location_and_conditional_flow(x0, x1)
 
 
-class TargetConditionalFlowMatching(ConditionalFlowMatching):
+class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
     """
     Lipman et al. 2023 style target OT conditional flow matching.
-    This class inherits the ConditionalFlowMatching and override the 
+    This class inherits the ConditionalFlowMatcher and override the 
     compute_mu_t, compute_sigma_t and compute_conditional_flow functions
     in order to compute [2]'s flow matching
     
@@ -266,7 +266,7 @@ class TargetConditionalFlowMatching(ConditionalFlowMatching):
         return (x1 - (1 - self.sigma) * xt) / (1 - (1 - self.sigma) * t)
 
 
-class SchrodingerBridgeConditionalFlowMatching(ConditionalFlowMatching):
+class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
     def __init__(self, sigma: float = 0.0):
         self.sigma = sigma
         self.ot_sampler = OTPlanSampler(method="sinkhorn", reg=2 * self.sigma**2)
@@ -355,7 +355,7 @@ class SchrodingerBridgeConditionalFlowMatching(ConditionalFlowMatching):
         return super().sample_location_and_conditional_flow(x0, x1)
 
 
-class VariancePreservingConditionalFlowMatching(ConditionalFlowMatching):
+class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
     def compute_mu_t(self, x0, x1, t):
         return torch.cos(math.pi / 2 * t) * x0 + torch.sin(math.pi / 2 * t) * x1
 
