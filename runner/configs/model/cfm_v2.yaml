@@ -1,0 +1,28 @@
+_target_: src.models.runner.CFMLitModule
+_partial_: true
+
+optimizer:
+  _target_: torch.optim.AdamW
+  _partial_: true
+  lr: 0.001
+  weight_decay: 1e-5
+
+net:
+  _target_: src.models.components.simple_mlp.VelocityNet
+  _partial_: true
+  hidden_dims: [64, 64, 64]
+  batch_norm: False
+  activation: "selu"
+
+flow_matcher:
+  _target_: torchcfm.ConditionalFlowMatcher
+  sigma: 0.0
+
+solver:
+  _target_: src.models.components.solver.FlowSolver
+  _partial_: true
+  ode_solver: "euler"
+  atol: 1e-5
+  rtol: 1e-5
+
+plot: True
