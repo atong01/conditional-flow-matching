@@ -12,9 +12,7 @@ import math
 import torch
 
 #------------------------------------------------------------------------------------
-##BUG ImportError: attempted relative import with no known parent package
-## TO SOLVE LATER AND COMMENT FOR NOW
-from .optimal_transport import OTPlanSampler
+from optimal_transport import OTPlanSampler
 #------------------------------------------------------------------------------------
 
 class ConditionalFlowMatcher:
@@ -368,3 +366,194 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         )
 
 
+
+    
+class SF2M(ConditionalFlowMatcher):
+    def __init__(self, sigma: float = 0.1):
+        """
+        Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
+        hyper-parameter $\sigma$.
+
+        Parameters
+        ----------
+        sigma : float
+        """
+        self.sigma = sigma
+        self.ot_sampler = OTPlanSampler(method="exact")
+
+    def F(self, t):
+        """
+        THE NAME OF THIS FUNCTION HAS TO MEAN SMTH. CURRENTLY NOT ACCEPTABLE.
+        """
+        t = t * 1.0
+        if isinstance(t, float):
+            t = torch.tensor(t)
+        return t
+
+    def compute_mu_t(self, x0, x1, t):
+        """
+        Compute the mean of the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs, 1)
+
+        Returns
+        -------
+        mean mu_t: t * x1 + (1 - t) * x0
+
+        References
+        ----------
+        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        """
+        ft = self.F(t)
+        fone = self.F(1)
+        return x0 + (x1 - x0) * ft / fone
+
+    def compute_sigma_t(self, x0, x1, t):
+        """
+        Compute the mean of the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs, 1)
+
+        Returns
+        -------
+        standard deviation sigma
+
+        References
+        ----------
+        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        """
+        del x0, x1
+        sigma_t = self.F(t) - self.F(t) ** 2 / self.F(1)  # sigma * torch.sqrt(t - t**2)
+        return sigma_t
+
+    def sample_xt(self, x0, x1, t):
+        """
+        Draw a sample from the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs, 1)
+
+        Returns
+        -------
+        xt : Tensor, shape (bs, dim)
+
+        References
+        ----------
+        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        """
+        mu_t = self.compute_mu_t(x0, x1, t)
+        sigma_t = self.compute_sigma_t(x0, x1, t)
+        return mu_t + sigma_t * torch.randn_like(mu_t)
+
+    def compute_conditional_flow(self, x0, x1, t, xt):
+        """
+        Compute the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs, 1)
+        xt : Tensor, shape (bs, dim)
+            represents the samples drawn from probability path pt
+
+        Returns
+        -------
+        ut : conditional vector field ut(x1|x0) = x1 - x0
+
+        References
+        ----------
+        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        """
+        ft = self.F(t) # Find good function name.
+        fone = self.F(1)
+        mu_t = self.compute_mu_t(x0, x1, t)
+        sigma_t = self.compute_sigma_t(x0, x1, t)
+        my_sigmat = torch.ones_like(t) # Find good variable name.
+        
+        
+        sigma_t_prime = my_sigmat ** 2 - 2 * ft * my_sigmat ** 2 / fone
+        sigma_t_prime_over_sigma_t = sigma_t_prime / (sigma_t + 1e-8)
+        mu_t_prime = (x1 - x0) * my_sigmat ** 2 / fone
+        ut = sigma_t_prime_over_sigma_t * (xt - mu_t) + mu_t_prime
+        return ut
+
+    def sample_location_and_conditional_flow(self, x0, x1):
+        """
+        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma)) 
+        and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+
+
+        Returns
+        -------
+        t : float, shape (bs, 1)
+        xt : Tensor, shape (bs, dim)
+            represents the samples drawn from probability path pt
+        ut : conditional vector field ut(x1|x0) = x1 - x0
+
+        References
+        ----------
+        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        """
+        #x0, x1 = self.ot_sampler.sample_plan(x0, x1)
+        t = torch.rand(x0.shape[0], 1).type_as(x0)
+        xt = self.sample_xt(x0, x1, t)
+        ut = self.compute_conditional_flow(x0, x1, t, xt)
+        return t, xt, ut
+
+    def compute_score(self, x0, x1, t, xt):
+        """
+        Compute the score $\nabla log(pt(x)$
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs, 1)
+        xt : Tensor, shape (bs, dim)
+            represents the samples drawn from probability path p_t
+
+        Returns
+        -------
+        $\nabla log p_t(x)$ : score
+
+        References
+        ----------
+        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        """
+        #x0, x1 = self.ot_sampler.sample_plan(x0, x1)
+        mu_t = self.compute_mu_t(x0, x1, t)
+        sigma_t = self.compute_sigma_t(x0, x1, t)
+        eps = (xt - mu_t)/sigma_t # to get the same noise as in ut
+        my_sigmat = torch.ones_like(t) # Find a good variable name
+        return -eps * my_sigmat ** 2 / 2
+        
+        
