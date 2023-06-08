@@ -252,14 +252,73 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
     """
 
     def compute_mu_t(self, x0, x1, t):
+        """
+        Compute the mean of the probability path tx1, see (Eq.20) [3].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs, 1)
+
+        Returns
+        -------
+        mean mu_t: t * x1
+
+        References
+        ----------
+        [3] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        """
         del x0
         return t * x1
 
     def compute_sigma_t(self, x0, x1, t):
+        """
+        Compute the mean of the probability path N(t * x1, 1 -(1 - sigma)t), see (Eq.20) [3].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs, 1)
+
+        Returns
+        -------
+        standard deviation sigma 1 -(1 - sigma)t
+
+        References
+        ----------
+        [3] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        """
         del x0, x1
         return 1 - (1 - self.sigma) * t
 
     def compute_conditional_flow(self, x0, x1, t, xt):
+        """
+        Compute the conditional vector field ut(x1|x0) = (x1 - (1 - sigma) t)/(1 - (1 - sigma)t), see Eq.(21) [3].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs, 1)
+        xt : Tensor, shape (bs, dim)
+            represents the samples drawn from probability path pt
+
+        Returns
+        -------
+        ut : conditional vector field ut(x1|x0) = (x1 - (1 - sigma) t)/(1 - (1 - sigma)t)
+
+        References
+        ----------
+        [1] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        """
         del x0
         return (x1 - (1 - self.sigma) * xt) / (1 - (1 - self.sigma) * t)
 
