@@ -324,7 +324,22 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
 
 class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
+    """
+    Child class for Schrödinger bridge conditional flow matching method. This class implements the 
+    SB-CFM methods from [1] and inherits the ConditionalFlowMatcher parent class.
+
+    It overrides the compute_sigma_t, compute_conditional_flow and sample_location_and_conditional_flow functions.
+    """
     def __init__(self, sigma: float = 0.0):
+        """
+        Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the
+        hyper-parameter $\sigma$ and the entropic OT map.
+
+        Parameters
+        ----------
+        sigma : float
+        ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
+        """
         self.sigma = sigma
         self.ot_sampler = OTPlanSampler(method="sinkhorn", reg=2 * self.sigma**2)
 
