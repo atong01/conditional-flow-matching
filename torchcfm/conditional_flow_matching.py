@@ -12,7 +12,7 @@ import math
 import torch
 
 #------------------------------------------------------------------------------------
-from optimal_transport import OTPlanSampler
+from .optimal_transport import OTPlanSampler
 #------------------------------------------------------------------------------------
 
 class ConditionalFlowMatcher:
@@ -380,6 +380,7 @@ class SF2M(ConditionalFlowMatcher):
         """
         self.sigma = sigma
         self.ot_sampler = OTPlanSampler(method="exact")
+        self.entropic_ot_sampler = OTPlanSampler(method="sinkhorn", reg=1.)
 
     def F(self, t):
         """
