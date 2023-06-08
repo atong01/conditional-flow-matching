@@ -330,7 +330,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
     It overrides the compute_sigma_t, compute_conditional_flow and sample_location_and_conditional_flow functions.
     """
-    def __init__(self, sigma: float = 0.0):
+    def __init__(self, sigma: float = 1.0):
         """
         Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the
         hyper-parameter $\sigma$ and the entropic OT map.
@@ -393,7 +393,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         [1] Improving and Generalizing Flow-Based Generative Models 
         with minibatch optimal transport, Preprint, Tong et al.
         """
-        mu_t = self.compute_mu_t(self, x0, x1, t)
+        mu_t = self.compute_mu_t(x0, x1, t)
         sigma_t_prime_over_sigma_t = (1 - 2 * t) / (2 * t * (1 - t))
         ut = sigma_t_prime_over_sigma_t * (xt - mu_t) + x1 - x0
         return ut
