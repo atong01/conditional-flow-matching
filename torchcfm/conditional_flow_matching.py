@@ -428,6 +428,12 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
 
     
 class SF2M(ConditionalFlowMatcher):
+    """
+    Child class for simulation-free score and flow matching [2]. This class implements the 
+    SF2M method from [2] and inherits the ConditionalFlowMatcher parent class.
+
+    It overrides the all functions.
+    """
     def __init__(self, sigma: float = 0.1):
         """
         Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
@@ -468,7 +474,7 @@ class SF2M(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
         """
         ft = self.F(t)
         fone = self.F(1)
@@ -492,7 +498,7 @@ class SF2M(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
         """
         del x0, x1
         sigma_t = self.F(t) - self.F(t) ** 2 / self.F(1)  # sigma * torch.sqrt(t - t**2)
@@ -516,7 +522,7 @@ class SF2M(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
         """
         mu_t = self.compute_mu_t(x0, x1, t)
         sigma_t = self.compute_sigma_t(x0, x1, t)
@@ -542,7 +548,7 @@ class SF2M(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
         """
         ft = self.F(t) # Find good function name.
         fone = self.F(1)
@@ -579,7 +585,7 @@ class SF2M(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
         """
         #x0, x1 = self.ot_sampler.sample_plan(x0, x1)
         t = torch.rand(x0.shape[0], 1).type_as(x0)
@@ -607,7 +613,7 @@ class SF2M(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
         """
         #x0, x1 = self.ot_sampler.sample_plan(x0, x1)
         mu_t = self.compute_mu_t(x0, x1, t)
