@@ -25,7 +25,6 @@ from torchcfm.conditional_flow_matching import *
 
 savedir = "models/8gaussian-moons"
 os.makedirs(savedir, exist_ok=True)
-import torchsde
 
 
 #################################
