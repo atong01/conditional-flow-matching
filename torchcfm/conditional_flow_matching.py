@@ -11,14 +11,20 @@ import math
 
 import torch
 
-#------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 from .optimal_transport import OTPlanSampler
-#------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------
+
+
+def pad_t_like_x(t, x):
+    return t.reshape(-1, *([1] * (x.dim() - 1)))
+
 
 class ConditionalFlowMatcher:
     """
-    Base class for conditional flow matching methods. This class implements the 
-    independant conditional flow matching methods from [1] and serves as a parent class 
+    Base class for conditional flow matching methods. This class implements the
+    independant conditional flow matching methods from [1] and serves as a parent class
     for all other flow matching methods.
 
     It implements:
@@ -26,6 +32,7 @@ class ConditionalFlowMatcher:
     - conditional flow matching ut(x1|x0) = x1 - x0
     - score function $\nabla log p_t(x|x0, x1)$
     """
+
     def __init__(self, sigma: float = 0.0):
         """
         Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
@@ -57,6 +64,7 @@ class ConditionalFlowMatcher:
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
+        t = pad_t_like_x(t, x0)
         return t * x1 + (1 - t) * x0
 
     def compute_sigma_t(self, x0, x1, t):
@@ -133,7 +141,7 @@ class ConditionalFlowMatcher:
 
     def sample_location_and_conditional_flow(self, x0, x1):
         """
-        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma)) 
+        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1].
 
         Parameters
@@ -155,7 +163,7 @@ class ConditionalFlowMatcher:
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
-        t = torch.rand(x0.shape[0], 1).type_as(x0)
+        t = torch.rand(x0.shape[0]).type_as(x0)
         xt = self.sample_xt(x0, x1, t)
         ut = self.compute_conditional_flow(x0, x1, t, xt)
         return t, xt, ut
@@ -194,11 +202,12 @@ class ConditionalFlowMatcher:
 
 class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
     """
-    Child class for optimal transport conditional flow matching method. This class implements the 
+    Child class for optimal transport conditional flow matching method. This class implements the
     OT-CFM methods from [1] and inherits the ConditionalFlowMatcher parent class.
 
     It overrides the sample_location_and_conditional_flow.
     """
+
     def __init__(self, sigma: float = 0.0):
         """
         Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
@@ -214,7 +223,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
 
     def sample_location_and_conditional_flow(self, x0, x1):
         """
-        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma)) 
+        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1]
         with respect to the minibatch OT plan $\Pi$.
 
@@ -244,10 +253,10 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
 class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
     """
     Lipman et al. 2023 style target OT conditional flow matching.
-    This class inherits the ConditionalFlowMatcher and override the 
+    This class inherits the ConditionalFlowMatcher and override the
     compute_mu_t, compute_sigma_t and compute_conditional_flow functions
     in order to compute [2]'s flow matching
-    
+
     [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
     """
 
@@ -325,11 +334,12 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
 class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
     """
-    Child class for Schrödinger bridge conditional flow matching method. This class implements the 
+    Child class for Schrödinger bridge conditional flow matching method. This class implements the
     SB-CFM methods from [1] and inherits the ConditionalFlowMatcher parent class.
 
     It overrides the compute_sigma_t, compute_conditional_flow and sample_location_and_conditional_flow functions.
     """
+
     def __init__(self, sigma: float = 1.0):
         """
         Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the
@@ -369,7 +379,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
     def compute_conditional_flow(self, x0, x1, t, xt):
         """
-        Compute the conditional vector field 
+        Compute the conditional vector field
         ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0,
         see Eq.(21) [1].
 
@@ -385,12 +395,12 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Returns
         -------
-        ut : conditional vector field 
+        ut : conditional vector field
         ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models 
+        [1] Improving and Generalizing Flow-Based Generative Models
         with minibatch optimal transport, Preprint, Tong et al.
         """
         mu_t = self.compute_mu_t(x0, x1, t)
@@ -400,7 +410,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
     def sample_location_and_conditional_flow(self, x0, x1):
         """
-        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2 )) 
+        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2 ))
         and the conditional vector field ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0,
         (see Eq.(15) [1]) with respect to the minibatch entropic OT plan.
 
@@ -440,15 +450,14 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         )
 
 
-
-    
 class SF2M(ConditionalFlowMatcher):
     """
-    Child class for simulation-free score and flow matching [2]. This class implements the 
+    Child class for simulation-free score and flow matching [2]. This class implements the
     SF2M method from [2] and inherits the ConditionalFlowMatcher parent class.
 
     It overrides the all functions.
     """
+
     def __init__(self, sigma: float = 0.1):
         """
         Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
@@ -460,7 +469,7 @@ class SF2M(ConditionalFlowMatcher):
         """
         self.sigma = sigma
         self.ot_sampler = OTPlanSampler(method="exact")
-        self.entropic_ot_sampler = OTPlanSampler(method="sinkhorn", reg=1.)
+        self.entropic_ot_sampler = OTPlanSampler(method="sinkhorn", reg=1.0)
 
     def F(self, t):
         """
@@ -565,22 +574,21 @@ class SF2M(ConditionalFlowMatcher):
         ----------
         [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
         """
-        ft = self.F(t) # Find good function name.
+        ft = self.F(t)  # Find good function name.
         fone = self.F(1)
         mu_t = self.compute_mu_t(x0, x1, t)
         sigma_t = self.compute_sigma_t(x0, x1, t)
-        my_sigmat = torch.ones_like(t) # Find good variable name.
-        
-        
-        sigma_t_prime = my_sigmat ** 2 - 2 * ft * my_sigmat ** 2 / fone
+        my_sigmat = torch.ones_like(t)  # Find good variable name.
+
+        sigma_t_prime = my_sigmat**2 - 2 * ft * my_sigmat**2 / fone
         sigma_t_prime_over_sigma_t = sigma_t_prime / (sigma_t + 1e-8)
-        mu_t_prime = (x1 - x0) * my_sigmat ** 2 / fone
+        mu_t_prime = (x1 - x0) * my_sigmat**2 / fone
         ut = sigma_t_prime_over_sigma_t * (xt - mu_t) + mu_t_prime
         return ut
 
     def sample_location_and_conditional_flow(self, x0, x1):
         """
-        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma)) 
+        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1].
 
         Parameters
@@ -602,7 +610,7 @@ class SF2M(ConditionalFlowMatcher):
         ----------
         [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
         """
-        #x0, x1 = self.ot_sampler.sample_plan(x0, x1)
+        # x0, x1 = self.ot_sampler.sample_plan(x0, x1)
         t = torch.rand(x0.shape[0], 1).type_as(x0)
         xt = self.sample_xt(x0, x1, t)
         ut = self.compute_conditional_flow(x0, x1, t, xt)
@@ -630,11 +638,9 @@ class SF2M(ConditionalFlowMatcher):
         ----------
         [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
         """
-        #x0, x1 = self.ot_sampler.sample_plan(x0, x1)
+        # x0, x1 = self.ot_sampler.sample_plan(x0, x1)
         mu_t = self.compute_mu_t(x0, x1, t)
         sigma_t = self.compute_sigma_t(x0, x1, t)
-        eps = (xt - mu_t)/sigma_t # to get the same noise as in ut
-        my_sigmat = torch.ones_like(t) # Find a good variable name
-        return -eps * my_sigmat ** 2 / 2
-        
-        
+        eps = (xt - mu_t) / sigma_t  # to get the same noise as in ut
+        my_sigmat = torch.ones_like(t)  # Find a good variable name
+        return -eps * my_sigmat**2 / 2
