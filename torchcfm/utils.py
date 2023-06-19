@@ -67,7 +67,6 @@ def plot_trajectories(traj):
     plt.show()
     
 
-## import math
 class SDE(torch.nn.Module):
     noise_type = "diagonal"
     sde_type = "ito"

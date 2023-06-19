@@ -11,13 +11,12 @@ import math
 
 import torch
 
-# ------------------------------------------------------------------------------------
 from .optimal_transport import OTPlanSampler
-
-# ------------------------------------------------------------------------------------
 
 
 def pad_t_like_x(t, x):
+    if isinstance(t, float):
+        return t
     return t.reshape(-1, *([1] * (x.dim() - 1)))
 
 
@@ -67,7 +66,7 @@ class ConditionalFlowMatcher:
         t = pad_t_like_x(t, x0)
         return t * x1 + (1 - t) * x0
 
-    def compute_sigma_t(self, x0, x1, t):
+    def compute_sigma_t(self, t):
         """
         Compute the mean of the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
 
@@ -87,10 +86,10 @@ class ConditionalFlowMatcher:
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
-        del x0, x1, t
+        del t
         return self.sigma
 
-    def sample_xt(self, x0, x1, t):
+    def sample_xt(self, x0, x1, t, epsilon):
         """
         Draw a sample from the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
 
@@ -101,6 +100,8 @@ class ConditionalFlowMatcher:
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
         t : float, shape (bs, 1)
+        epsilon : Tensor, shape (bs, dim)
+            noise sample from N(0, 1)
 
         Returns
         -------
@@ -111,8 +112,9 @@ class ConditionalFlowMatcher:
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
         mu_t = self.compute_mu_t(x0, x1, t)
-        sigma_t = self.compute_sigma_t(x0, x1, t)
-        return mu_t + sigma_t * torch.randn_like(mu_t)
+        sigma_t = self.compute_sigma_t(t)
+        sigma_t = pad_t_like_x(sigma_t, x0)
+        return mu_t + sigma_t * epsilon
 
     def compute_conditional_flow(self, x0, x1, t, xt):
         """
@@ -139,7 +141,10 @@ class ConditionalFlowMatcher:
         del t, xt
         return x1 - x0
 
-    def sample_location_and_conditional_flow(self, x0, x1):
+    def sample_noise_like(self, x):
+        return torch.randn_like(x)
+
+    def sample_location_and_conditional_flow(self, x0, x1, return_noise=False):
         """
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1].
@@ -150,6 +155,8 @@ class ConditionalFlowMatcher:
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
+        return_noise : bool
+            return the noise sample epsilon
 
 
         Returns
@@ -158,46 +165,39 @@ class ConditionalFlowMatcher:
         xt : Tensor, shape (bs, dim)
             represents the samples drawn from probability path pt
         ut : conditional vector field ut(x1|x0) = x1 - x0
+        (optionally) eps: Tensor, shape (bs, dim) such that xt = mu_t + sigma_t * epsilon
 
         References
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
         t = torch.rand(x0.shape[0]).type_as(x0)
-        xt = self.sample_xt(x0, x1, t)
+        eps = self.sample_noise_like(x0)
+        xt = self.sample_xt(x0, x1, t, eps)
         ut = self.compute_conditional_flow(x0, x1, t, xt)
-        return t, xt, ut
+        if return_noise:
+            return t, xt, ut, eps
+        else:
+            return t, xt, ut
 
-    def compute_score(self, x0, x1, t, xt):
+    def compute_lambda(self, t):
         """
-        Compute the score $\nabla log(pt(x)$
+        Compute the lambda function, see Eq.(XXX) [1].
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
-            represents the source minibatch
         t : float, shape (bs, 1)
-        xt : Tensor, shape (bs, dim)
-            represents the samples drawn from probability path p_t
 
         Returns
         -------
-        $\nabla log p_t(x)$ : score
+        lambda : score weighting function
 
         References
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
-        mu_t = self.compute_mu_t(x0, x1, t)
-        sigma_t = self.compute_sigma_t(x0, x1, t)
-        n = torch.numel(mu_t[0])
-        return (
-            -n * torch.log(sigma_t)
-            - n / 2 * torch.log(2 * math.pi)
-            - torch.sum((xt - mu_t) ** 2) / (2 * sigma_t**2)
-        )
+        sigma_t = self.compute_sigma_t(t)
+        return 2 * sigma_t / self.sigma**2
 
 
 class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
@@ -221,7 +221,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         self.sigma = sigma
         self.ot_sampler = OTPlanSampler(method="exact")
 
-    def sample_location_and_conditional_flow(self, x0, x1):
+    def sample_location_and_conditional_flow(self, x0, x1, return_noise=False):
         """
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1]
@@ -233,7 +233,8 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-
+        return_noise : bool
+            return the noise sample epsilon
 
         Returns
         -------
@@ -241,13 +242,14 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         xt : Tensor, shape (bs, dim)
             represents the samples drawn from probability path pt
         ut : conditional vector field ut(x1|x0) = x1 - x0
+        (optionally) epsilon : Tensor, shape (bs, dim) such that xt = mu_t + sigma_t * epsilon
 
         References
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
-        return super().sample_location_and_conditional_flow(x0, x1)
+        return super().sample_location_and_conditional_flow(x0, x1, return_noise)
 
 
 class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
@@ -283,7 +285,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
         del x0
         return t * x1
 
-    def compute_sigma_t(self, x0, x1, t):
+    def compute_sigma_t(self, t):
         """
         Compute the mean of the probability path N(t * x1, 1 -(1 - sigma)t), see (Eq.20) [3].
 
@@ -303,7 +305,6 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
         ----------
         [3] Flow Matching for Generative Modelling, ICLR, Lipman et al.
         """
-        del x0, x1
         return 1 - (1 - self.sigma) * t
 
     def compute_conditional_flow(self, x0, x1, t, xt):
@@ -340,7 +341,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
     It overrides the compute_sigma_t, compute_conditional_flow and sample_location_and_conditional_flow functions.
     """
 
-    def __init__(self, sigma: float = 1.0):
+    def __init__(self, sigma: float = 1.0, ot_method="exact"):
         """
         Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the
         hyper-parameter $\sigma$ and the entropic OT map.
@@ -351,9 +352,10 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
         """
         self.sigma = sigma
-        self.ot_sampler = OTPlanSampler(method="sinkhorn", reg=2 * self.sigma**2)
+        self.ot_method = ot_method
+        self.ot_sampler = OTPlanSampler(method=ot_method, reg=2 * self.sigma**2)
 
-    def compute_sigma_t(self, x0, x1, t):
+    def compute_sigma_t(self, t):
         """
         Compute the mean of the probability path N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2),
         see (Eq.20) [1].
@@ -374,7 +376,6 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
-        # Potential bug below, should be sigma^2 to be consistent with paper
         return self.sigma * torch.sqrt(t * (1 - t))
 
     def compute_conditional_flow(self, x0, x1, t, xt):
@@ -403,12 +404,13 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         [1] Improving and Generalizing Flow-Based Generative Models
         with minibatch optimal transport, Preprint, Tong et al.
         """
+        t = pad_t_like_x(t, x0)
         mu_t = self.compute_mu_t(x0, x1, t)
         sigma_t_prime_over_sigma_t = (1 - 2 * t) / (2 * t * (1 - t))
         ut = sigma_t_prime_over_sigma_t * (xt - mu_t) + x1 - x0
         return ut
 
-    def sample_location_and_conditional_flow(self, x0, x1):
+    def sample_location_and_conditional_flow(self, x0, x1, return_noise=False):
         """
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2 ))
         and the conditional vector field ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0,
@@ -420,6 +422,8 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
+        return_noise: bool
+            return the noise sample epsilon
 
 
         Returns
@@ -428,13 +432,14 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         xt : Tensor, shape (bs, dim)
             represents the samples drawn from probability path pt
         ut : conditional vector field ut(x1|x0) = x1 - x0
+        (optionally) epsilon : Tensor, shape (bs, dim) such that xt = mu_t + sigma_t * epsilon
 
         References
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
-        return super().sample_location_and_conditional_flow(x0, x1)
+        return super().sample_location_and_conditional_flow(x0, x1, return_noise)
 
 
 class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
@@ -448,199 +453,3 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
             / 2
             * (torch.cos(math.pi / 2 * t) * x1 - torch.sin(math.pi / 2 * t) * x0)
         )
-
-
-class SF2M(ConditionalFlowMatcher):
-    """
-    Child class for simulation-free score and flow matching [2]. This class implements the
-    SF2M method from [2] and inherits the ConditionalFlowMatcher parent class.
-
-    It overrides the all functions.
-    """
-
-    def __init__(self, sigma: float = 0.1):
-        """
-        Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
-        hyper-parameter $\sigma$.
-
-        Parameters
-        ----------
-        sigma : float
-        """
-        self.sigma = sigma
-        self.ot_sampler = OTPlanSampler(method="exact")
-        self.entropic_ot_sampler = OTPlanSampler(method="sinkhorn", reg=1.0)
-
-    def F(self, t):
-        """
-        THE NAME OF THIS FUNCTION HAS TO MEAN SMTH. CURRENTLY NOT ACCEPTABLE.
-        """
-        t = t * 1.0
-        if isinstance(t, float):
-            t = torch.tensor(t)
-        return t
-
-    def compute_mu_t(self, x0, x1, t):
-        """
-        Compute the mean of the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
-
-        Parameters
-        ----------
-        x0 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        t : float, shape (bs, 1)
-
-        Returns
-        -------
-        mean mu_t: t * x1 + (1 - t) * x0
-
-        References
-        ----------
-        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
-        """
-        ft = self.F(t)
-        fone = self.F(1)
-        return x0 + (x1 - x0) * ft / fone
-
-    def compute_sigma_t(self, x0, x1, t):
-        """
-        Compute the mean of the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
-
-        Parameters
-        ----------
-        x0 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        t : float, shape (bs, 1)
-
-        Returns
-        -------
-        standard deviation sigma
-
-        References
-        ----------
-        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
-        """
-        del x0, x1
-        sigma_t = self.F(t) - self.F(t) ** 2 / self.F(1)  # sigma * torch.sqrt(t - t**2)
-        return sigma_t
-
-    def sample_xt(self, x0, x1, t):
-        """
-        Draw a sample from the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
-
-        Parameters
-        ----------
-        x0 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        t : float, shape (bs, 1)
-
-        Returns
-        -------
-        xt : Tensor, shape (bs, dim)
-
-        References
-        ----------
-        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
-        """
-        mu_t = self.compute_mu_t(x0, x1, t)
-        sigma_t = self.compute_sigma_t(x0, x1, t)
-        return mu_t + sigma_t * torch.randn_like(mu_t)
-
-    def compute_conditional_flow(self, x0, x1, t, xt):
-        """
-        Compute the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1].
-
-        Parameters
-        ----------
-        x0 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        t : float, shape (bs, 1)
-        xt : Tensor, shape (bs, dim)
-            represents the samples drawn from probability path pt
-
-        Returns
-        -------
-        ut : conditional vector field ut(x1|x0) = x1 - x0
-
-        References
-        ----------
-        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
-        """
-        ft = self.F(t)  # Find good function name.
-        fone = self.F(1)
-        mu_t = self.compute_mu_t(x0, x1, t)
-        sigma_t = self.compute_sigma_t(x0, x1, t)
-        my_sigmat = torch.ones_like(t)  # Find good variable name.
-
-        sigma_t_prime = my_sigmat**2 - 2 * ft * my_sigmat**2 / fone
-        sigma_t_prime_over_sigma_t = sigma_t_prime / (sigma_t + 1e-8)
-        mu_t_prime = (x1 - x0) * my_sigmat**2 / fone
-        ut = sigma_t_prime_over_sigma_t * (xt - mu_t) + mu_t_prime
-        return ut
-
-    def sample_location_and_conditional_flow(self, x0, x1):
-        """
-        Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
-        and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1].
-
-        Parameters
-        ----------
-        x0 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
-            represents the source minibatch
-
-
-        Returns
-        -------
-        t : float, shape (bs, 1)
-        xt : Tensor, shape (bs, dim)
-            represents the samples drawn from probability path pt
-        ut : conditional vector field ut(x1|x0) = x1 - x0
-
-        References
-        ----------
-        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
-        """
-        # x0, x1 = self.ot_sampler.sample_plan(x0, x1)
-        t = torch.rand(x0.shape[0], 1).type_as(x0)
-        xt = self.sample_xt(x0, x1, t)
-        ut = self.compute_conditional_flow(x0, x1, t, xt)
-        return t, xt, ut
-
-    def compute_score(self, x0, x1, t, xt):
-        """
-        Compute the score $\nabla log(pt(x)$
-
-        Parameters
-        ----------
-        x0 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
-            represents the source minibatch
-        t : float, shape (bs, 1)
-        xt : Tensor, shape (bs, dim)
-            represents the samples drawn from probability path p_t
-
-        Returns
-        -------
-        $\nabla log p_t(x)$ : score
-
-        References
-        ----------
-        [2] Schrödinger bridge via score and flow matching, Preprint, Tong et al.
-        """
-        # x0, x1 = self.ot_sampler.sample_plan(x0, x1)
-        mu_t = self.compute_mu_t(x0, x1, t)
-        sigma_t = self.compute_sigma_t(x0, x1, t)
-        eps = (xt - mu_t) / sigma_t  # to get the same noise as in ut
-        my_sigmat = torch.ones_like(t)  # Find a good variable name
-        return -eps * my_sigmat**2 / 2
