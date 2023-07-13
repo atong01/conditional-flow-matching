@@ -47,7 +47,7 @@ for k in range(20000):
 
     t, xt, ut = FM.sample_location_and_conditional_flow(x0, x1)
 
-    vt = model(torch.cat([xt, t], dim=-1))
+    vt = model(torch.cat([xt, t[:, None]], dim=-1))
     loss = torch.mean((vt - ut) ** 2)
     
     loss.backward()
@@ -91,7 +91,7 @@ for k in range(20000):
 
     t, xt, ut = FM.sample_location_and_conditional_flow(x0, x1)
 
-    vt = model(torch.cat([xt, t], dim=-1))
+    vt = model(torch.cat([xt, t[:, None]], dim=-1))
     loss = torch.mean((vt - ut) ** 2)
     
     loss.backward()
@@ -118,7 +118,7 @@ torch.save(model, f"{savedir}/cfm_v1.pt")
 #            SB-CFM
 #################################
 
-sigma = 3.
+sigma = 1.
 dim = 2
 batch_size = 256
 model = MLP(dim=dim, time_varying=True)
@@ -134,7 +134,7 @@ for k in range(20000):
 
     t, xt, ut = FM.sample_location_and_conditional_flow(x0, x1)
 
-    vt = model(torch.cat([xt, t], dim=-1))
+    vt = model(torch.cat([xt, t[:, None]], dim=-1))
     loss = torch.mean((vt - ut) ** 2)
     
     loss.backward()
