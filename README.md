@@ -2,13 +2,12 @@
 
 # Conditional Flow Matching
 
-Alexander Tong, Nikolay Malkin, Guillaume Huguet, Yanlei Zhang, Jarrid Rector-Brooks, Kilian Fatras, Guy Wolf, Yoshua Bengio
-
 <!---[![Conference](http://img.shields.io/badge/AnyConference-year-4b44ce.svg)](https://papers.nips.cc/paper/2020) -->
 
 <!---[![contributors](https://img.shields.io/github/contributors/atong01/conditional-flow-matching.svg)](https://github.com/atong01/conditional-flow-matching/graphs/contributors) -->
 
-[![Paper](http://img.shields.io/badge/paper-arxiv.2302.00482-B31B1B.svg)](https://arxiv.org/abs/2302.00482)
+[![OT-CFM Preprint](http://img.shields.io/badge/paper-arxiv.2302.00482-B31B1B.svg)](https://arxiv.org/abs/2302.00482)
+[![SF2M Preprint](http://img.shields.io/badge/paper-arxiv.2307.03672-B31B1B.svg)](https://arxiv.org/abs/2307.03672)
 [![pytorch](https://img.shields.io/badge/PyTorch_1.8+-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org/get-started/locally/)
 [![lightning](https://img.shields.io/badge/-Lightning_1.6+-792ee5?logo=pytorchlightning&logoColor=white)](https://pytorchlightning.ai/)
 [![hydra](https://img.shields.io/badge/Config-Hydra_1.2-89b8cd)](https://hydra.cc/)
@@ -28,7 +27,7 @@ Alexander Tong, Nikolay Malkin, Guillaume Huguet, Yanlei Zhang, Jarrid Rector-Br
 
 Conditional Flow Matching is a fast way to train Continuous Normalizing Flow (CNF) models. CFM is a simulation-free training objective for continuous normalizing flows that allows conditional generative modeling and speeds up training and inference. See [this http link](https://arxiv.org/abs/2302.00482) for the preprint.
 
-Under this general framework we introduce Optimal Transport Conditional Flow Matching (OT-CFM). OT-CFM creates dynamical optimal transport flows between marginal distributions by introducing an optimal transport condition.
+Under this general framework we introduce Optimal Transport Conditional Flow Matching (OT-CFM). OT-CFM creates dynamical optimal transport flows between marginal distributions by introducing an optimal transport condition. This can also be extended to Schrödinger Bridges either in the deterministic setting (
 
 ## Examples
 
@@ -42,9 +41,11 @@ There are many interesting related works to check out on simulation free trainin
 
 - Flow Matching for Generative Modeling (Lipman et al. 2023) [Paper](https://openreview.net/forum?id=PqvMRDCJT9t)
 - Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow (Liu et al. 2023) [Paper](https://openreview.net/forum?id=XVjTT1nw5z)
-- Building Normalizing Flows with Stochastic Interpolants (Albergo et al. 2023) [Paper](https://openreview.net/forum?id=li7qeBbCR1t)
+- Building Normalizing Flows with Stochastic Interpolants (Albergo et al. 2023a) [Paper](https://openreview.net/forum?id=li7qeBbCR1t)
+- Stochastic Interpolants: A Unifying Framework for Flows and Diffusions (Albergo et al. 2023b) [Paper](https://arxiv.org/abs/2303.08797)
 - Action Matching: Learning Stochastic Dynamics From Samples (Neklyudov et al. 2022) [Paper](https://arxiv.org/abs/2210.06662) [Code](https://github.com/necludov/jam)
 - Riemannian Flow Matching on General Geometries (Chen et al. 2023) [Paper](https://arxiv.org/abs/2302.03660)
+- Multisample Flow MAtching: Straightening Flows with Minibatch Couplings (Pooladian et al. 2023) [Paper](https://arxiv.org/abs/2304.14772)
 
 ## Code Contributions
 
