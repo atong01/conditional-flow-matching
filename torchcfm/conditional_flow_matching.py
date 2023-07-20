@@ -1,6 +1,4 @@
-"""
-Implements Conditional Flow Matcher Losses
-"""
+"""Implements Conditional Flow Matcher Losses."""
 
 # Author: Alex Tong
 #         Kilian Fatras
@@ -21,10 +19,9 @@ def pad_t_like_x(t, x):
 
 
 class ConditionalFlowMatcher:
-    """
-    Base class for conditional flow matching methods. This class implements the
-    independant conditional flow matching methods from [1] and serves as a parent class
-    for all other flow matching methods.
+    """Base class for conditional flow matching methods. This class implements the independent
+    conditional flow matching methods from [1] and serves as a parent class for all other flow
+    matching methods.
 
     It implements:
     - Drawing data from gaussian probability path N(t * x1 + (1 - t) * x0, sigma) function
@@ -33,7 +30,7 @@ class ConditionalFlowMatcher:
     """
 
     def __init__(self, sigma: float = 0.0):
-        """
+        r"""
         Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
         hyper-parameter $\sigma$.
 
@@ -181,8 +178,7 @@ class ConditionalFlowMatcher:
             return t, xt, ut
 
     def compute_lambda(self, t):
-        """
-        Compute the lambda function, see Eq.(XXX) [1].
+        """Compute the lambda function, see Eq.(XXX) [1].
 
         Parameters
         ----------
@@ -201,15 +197,14 @@ class ConditionalFlowMatcher:
 
 
 class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
-    """
-    Child class for optimal transport conditional flow matching method. This class implements the
-    OT-CFM methods from [1] and inherits the ConditionalFlowMatcher parent class.
+    """Child class for optimal transport conditional flow matching method. This class implements
+    the OT-CFM methods from [1] and inherits the ConditionalFlowMatcher parent class.
 
     It overrides the sample_location_and_conditional_flow.
     """
 
     def __init__(self, sigma: float = 0.0):
-        """
+        r"""
         Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
         hyper-parameter $\sigma$.
 
@@ -222,7 +217,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         self.ot_sampler = OTPlanSampler(method="exact")
 
     def sample_location_and_conditional_flow(self, x0, x1, return_noise=False):
-        """
+        r"""
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1]
         with respect to the minibatch OT plan $\Pi$.
@@ -253,18 +248,15 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
 
 
 class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
-    """
-    Lipman et al. 2023 style target OT conditional flow matching.
-    This class inherits the ConditionalFlowMatcher and override the
-    compute_mu_t, compute_sigma_t and compute_conditional_flow functions
-    in order to compute [2]'s flow matching
+    """Lipman et al. 2023 style target OT conditional flow matching. This class inherits the
+    ConditionalFlowMatcher and override the compute_mu_t, compute_sigma_t and
+    compute_conditional_flow functions in order to compute [2]'s flow matching.
 
     [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
     """
 
     def compute_mu_t(self, x0, x1, t):
-        """
-        Compute the mean of the probability path tx1, see (Eq.20) [3].
+        """Compute the mean of the probability path tx1, see (Eq.20) [3].
 
         Parameters
         ----------
@@ -334,15 +326,15 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
 
 class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
-    """
-    Child class for Schrödinger bridge conditional flow matching method. This class implements the
-    SB-CFM methods from [1] and inherits the ConditionalFlowMatcher parent class.
+    """Child class for Schrödinger bridge conditional flow matching method. This class implements
+    the SB-CFM methods from [1] and inherits the ConditionalFlowMatcher parent class.
 
-    It overrides the compute_sigma_t, compute_conditional_flow and sample_location_and_conditional_flow functions.
+    It overrides the compute_sigma_t, compute_conditional_flow and
+    sample_location_and_conditional_flow functions.
     """
 
     def __init__(self, sigma: float = 1.0, ot_method="exact"):
-        """
+        r"""
         Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the
         hyper-parameter $\sigma$ and the entropic OT map.
 
@@ -379,8 +371,8 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         return self.sigma * torch.sqrt(t * (1 - t))
 
     def compute_conditional_flow(self, x0, x1, t, xt):
-        """
-        Compute the conditional vector field
+        """Compute the conditional vector field.
+
         ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0,
         see Eq.(21) [1].
 
@@ -448,8 +440,4 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
 
     def compute_conditional_flow(self, x0, x1, t, xt):
         del xt
-        return (
-            math.pi
-            / 2
-            * (torch.cos(math.pi / 2 * t) * x1 - torch.sin(math.pi / 2 * t) * x0)
-        )
+        return math.pi / 2 * (torch.cos(math.pi / 2 * t) * x1 - torch.sin(math.pi / 2 * t) * x0)

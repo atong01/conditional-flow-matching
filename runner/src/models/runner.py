@@ -2,13 +2,14 @@ from typing import Any, List, Optional, Union
 
 import numpy as np
 import torch
-from torchcfm import ConditionalFlowMatcher
 from pytorch_lightning import LightningDataModule, LightningModule
 
-from .components.solver import FlowSolver
+from torchcfm import ConditionalFlowMatcher
+
 from .components.augmentation import AugmentationModule
 from .components.distribution_distances import compute_distribution_distances
 from .components.plotting import plot_trajectory, store_trajectories
+from .components.solver import FlowSolver
 from .utils import get_wandb_logger
 
 

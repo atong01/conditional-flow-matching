@@ -1,9 +1,10 @@
 import math
+
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchdyn
 from torchdyn.datasets import generate_moons
-import matplotlib.pyplot as plt
 
 # Implement some helper functions
 
@@ -53,9 +54,7 @@ class torch_wrapper(torch.nn.Module):
 
 
 def plot_trajectories(traj):
-    """
-    Plot trajectories of some selected samples
-    """
+    """Plot trajectories of some selected samples."""
     n = 2000
     plt.figure(figsize=(6, 6))
     plt.scatter(traj[0, :n, 0], traj[0, :n, 1], s=10, alpha=0.8, c="black")
@@ -65,17 +64,18 @@ def plot_trajectories(traj):
     plt.xticks([])
     plt.yticks([])
     plt.show()
-    
+
 
 class SDE(torch.nn.Module):
     noise_type = "diagonal"
     sde_type = "ito"
 
-    def __init__(self, ode_drift, score, reverse=False):
+    def __init__(self, ode_drift, score, noise=1.0, reverse=False):
         super().__init__()
         self.drift = ode_drift
         self.score = score
         self.reverse = reverse
+        self.noise = noise
 
     # Drift
     def f(self, t, y):
@@ -91,4 +91,4 @@ class SDE(torch.nn.Module):
 
     # Diffusion
     def g(self, t, y):
-        return torch.ones_like(t) * torch.ones_like(y)
+        return torch.ones_like(t) * torch.ones_like(y) * self.noise
