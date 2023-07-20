@@ -1,0 +1,33 @@
+# @package _global_
+
+defaults:
+  - override /model: image_cfm.yaml
+  - override /callbacks: no_stopping
+  - override /logger:
+      - csv.yaml
+      - wandb.yaml
+  - override /datamodule: cifar.yaml
+  - override /trainer: ddp.yaml
+
+name: "cfm"
+seed: 42
+
+datamodule:
+  batch_size: 128
+
+model:
+  _target_: src.models.cfm_module.CFMLitModule
+  sigma_min: 1e-4
+
+  scheduler:
+    _target_: timm.scheduler.PolyLRScheduler
+    _partial_: True
+    warmup_t: 200
+    warmup_lr_init: 1e-8
+    t_initial: 2000
+
+trainer:
+  devices: 2
+  max_epochs: 2000
+  check_val_every_n_epoch: 10
+  limit_val_batches: 0.01

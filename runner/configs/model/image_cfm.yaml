@@ -1,0 +1,46 @@
+_target_: src.models.cfm_module.CFMLitModule
+_partial_: true
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 0.0005
+
+net:
+  _target_: src.models.components.unet.UNetModelWrapper
+  _partial_: true
+  num_res_blocks: 2
+  num_channels: 256
+  channel_mult: [1, 2, 2, 2]
+  num_heads: 4
+  num_head_channels: 64
+  attention_resolutions: "16"
+  dropout: 0
+
+augmentations:
+  _target_: src.models.components.augmentation.AugmentationModule
+  cnf_estimator: null
+  l1_reg: 0.
+  l2_reg: 0.
+  squared_l2_reg: 0.
+  jacobian_frobenius_reg: 0.
+  jacobian_diag_frobenius_reg: 0.
+  jacobian_off_diag_frobenius_reg: 0.
+
+partial_solver:
+  _target_: src.models.components.solver.FlowSolver
+  _partial_: true
+  ode_solver: "euler"
+  atol: 1e-5
+  rtol: 1e-5
+
+test_nfe: 100
+
+ot_sampler: null
+
+sigma_min: 0.1
+
+# Set to integer if want to train with left out timepoint
+leaveout_timepoint: -1
+
+plot: True

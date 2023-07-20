@@ -1,0 +1,11 @@
+_target_: src.datamodules.cifar10_datamodule.CIFAR10DataModule
+#_target_: pl_bolts.datamodules.cifar10_datamodule.CIFAR10DataModule
+data_dir: ${paths.data_dir}
+batch_size: 128
+val_split: 0.0
+num_workers: 0
+normalize: True
+seed: 42
+shuffle: True
+pin_memory: True
+drop_last: False

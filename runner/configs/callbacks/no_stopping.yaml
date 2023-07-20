@@ -1,0 +1,15 @@
+defaults:
+  - model_checkpoint.yaml
+  - model_summary.yaml
+  - rich_progress_bar.yaml
+  - _self_
+
+model_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints
+  filename: "epoch_{epoch:04d}"
+  save_last: True
+  every_n_epochs: 100 # number of epochs between checkpoints
+  auto_insert_metric_name: False
+
+model_summary:
+  max_depth: 3
