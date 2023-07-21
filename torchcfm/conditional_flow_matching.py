@@ -193,7 +193,7 @@ class ConditionalFlowMatcher:
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
         sigma_t = self.compute_sigma_t(t)
-        return 2 * sigma_t / self.sigma**2
+        return 2 * sigma_t / (self.sigma**2 + 1e-8)
 
 
 class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
@@ -398,7 +398,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         """
         t = pad_t_like_x(t, x0)
         mu_t = self.compute_mu_t(x0, x1, t)
-        sigma_t_prime_over_sigma_t = (1 - 2 * t) / (2 * t * (1 - t))
+        sigma_t_prime_over_sigma_t = (1 - 2 * t) / (2 * t * (1 - t) + 1e-8)
         ut = sigma_t_prime_over_sigma_t * (xt - mu_t) + x1 - x0
         return ut
 
