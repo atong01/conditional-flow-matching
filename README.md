@@ -74,6 +74,8 @@ pip install -r requirements.txt
 Train model with default configuration
 
 ```bash
+cd runner
+
 # train on CPU
 python src/train.py trainer=cpu
 
