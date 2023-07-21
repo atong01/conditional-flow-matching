@@ -25,9 +25,7 @@
 
 ## Description
 
-Conditional Flow Matching is a fast way to train Continuous Normalizing Flow (CNF) models. CFM is a simulation-free training objective for continuous normalizing flows that allows conditional generative modeling and speeds up training and inference. See [this http link](https://arxiv.org/abs/2302.00482) for the preprint.
-
-Under this general framework we introduce Optimal Transport Conditional Flow Matching (OT-CFM). OT-CFM creates dynamical optimal transport flows between marginal distributions by introducing an optimal transport condition. This can also be extended to Schrödinger Bridges either in the deterministic setting (
+Conditional Flow Matching (CFM) is a fast way to train Continuous Normalizing Flow (CNF) models. CFM is a simulation-free training objective for continuous normalizing flows that allows conditional generative modeling and speeds up training and inference. This repository contains the code to reproduce the experiments and illustrations of two preprints. In the first preprint, we introduce Optimal Transport Conditional Flow Matching ([OT-CFM](https://arxiv.org/abs/2302.00482)). OT-CFM is a CFM variant that approximates the dynamical formulation of optimal transport (OT). Based on the OT theory, OT-CFM leverages the static optimal transport plan as well as the optimal probability paths and vector fields to approximate dynamic OT. The second preprint is [SF2M](https://arxiv.org/abs/2307.03672). SF2M leverages the OT-CFM method as well as score-based methods to approximate Schrödinger Bridges, a stochastic version of optimal transport.
 
 ## Examples
 
