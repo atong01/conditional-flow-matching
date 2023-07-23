@@ -21,21 +21,62 @@
 
 </div>
 
-![My Image](assets/8gaussians-to-moons.gif)
-
 ## Description
 
-Conditional Flow Matching (CFM) is a fast way to train Continuous Normalizing Flow (CNF) models. CFM is a simulation-free training objective for continuous normalizing flows that allows conditional generative modeling and speeds up training and inference. This repository contains the code to reproduce the experiments and illustrations of two preprints. In the first preprint, we introduce Optimal Transport Conditional Flow Matching ([OT-CFM](https://arxiv.org/abs/2302.00482)). OT-CFM is a CFM variant that approximates the dynamical formulation of optimal transport (OT). Based on the OT theory, OT-CFM leverages the static optimal transport plan as well as the optimal probability paths and vector fields to approximate dynamic OT. The second preprint is [SF2M](https://arxiv.org/abs/2307.03672). SF2M leverages the OT-CFM method as well as score-based methods to approximate Schrödinger Bridges, a stochastic version of optimal transport.
+Conditional Flow Matching (CFM) is a fast way to train continuous normalizing flow (CNF) models. CFM is a simulation-free training objective for continuous normalizing flows that allows conditional generative modeling and speeds up training and inference. 
+
+This repository contains the code to reproduce the main experiments and illustrations of two preprints:
+- [Improving and generalizing flow-based generative models with minibatch optimal transport](https://arxiv.org/abs/2302.00482). We introduce **Optimal Transport Conditional Flow Matching** (OT-CFM), a CFM variant that approximates the dynamical formulation of optimal transport (OT). Based on OT theory, OT-CFM leverages the static optimal transport plan as well as the optimal probability paths and vector fields to approximate dynamic OT. 
+- [Simulation-free Schrödinger bridges via score and flow matching](https://arxiv.org/abs/2307.03672). We propose **Simulation-Free Score and Flow Matching** (SF<sup>2</sup>M). SF<sup>2</sup>M leverages OT-CFM as well as score-based methods to approximate Schrödinger bridges, a stochastic version of optimal transport.
+
+If you find this code useful in your research, please cite the following papers (expand for BibTeX):
+
+<details>
+<summary>
+A. Tong, N. Malkin, G. Huguet, Y. Zhang, J. Rector-Brooks, K. Fatras, G. Wolf, Y. Bengio. Improving and Generalizing Flow-Based Generative Models with Minibatch Optimal Transport, 2023.
+</summary>
+
+```bibtex
+@article{tong2023improving,
+  title = {Improving and Generalizing Flow-Based Generative Models with Minibatch Optimal Transport},
+  author = {Tong, Alexander and Malkin, Nikolay and Huguet, Guillaume and Zhang, Yanlei and {Rector-Brooks}, Jarrid and Fatras, Kilian and Wolf, Guy and Bengio, Yoshua},
+  year = {2023},
+  journal = {arXiv preprint 2302.00482}
+}
+```
+</details>
+
+<details>
+<summary>
+A. Tong, N. Malkin, K. Fatras, L. Atanackovic, Y. Zhang, G. Huguet, G. Wolf, Y. Bengio. Simulation-Free Schrödinger Bridges via Score and Flow Matching, 2023.
+</summary>
+
+```bibtex
+@article{tong2023simulation,
+   title={Simulation-Free Schr{\"o}dinger Bridges via Score and Flow Matching},
+   author={Tong, Alexander and Malkin, Nikolay and Fatras, Kilian and Atanackovic, Lazar and Zhang, Yanlei and Huguet, Guillaume and Wolf, Guy and Bengio, Yoshua},
+   year={2023},
+    journal={arXiv preprint 2307.03672}
+}
+```
+</details>
 
 ## Examples
 
-The density, vector field, and trajectories of simulation-free CNF training schemes. The first two methods variance preserving SDE (VP-SDE) and Flow Matching (FM) require a gaussian source distribution so do not appear in the above example mapping 8 Gaussians to the two moons dataset. Training action matching with the same architecture (3x64 MLP with SeLU activations) underfits however, with a Relu SiLU and SiLU activations as suggested in the [example code](https://github.com/necludov/jam) it seems to fit better under our training setup (Action-Matching (Swish). The models to produce the GIF are stored in `examples/models` and can be visualized with this [![notebook](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/notebooks/model-comparison-plotting.ipynb).
+![My Image](assets/8gaussians-to-moons.gif)
 
 ![My Image](assets/gaussian-to-moons.gif)
 
-## Relevant Related Works
+The density, vector field, and trajectories of simulation-free CNF training schemes: mapping 8 Gaussians to two moons (above) and a single Gaussian to two moons (below).
 
-There are many interesting related works to check out on simulation free training of flow models including:
+The first two methods, variance-preserving SDE (VP-SDE) and flow matching (FM), require a Gaussian source distribution so do not appear in the above example mapping 8 Gaussians distribution to the two moons distribution. Action matching with the same architecture (3x64 MLP with SeLU activations) underfits with the ReLU, SiLU, and SiLU activations as suggested in the [example code](https://github.com/necludov/jam), but it seems to fit better under our training setup (Action-Matching (Swish). 
+
+The models to produce the GIFs are stored in `examples/models` and can be visualized with this [![notebook](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/notebooks/model-comparison-plotting.ipynb).
+
+
+## Related Work
+
+Relevant papers on simulation-free training of flow models:
 
 - Flow Matching for Generative Modeling (Lipman et al. 2023) [Paper](https://openreview.net/forum?id=PqvMRDCJT9t)
 - Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow (Liu et al. 2023) [Paper](https://openreview.net/forum?id=XVjTT1nw5z)
