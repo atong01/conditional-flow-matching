@@ -69,7 +69,7 @@ A. Tong, N. Malkin, K. Fatras, L. Atanackovic, Y. Zhang, G. Huguet, G. Wolf, Y. 
 
 The density, vector field, and trajectories of simulation-free CNF training schemes: mapping 8 Gaussians to two moons (above) and a single Gaussian to two moons (below).
 
-The first two methods, variance-preserving SDE (VP-SDE) and flow matching (FM), require a Gaussian source distribution so do not appear in the above example mapping 8 Gaussians distribution to the two moons distribution. Action matching with the same architecture (3x64 MLP with SeLU activations) underfits with the ReLU, SiLU, and SiLU activations as suggested in the [example code](https://github.com/necludov/jam), but it seems to fit better under our training setup (Action-Matching (Swish). 
+The first two methods, variance-preserving SDE (VP-SDE) and flow matching (FM), require a Gaussian source distribution so do not appear in the above example mapping 8 Gaussians distribution to the two moons distribution. Action matching with the same architecture (3x64 MLP with SeLU activations) underfits with the ReLU, SiLU, and SiLU activations as suggested in the [example code](https://github.com/necludov/jam), but it seems to fit better under our training setup (Action-Matching (Swish)). 
 
 The models to produce the GIFs are stored in `examples/models` and can be visualized with this notebook: [![notebook](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/notebooks/model-comparison-plotting.ipynb).
 
