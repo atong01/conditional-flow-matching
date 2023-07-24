@@ -82,7 +82,7 @@ class ICNNLitModule(LightningModule):
         return batch
 
     def preprocess_batch(self, X):
-        """converts a batch of data into matched a random pair of (x0, x1)"""
+        """Converts a batch of data into matched a random pair of (x0, x1)"""
         t_select = torch.zeros(1)
         if self.is_trajectory:
             batch_size, times, dim = X.shape

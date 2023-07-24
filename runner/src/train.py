@@ -125,7 +125,6 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 
 @hydra.main(version_base="1.2", config_path=root / "configs", config_name="train.yaml")
 def main(cfg: DictConfig) -> Optional[float]:
-
     # train the model
     metric_dict, _ = train(cfg)
 

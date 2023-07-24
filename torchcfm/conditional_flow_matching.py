@@ -30,9 +30,8 @@ class ConditionalFlowMatcher:
     """
 
     def __init__(self, sigma: float = 0.0):
-        r"""
-        Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
-        hyper-parameter $\sigma$.
+        r"""Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS] hyper-
+        parameter $\sigma$.
 
         Parameters
         ----------
@@ -204,9 +203,8 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
     """
 
     def __init__(self, sigma: float = 0.0):
-        r"""
-        Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS]
-        hyper-parameter $\sigma$.
+        r"""Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS] hyper-
+        parameter $\sigma$.
 
         Parameters
         ----------
@@ -334,9 +332,8 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
     """
 
     def __init__(self, sigma: float = 1.0, ot_method="exact"):
-        r"""
-        Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the
-        hyper-parameter $\sigma$ and the entropic OT map.
+        r"""Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the hyper-
+        parameter $\sigma$ and the entropic OT map.
 
         Parameters
         ----------

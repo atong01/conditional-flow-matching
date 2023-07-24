@@ -51,7 +51,7 @@ class DivergenceFreeNet(SimpleDenseNet):
         return self.model(x)
 
     def forward(self, t, x):
-        """ignore t run model."""
+        """Ignore t run model."""
         if t.dim() < 2:
             t = t.repeat(x.shape[0])[:, None]
         x = torch.cat([t, x], dim=-1)
@@ -65,7 +65,7 @@ class TimeInvariantVelocityNet(SimpleDenseNet):
         super().__init__(input_size=dim, target_size=dim, *args, **kwargs)
 
     def forward(self, t, x):
-        """ignore t run model."""
+        """Ignore t run model."""
         del t
         return self.model(x)
 
@@ -75,7 +75,7 @@ class VelocityNet(SimpleDenseNet):
         super().__init__(input_size=dim + 1, target_size=dim, *args, **kwargs)
 
     def forward(self, t, x):
-        """ignore t run model."""
+        """Ignore t run model."""
         if t.dim() < 1 or t.shape[0] != x.shape[0]:
             t = t.repeat(x.shape[0])[:, None]
         if t.dim() < 2:

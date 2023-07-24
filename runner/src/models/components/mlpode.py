@@ -31,8 +31,8 @@ class MLPODEF(Intervenable):
         self.GL_reg = GL_reg  # adaptive lasso parameter
 
         self.fc1 = nn.Linear(dims[0], dims[0] * dims[1], bias=bias)
-        """
-        Old way of implementing time_invariant
+        """Old way of implementing time_invariant.
+
         if time_invariant:
             self.fc1 = nn.Linear(dims[0], dims[0] * dims[1], bias=bias)
         else:
@@ -185,7 +185,6 @@ class BayesMLPODEF(Intervenable):
         self.elu = nn.ELU(inplace=True)
 
     def forward(self, t, x):  # [n, 1, d] -> [n, 1, d]
-
         if not self.time_invariant:
             x = torch.cat((x, t), dim=-1)
 
@@ -364,7 +363,6 @@ class DeepEnsMLPODEF(Intervenable):
             fc.sample_once_flag = True
 
     def forward(self, t, x):  # [n, 1, d] -> [n, 1, d]
-
         if not self.time_invariant:
             x = torch.cat((x, t), dim=-1)
 
@@ -496,7 +494,7 @@ class DibsEnsembleLayer(EnsembleLayer):
 
 
 class DeepEnsHyperMLPODEF(Intervenable):
-    """Define an DeepEns-MLP ODE function to acquire graph structure G and use G in linear pipline
+    """Define an DeepEns-MLP ODE function to acquire graph structure G and use G in linear pipeline
     via hyper-net architecture.
 
     - goals: P(params | G)P(G)

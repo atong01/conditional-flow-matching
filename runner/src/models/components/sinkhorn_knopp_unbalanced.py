@@ -194,7 +194,6 @@ def sinkhorn_knopp_unbalanced(
             return res
 
     else:  # return OT matrix
-
         if log:
             return u[:, None] * K * v[None, :], log
         else:

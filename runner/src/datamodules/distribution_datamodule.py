@@ -53,7 +53,7 @@ class TrajectoryNetDistributionTrajectoryDataModule(LightningDataModule):
         )
 
     def split(self):
-        """split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
+        """Split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
         train_val_test_split = self.hparams.train_val_test_split
         if isinstance(train_val_test_split, int):
             self.split_timepoint_data = list(map(lambda x: (x, x, x), self.timepoint_data))
@@ -138,7 +138,7 @@ class CustomTrajectoryDataModule(LightningDataModule):
         )
 
     def split(self):
-        """split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
+        """Split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
         train_val_test_split = self.hparams.train_val_test_split
         if isinstance(train_val_test_split, int):
             self.split_timepoint_data = list(map(lambda x: (x, x, x), self.timepoint_data))
@@ -319,7 +319,7 @@ class DiffusionSchrodingerBridgeGaussians(LightningDataModule):
         self.a = a
 
     def split(self):
-        """split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
+        """Split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
         train_val_test_split = self.hparams.train_val_test_split
         if isinstance(train_val_test_split, int):
             self.split_timepoint_data = list(map(lambda x: (x, x, x), self.timepoint_data))
@@ -421,7 +421,7 @@ class TwoDimDataModule(LightningDataModule):
         self.dim = 2
 
     def split(self):
-        """split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
+        """Split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
         train_val_test_split = self.hparams.train_val_test_split
         if isinstance(train_val_test_split, int):
             self.split_timepoint_data = list(map(lambda x: (x, x, x), self.timepoint_data))
@@ -548,7 +548,7 @@ class ICNNDataModule(LightningDataModule):
         )
 
     def split(self):
-        """split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
+        """Split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
         train_val_test_split = self.hparams.train_val_test_split
         if isinstance(train_val_test_split, int):
             self.split_timepoint_data = list(map(lambda x: (x, x, x), self.timepoint_data))

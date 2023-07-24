@@ -13,8 +13,8 @@ def earth_mover_distance(
     return_matrix=False,
     metric="sqeuclidean",
 ):
-    """
-    Returns the earth mover's distance between two point clouds
+    """Returns the earth mover's distance between two point clouds.
+
     Parameters
     ----------
     cloud1 : 2-D array
@@ -56,8 +56,9 @@ def earth_mover_distance(
 
 
 def interpolate_with_ot(p0, p1, tmap, interp_frac, size):
-    """
-    Interpolate between p0 and p1 at fraction t_interpolate knowing a transport map from p0 to p1
+    """Interpolate between p0 and p1 at fraction t_interpolate knowing a transport map from p0 to
+    p1.
+
     Parameters
     ----------
     p0 : 2-D array
@@ -104,8 +105,9 @@ def interpolate_with_ot(p0, p1, tmap, interp_frac, size):
 
 
 def interpolate_per_point_with_ot(p0, p1, tmap, interp_frac):
-    """
-    Interpolate between p0 and p1 at fraction t_interpolate knowing a transport map from p0 to p1
+    """Interpolate between p0 and p1 at fraction t_interpolate knowing a transport map from p0 to
+    p1.
+
     Parameters
     ----------
     p0 : 2-D array

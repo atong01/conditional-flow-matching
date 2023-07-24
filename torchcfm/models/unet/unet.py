@@ -75,8 +75,8 @@ class Upsample(nn.Module):
 
     :param channels: channels in the inputs and outputs.
     :param use_conv: a bool determining if a convolution is applied.
-    :param dims: determines if the signal is 1D, 2D, or 3D. If 3D, then
-                 upsampling occurs in the inner-two dimensions.
+    :param dims: determines if the signal is 1D, 2D, or 3D. If 3D, then upsampling occurs in the
+        inner-two dimensions.
     """
 
     def __init__(self, channels, use_conv, dims=2, out_channels=None):
@@ -104,8 +104,8 @@ class Downsample(nn.Module):
 
     :param channels: channels in the inputs and outputs.
     :param use_conv: a bool determining if a convolution is applied.
-    :param dims: determines if the signal is 1D, 2D, or 3D. If 3D, then
-                 downsampling occurs in the inner-two dimensions.
+    :param dims: determines if the signal is 1D, 2D, or 3D. If 3D, then downsampling occurs in the
+        inner-two dimensions.
     """
 
     def __init__(self, channels, use_conv, dims=2, out_channels=None):
@@ -133,9 +133,8 @@ class ResBlock(TimestepBlock):
     :param emb_channels: the number of timestep embedding channels.
     :param dropout: the rate of dropout.
     :param out_channels: if specified, the number of out channels.
-    :param use_conv: if True and out_channels is specified, use a spatial
-        convolution instead of a smaller 1x1 convolution to change the
-        channels in the skip connection.
+    :param use_conv: if True and out_channels is specified, use a spatial convolution instead of a
+        smaller 1x1 convolution to change the channels in the skip connection.
     :param dims: determines if the signal is 1D, 2D, or 3D.
     :param use_checkpoint: if True, use gradient checkpointing on this module.
     :param up: if True, use this block for upsampling.
@@ -877,7 +876,7 @@ class UNetModelWrapper(UNetModel):
         use_fp16=False,
         use_new_attention_order=False,
     ):
-        """dim (tuple): (C, H, W)"""
+        """Dim (tuple): (C, H, W)"""
         image_size = dim[-1]
         if channel_mult is None:
             if image_size == 512:

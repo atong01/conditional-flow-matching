@@ -22,8 +22,9 @@ class SequentialDiffEq(nn.Module):
 
 class MixtureODELayer(nn.Module):
     """Produces a mixture of experts where output = sigma(t) * f(t, x).
-    Time-dependent weights sigma(t) help learn to blend the experts without resorting to a highly stiff f.
-    Supports both regular and diffeq experts.
+
+    Time-dependent weights sigma(t) help learn to blend the experts without resorting to a highly
+    stiff f. Supports both regular and diffeq experts.
     """
 
     def __init__(self, experts):

@@ -338,7 +338,6 @@ class Sequential(nn.Sequential):
 
 
 if __name__ == "__main__":
-
     # Test Shapes
     class SharedContext:
         pass

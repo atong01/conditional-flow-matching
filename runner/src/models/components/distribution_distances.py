@@ -9,7 +9,7 @@ from .optimal_transport import wasserstein
 
 
 def compute_distances(pred, true):
-    """computes distances between vectors."""
+    """Computes distances between vectors."""
     mse = torch.nn.functional.mse_loss(pred, true).item()
     me = math.sqrt(mse)
     mae = torch.mean(torch.abs(pred - true)).item()

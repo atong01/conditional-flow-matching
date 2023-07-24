@@ -5,11 +5,12 @@ import torch
 class NoiseScheduler:
     """Base Class for noise schedule.
 
-    The noise schedule is a function that maps time to reference process noise level.
-    We can use this to determine the Brownian bridge noise schedule.
+    The noise schedule is a function that maps time to reference process noise level. We can use
+    this to determine the Brownian bridge noise schedule.
 
     We define the noise schedule with __call__ and the Brownian bridge noise schedule with sigma_t.
-    We define F as the integral of the squared reference process noise schedule which is a useful intermediate quantity.
+    We define F as the integral of the squared reference process noise schedule which is a useful
+    intermediate quantity.
     """
 
     def __call__(self, t):

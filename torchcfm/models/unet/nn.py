@@ -87,8 +87,7 @@ def normalization(channels):
 def timestep_embedding(timesteps, dim, max_period=10000):
     """Create sinusoidal timestep embeddings.
 
-    :param timesteps: a 1-D Tensor of N indices, one per batch element.
-                      These may be fractional.
+    :param timesteps: a 1-D Tensor of N indices, one per batch element. These may be fractional.
     :param dim: the dimension of the output.
     :param max_period: controls the minimum frequency of the embeddings.
     :return: an [N x dim] Tensor of positional embeddings.

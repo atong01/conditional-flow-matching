@@ -170,7 +170,6 @@ class AugmentationModule(nn.Module):
 
 
 if __name__ == "__main__":
-
     # Test Shapes
     class SharedContext:
         pass

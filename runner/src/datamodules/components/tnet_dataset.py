@@ -160,7 +160,7 @@ class SCData:
 
 
 def _get_data_points(adata, basis) -> np.ndarray:
-    """Returns the data points corrseponding to the selected basis."""
+    """Returns the data points corresponding to the selected basis."""
 
     if basis == "highly_variable":
         data_points = adata[:, adata.var[basis]].X.toarray()
@@ -483,8 +483,9 @@ class CircleTestDataV3(EBData):
 
 
 def interpolate_with_ot(p0, p1, tmap, interp_frac, size):
-    """
-    Interpolate between p0 and p1 at fraction t_interpolate knowing a transport map from p0 to p1
+    """Interpolate between p0 and p1 at fraction t_interpolate knowing a transport map from p0 to
+    p1.
+
     Parameters
     ----------
     p0 : 2-D array
@@ -754,8 +755,8 @@ class CycleDataset(TreeTestData):
 
     We generate this by taking a uniform distribution then rotating it 1/4 way around the circle.
 
-    The interpolation is then 1/8 of the way around the circle. We need a new evaluation mechanism to
-    be able to handle this case, as distribution level, all are approximately zero difference.
+    The interpolation is then 1/8 of the way around the circle. We need a new evaluation mechanism
+    to be able to handle this case, as distribution level, all are approximately zero difference.
     """
 
     def __init__(self, shift=0.1, r_std=0.1):

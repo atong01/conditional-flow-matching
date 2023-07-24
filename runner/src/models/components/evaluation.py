@@ -139,7 +139,7 @@ def compare_graph_distribution(true_graph, estimated_graphs):
             entropy_admissible += p * np.log2(p)
     kl_unif = np.log2(len(admissible_count)) - entropy_admissible
 
-    # compute proportion of admisible graphs
+    # compute proportion of admissible graphs
     admissible_proportion = [
         float(x) / float(sum(sample_count.values())) for x in list(admissible_count.values())
     ]
@@ -184,7 +184,8 @@ def compute_graphs_sparsity(graph):
 
 
 def compare_graphs(true_graph, estimated_graph):
-    """Compute performance measures on (binary) adjacency matrix
+    """Compute performance measures on (binary) adjacency matrix.
+
     Input:
      - true_graph: (dxd) np.array, the true adjacency matrix
      - estimated graph: (dxd) np.array, the estimated adjacency matrix (weighted or unweighted)

@@ -72,7 +72,7 @@ class CFMLitModule(LightningModule):
         return batch
 
     def preprocess_batch(self, batch, training=False):
-        """converts a batch of data into matched a random pair of (x0, x1)"""
+        """Converts a batch of data into matched a random pair of (x0, x1)"""
         X = self.unpack_batch(batch)
         # If no trajectory assume generate from standard normal
         x0 = torch.randn_like(X)

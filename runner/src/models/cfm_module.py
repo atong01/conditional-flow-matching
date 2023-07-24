@@ -142,7 +142,7 @@ class CFMLitModule(LightningModule):
         return batch
 
     def preprocess_batch(self, X, training=False):
-        """converts a batch of data into matched a random pair of (x0, x1)"""
+        """Converts a batch of data into matched a random pair of (x0, x1)"""
         t_select = torch.zeros(1).to(X.device)
         if self.is_trajectory:
             batch_size, times, dim = X.shape
@@ -622,7 +622,7 @@ class RectifiedFlowLitModule(CFMLitModule):
         self.criterion = torch.nn.MSELoss()
 
     def preprocess_batch(self, X, training=False):
-        """converts a batch of data into matched a random pair of (x0, x1)"""
+        """Converts a batch of data into matched a random pair of (x0, x1)"""
         t_select = torch.zeros(1).to(X.device)
         if self.is_trajectory:
             batch_size, times, dim = X.shape
@@ -1006,7 +1006,7 @@ class SF2MLitModule(CFMLitModule):
                 )
 
     def preprocess_batch(self, X, training=False):
-        """converts a batch of data into matched a random pair of (x0, x1)"""
+        """Converts a batch of data into matched a random pair of (x0, x1)"""
         if self.stored_data is not None and training:
             # Randomly sample a batch from the stored data.
             idx = torch.randint(self.stored_data.shape[0], size=(X.shape[0],))

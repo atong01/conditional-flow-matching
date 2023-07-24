@@ -88,7 +88,7 @@ class Intervenable(nn.Module):
     #    raise NotImplementedError
 
     def get_linear_structure(self):
-        """gets the linear approximation of the structure coefficients.
+        """Gets the linear approximation of the structure coefficients.
 
         May not be applicable for all models
         """
@@ -427,7 +427,6 @@ class DibsLayer(nn.Module):
         beta=0.5,
         bias=True,
     ):
-
         super().__init__()
         self.n_inputs = n_inputs
         self.n_outputs = n_outputs

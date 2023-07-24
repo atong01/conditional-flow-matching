@@ -29,7 +29,6 @@ def task_wrapper(task_func: Callable) -> Callable:
     """
 
     def wrap(cfg: DictConfig):
-
         # apply extra utilities
         extras(cfg)
 
