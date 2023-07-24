@@ -4,7 +4,7 @@ import os
 
 from setuptools import find_packages, setup
 
-version_py = os.path.join(os.path.dirname(__file__), "torchcfm", "__version__.py")
+version_py = os.path.join(os.path.dirname(__file__), "torchcfm", "version.py")
 version = open(version_py).read().strip().split("=")[-1].replace('"', "").strip()
 setup(
     name="torchcfm",
