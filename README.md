@@ -63,7 +63,6 @@ A. Tong, N. Malkin, K. Fatras, L. Atanackovic, Y. Zhang, G. Huguet, G. Wolf, Y. 
 
 ## Examples
 
-<<<<<<< HEAD
 ![My Image](assets/8gaussians-to-moons.gif)
 
 ![My Image](assets/gaussian-to-moons.gif)
