@@ -24,6 +24,13 @@ augmentations:
   jacobian_diag_frobenius_reg: 0.
   jacobian_off_diag_frobenius_reg: 0.
 
+partial_solver:
+  _target_: src.models.components.solver.FlowSolver
+  _partial_: true
+  ode_solver: "euler"
+  atol: 1e-5
+  rtol: 1e-5
+
 sigma_min: 0.1
 
 # Set to integer if want to train with left out timepoint
