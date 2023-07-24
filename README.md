@@ -137,6 +137,7 @@ conda activate myenv
 # install requirements
 pip install -r requirements.txt
 ```
+
 Note that `torchdyn==1.0.4` is broken on pypi. It may be necessary to install `torchdyn==1.0.3` until this is updated.
 
 Train model with default configuration
