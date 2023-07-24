@@ -63,6 +63,7 @@ A. Tong, N. Malkin, K. Fatras, L. Atanackovic, Y. Zhang, G. Huguet, G. Wolf, Y. 
 
 ## Examples
 
+<<<<<<< HEAD
 ![My Image](assets/8gaussians-to-moons.gif)
 
 ![My Image](assets/gaussian-to-moons.gif)
@@ -71,7 +72,30 @@ The density, vector field, and trajectories of simulation-free CNF training sche
 
 The first two methods, variance-preserving SDE (VP-SDE) and flow matching (FM), require a Gaussian source distribution so do not appear in the above example mapping 8 Gaussians distribution to the two moons distribution. Action matching with the same architecture (3x64 MLP with SeLU activations) underfits with the ReLU, SiLU, and SiLU activations as suggested in the [example code](https://github.com/necludov/jam), but it seems to fit better under our training setup (Action-Matching (Swish)). 
 
-The models to produce the GIFs are stored in `examples/models` and can be visualized with this notebook: [![notebook](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/notebooks/model-comparison-plotting.ipynb).
+The models to produce the GIFs are stored in `examples/models` and can be visualized with this notebook: [![notebook](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/examples/model-comparison-plotting.ipynb).
+
+We also have included an example of unconditional MNIST generation in `examples/mnist_example.ipynb` for both deterministic and stochastic generation. [![notebook](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/examples/mmnist_example.ipynb).
+
+
+## The torchcfm Package
+
+In our version 1 update we have extracted implementations of the relevant flow matching variants into a package `torchcfm`. This allows abstraction of the choice of the conditional distribution `q(z)`. `torchcfm` supplies the following loss functions:
+* `ConditionalFlowMatcher`: $z = (x_0, x_1)$, $q(z) = q(x_0) q(x_1)
+* `ExactOptimalTransportConditionalFlowMatcher`: $z = (x_0, x_1)$, $q(z) = \pi(x_0, x_1)$ where $\pi$ is an exact optimal transport joint. This is used in [Tong et al. 2023a] and [Poolidan et al. 2023] as "OT-CFM" and "Multisample FM with Batch OT" respectively.
+* `TargetConditionalFlowMatcher`: $z = x_1$, $q(z) = q(x_1)$ as defined in Lipman et al. 2023, learns a flow from a standard normal Gaussian to data using conditional flows which optimally transport the Gaussian to the datapoint (Note that this does not result in the marginal flow being optimal transport.
+* `SchrodingerBridgeConditionalFlowMatcher`: $z = (x_0, x_1)$, $q(z) = \pi_\epsilon(x_0, x_1)$ where $\pi_\epsilon$ is a an entropically regularized OT plan, although in practice this is often approximated by a minibatch OT plan (See Tong et al. 2023b). The flow-matching variant of this where the marginals are equivalent to the Schrodinger Bridge marginals is known as `SB-CFM` [Tong et al. 2023a]. When the score is also known and the bridge is stochastic is called [SF]2M [Tong et al. 2023b]
+* `VariancePreservingConditionalFlowMatcher`: $z = (x_0, x_1) $q(z) = q(x_0) q(x_1)$ but with conditional Gaussian probability paths which preserve variance over time using a trigonometric interpolation as presented in [Albergo et al. 2023a].
+
+## V0 -> V1
+
+In abstracting out the relevent losses from our `pytorch-lightning` implementation we have moved all of the `pytorch-lightning` code to `runner`. Every command that worked before for lightning should now be run from within the `runner` directory. V0 is now frozen in the `V0` branch.
+
+Major Changes:
+- Added code for the new Simulation-free Score and Flow Matching (SF)2M preprint
+- Created `torchcfm` pip installable package
+- Moved `pytorch-lightning` implementation and experiments to `runner` directory
+- Moved `notebooks` -> `examples`
+- Added image generation implementation in both lightning and a notebook in `examples`
 
 
 ## Related Work
@@ -79,12 +103,13 @@ The models to produce the GIFs are stored in `examples/models` and can be visual
 Relevant papers on simulation-free training of flow models:
 
 - Flow Matching for Generative Modeling (Lipman et al. 2023) [Paper](https://openreview.net/forum?id=PqvMRDCJT9t)
-- Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow (Liu et al. 2023) [Paper](https://openreview.net/forum?id=XVjTT1nw5z)
+- Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow (Liu et al. 2023) [Paper](https://openreview.net/forum?id=XVjTT1nw5z) [Code](https://github.com/gnobitab/RectifiedFlow.git)
 - Building Normalizing Flows with Stochastic Interpolants (Albergo et al. 2023a) [Paper](https://openreview.net/forum?id=li7qeBbCR1t)
 - Stochastic Interpolants: A Unifying Framework for Flows and Diffusions (Albergo et al. 2023b) [Paper](https://arxiv.org/abs/2303.08797)
 - Action Matching: Learning Stochastic Dynamics From Samples (Neklyudov et al. 2022) [Paper](https://arxiv.org/abs/2210.06662) [Code](https://github.com/necludov/jam)
 - Riemannian Flow Matching on General Geometries (Chen et al. 2023) [Paper](https://arxiv.org/abs/2302.03660)
-- Multisample Flow MAtching: Straightening Flows with Minibatch Couplings (Pooladian et al. 2023) [Paper](https://arxiv.org/abs/2304.14772)
+- Multisample Flow Matching: Straightening Flows with Minibatch Couplings (Pooladian et al. 2023) [Paper](https://arxiv.org/abs/2304.14772)
+
 
 ## Code Contributions
 
@@ -92,7 +117,7 @@ This repo is extracted from a larger private codebase which loses the original c
 
 ## How to run
 
-Run a simple minimal example here [![Run in Google Colab](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/notebooks/training-8gaussians-to-moons.ipynb). Or install the more efficient code locally with these steps.
+Run a simple minimal example here [![Run in Google Colab](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/examples/training-8gaussians-to-moons.ipynb). Or install the more efficient code locally with these steps.
 
 Install dependencies
 
