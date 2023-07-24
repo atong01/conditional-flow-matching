@@ -23,11 +23,12 @@
 
 ## Description
 
-Conditional Flow Matching (CFM) is a fast way to train continuous normalizing flow (CNF) models. CFM is a simulation-free training objective for continuous normalizing flows that allows conditional generative modeling and speeds up training and inference. 
+Conditional Flow Matching (CFM) is a fast way to train continuous normalizing flow (CNF) models. CFM is a simulation-free training objective for continuous normalizing flows that allows conditional generative modeling and speeds up training and inference.
 
 This repository contains the code to reproduce the main experiments and illustrations of two preprints:
-- [Improving and generalizing flow-based generative models with minibatch optimal transport](https://arxiv.org/abs/2302.00482). We introduce **Optimal Transport Conditional Flow Matching** (OT-CFM), a CFM variant that approximates the dynamical formulation of optimal transport (OT). Based on OT theory, OT-CFM leverages the static optimal transport plan as well as the optimal probability paths and vector fields to approximate dynamic OT. 
-- [Simulation-free Schrödinger bridges via score and flow matching](https://arxiv.org/abs/2307.03672). We propose **Simulation-Free Score and Flow Matching** ([SF]<sup>2</sup>M). [SF]<sup>2</sup>M leverages OT-CFM as well as score-based methods to approximate Schrödinger bridges, a stochastic version of optimal transport.
+
+- [Improving and generalizing flow-based generative models with minibatch optimal transport](https://arxiv.org/abs/2302.00482). We introduce **Optimal Transport Conditional Flow Matching** (OT-CFM), a CFM variant that approximates the dynamical formulation of optimal transport (OT). Based on OT theory, OT-CFM leverages the static optimal transport plan as well as the optimal probability paths and vector fields to approximate dynamic OT.
+- [Simulation-free Schrödinger bridges via score and flow matching](https://arxiv.org/abs/2307.03672). We propose **Simulation-Free Score and Flow Matching** (\[SF\]<sup>2</sup>M). \[SF\]<sup>2</sup>M leverages OT-CFM as well as score-based methods to approximate Schrödinger bridges, a stochastic version of optimal transport.
 
 If you find this code useful in your research, please cite the following papers (expand for BibTeX):
 
@@ -44,6 +45,7 @@ A. Tong, N. Malkin, G. Huguet, Y. Zhang, J. Rector-Brooks, K. Fatras, G. Wolf, Y
   journal={arXiv preprint 2302.00482}
 }
 ```
+
 </details>
 
 <details>
@@ -59,6 +61,7 @@ A. Tong, N. Malkin, K. Fatras, L. Atanackovic, Y. Zhang, G. Huguet, G. Wolf, Y. 
    journal={arXiv preprint 2307.03672}
 }
 ```
+
 </details>
 
 ## Examples
@@ -69,33 +72,33 @@ A. Tong, N. Malkin, K. Fatras, L. Atanackovic, Y. Zhang, G. Huguet, G. Wolf, Y. 
 
 The density, vector field, and trajectories of simulation-free CNF training schemes: mapping 8 Gaussians to two moons (above) and a single Gaussian to two moons (below).
 
-The first two methods, variance-preserving SDE (VP-SDE) and flow matching (FM), require a Gaussian source distribution so do not appear in the above example mapping 8 Gaussians distribution to the two moons distribution. Action matching with the same architecture (3x64 MLP with SeLU activations) underfits with the ReLU, SiLU, and SiLU activations as suggested in the [example code](https://github.com/necludov/jam), but it seems to fit better under our training setup (Action-Matching (Swish)). 
+The first two methods, variance-preserving SDE (VP-SDE) and flow matching (FM), require a Gaussian source distribution so do not appear in the above example mapping 8 Gaussians distribution to the two moons distribution. Action matching with the same architecture (3x64 MLP with SeLU activations) underfits with the ReLU, SiLU, and SiLU activations as suggested in the [example code](https://github.com/necludov/jam), but it seems to fit better under our training setup (Action-Matching (Swish)).
 
 The models to produce the GIFs are stored in `examples/models` and can be visualized with this notebook: [![notebook](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/examples/model-comparison-plotting.ipynb).
 
 We also have included an example of unconditional MNIST generation in `examples/mnist_example.ipynb` for both deterministic and stochastic generation. [![notebook](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/examples/mmnist_example.ipynb).
 
-
 ## The torchcfm Package
 
 In our version 1 update we have extracted implementations of the relevant flow matching variants into a package `torchcfm`. This allows abstraction of the choice of the conditional distribution `q(z)`. `torchcfm` supplies the following loss functions:
-* `ConditionalFlowMatcher`: $z = (x_0, x_1)$, $q(z) = q(x_0) q(x_1)
-* `ExactOptimalTransportConditionalFlowMatcher`: $z = (x_0, x_1)$, $q(z) = \pi(x_0, x_1)$ where $\pi$ is an exact optimal transport joint. This is used in [Tong et al. 2023a] and [Poolidan et al. 2023] as "OT-CFM" and "Multisample FM with Batch OT" respectively.
-* `TargetConditionalFlowMatcher`: $z = x_1$, $q(z) = q(x_1)$ as defined in Lipman et al. 2023, learns a flow from a standard normal Gaussian to data using conditional flows which optimally transport the Gaussian to the datapoint (Note that this does not result in the marginal flow being optimal transport.
-* `SchrodingerBridgeConditionalFlowMatcher`: $z = (x_0, x_1)$, $q(z) = \pi_\epsilon(x_0, x_1)$ where $\pi_\epsilon$ is a an entropically regularized OT plan, although in practice this is often approximated by a minibatch OT plan (See Tong et al. 2023b). The flow-matching variant of this where the marginals are equivalent to the Schrodinger Bridge marginals is known as `SB-CFM` [Tong et al. 2023a]. When the score is also known and the bridge is stochastic is called [SF]2M [Tong et al. 2023b]
-* `VariancePreservingConditionalFlowMatcher`: $z = (x_0, x_1) $q(z) = q(x_0) q(x_1)$ but with conditional Gaussian probability paths which preserve variance over time using a trigonometric interpolation as presented in [Albergo et al. 2023a].
+
+- `ConditionalFlowMatcher`: $z = (x_0, x_1)$, $q(z) = q(x_0) q(x_1)
+- `ExactOptimalTransportConditionalFlowMatcher`: $z = (x_0, x_1)$, $q(z) = \\pi(x_0, x_1)$ where $\\pi$ is an exact optimal transport joint. This is used in \[Tong et al. 2023a\] and \[Poolidan et al. 2023\] as "OT-CFM" and "Multisample FM with Batch OT" respectively.
+- `TargetConditionalFlowMatcher`: $z = x_1$, $q(z) = q(x_1)$ as defined in Lipman et al. 2023, learns a flow from a standard normal Gaussian to data using conditional flows which optimally transport the Gaussian to the datapoint (Note that this does not result in the marginal flow being optimal transport.
+- `SchrodingerBridgeConditionalFlowMatcher`: $z = (x_0, x_1)$, $q(z) = \\pi\_\\epsilon(x_0, x_1)$ where $\\pi\_\\epsilon$ is a an entropically regularized OT plan, although in practice this is often approximated by a minibatch OT plan (See Tong et al. 2023b). The flow-matching variant of this where the marginals are equivalent to the Schrodinger Bridge marginals is known as `SB-CFM` \[Tong et al. 2023a\]. When the score is also known and the bridge is stochastic is called \[SF\]2M \[Tong et al. 2023b\]
+- `VariancePreservingConditionalFlowMatcher`: $z = (x_0, x_1) $q(z) = q(x_0) q(x_1)$ but with conditional Gaussian probability paths which preserve variance over time using a trigonometric interpolation as presented in \[Albergo et al. 2023a\].
 
 ## V0 -> V1
 
-In abstracting out the relevent losses from our `pytorch-lightning` implementation we have moved all of the `pytorch-lightning` code to `runner`. Every command that worked before for lightning should now be run from within the `runner` directory. V0 is now frozen in the `V0` branch.
+In abstracting out the relevant losses from our `pytorch-lightning` implementation we have moved all of the `pytorch-lightning` code to `runner`. Every command that worked before for lightning should now be run from within the `runner` directory. V0 is now frozen in the `V0` branch.
 
 Major Changes:
+
 - Added code for the new Simulation-free Score and Flow Matching (SF)2M preprint
 - Created `torchcfm` pip installable package
 - Moved `pytorch-lightning` implementation and experiments to `runner` directory
 - Moved `notebooks` -> `examples`
 - Added image generation implementation in both lightning and a notebook in `examples`
-
 
 ## Related Work
 
@@ -108,7 +111,6 @@ Relevant papers on simulation-free training of flow models:
 - Action Matching: Learning Stochastic Dynamics From Samples (Neklyudov et al. 2022) [Paper](https://arxiv.org/abs/2210.06662) [Code](https://github.com/necludov/jam)
 - Riemannian Flow Matching on General Geometries (Chen et al. 2023) [Paper](https://arxiv.org/abs/2302.03660)
 - Multisample Flow Matching: Straightening Flows with Minibatch Couplings (Pooladian et al. 2023) [Paper](https://arxiv.org/abs/2304.14772)
-
 
 ## Code Contributions
 
