@@ -38,6 +38,7 @@ def test_experiments(tmp_path):
             "experiment=cfm",
             "model=cfm,otcfm,sbcfm,fm",
             "++trainer.fast_dev_run=true",
+            "limit_val_batches=0.25",
         ]
         + overrides
         + [f"{d}={tmp_path}" for d in dir_overrides]
