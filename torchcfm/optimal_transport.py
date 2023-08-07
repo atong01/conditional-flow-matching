@@ -65,6 +65,21 @@ class OTPlanSampler:
         i, j = self.sample_map(pi, x0.shape[0])
         return x0[i], x1[j]
 
+    def sample_plan_with_labels(self, x0, x1, y0=None, y1=None):
+        """Returns samples from the joint distribution.
+
+        Supports optional labels that can also be attached. These will be returned in the same
+        order as (x0, y0) pairs. Useful for class or time conditioning.
+        """
+        pi = self.get_map(x0, x1)
+        i, j = self.sample_map(pi, x0.shape[0])
+        return (
+            x0[i],
+            x1[j],
+            y0[i] if y0 is not None else None,
+            y1[j] if y1 is not None else None,
+        )
+
     def sample_trajectory(self, X):
         # Assume X is [batch, times, dim]
         times = X.shape[1]

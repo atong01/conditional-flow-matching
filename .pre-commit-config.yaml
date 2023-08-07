@@ -132,7 +132,7 @@ repos:
       - id: nbqa-flake8
         args:
           [
-            "--extend-ignore=E203,E402,E501,F401,F841,F821,F403,F405,F811",
+            "--extend-ignore=E203,E402,E501,F401,F841,F821,F403,F405,F811,E741",
             "--exclude=logs/*,data/*,notebooks/*",
           ]
         require_serial: true
