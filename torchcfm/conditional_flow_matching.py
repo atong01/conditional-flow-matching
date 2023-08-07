@@ -140,7 +140,7 @@ class ConditionalFlowMatcher:
     def sample_noise_like(self, x):
         return torch.randn_like(x)
 
-    def sample_location_and_conditional_flow(self, x0, x1, return_noise=False):
+    def sample_location_and_conditional_flow(self, x0, x1, y0=None, y1=None, return_noise=False):
         """
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1].
@@ -171,10 +171,14 @@ class ConditionalFlowMatcher:
         eps = self.sample_noise_like(x0)
         xt = self.sample_xt(x0, x1, t, eps)
         ut = self.compute_conditional_flow(x0, x1, t, xt)
+        to_return = [t, xt, ut]
+        if y0 is not None:
+            to_return.append(y0)
+        if y1 is not None:
+            to_return.append(y1)
         if return_noise:
-            return t, xt, ut, eps
-        else:
-            return t, xt, ut
+            to_return.append(eps)
+        return to_return
 
     def compute_lambda(self, t):
         """Compute the lambda function, see Eq.(XXX) [1].
@@ -214,7 +218,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         self.sigma = sigma
         self.ot_sampler = OTPlanSampler(method="exact")
 
-    def sample_location_and_conditional_flow(self, x0, x1, return_noise=False):
+    def sample_location_and_conditional_flow(self, x0, x1, y0=None, y1=None, return_noise=False):
         r"""
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1]
@@ -241,8 +245,8 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
-        x0, x1 = self.ot_sampler.sample_plan(x0, x1)
-        return super().sample_location_and_conditional_flow(x0, x1, return_noise)
+        x0, x1, y0, y1 = self.ot_sampler.sample_plan_with_labels(x0, x1, y0=y0, y1=y1)
+        return super().sample_location_and_conditional_flow(x0, x1, y0, y1, return_noise)
 
 
 class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
@@ -399,7 +403,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         ut = sigma_t_prime_over_sigma_t * (xt - mu_t) + x1 - x0
         return ut
 
-    def sample_location_and_conditional_flow(self, x0, x1, return_noise=False):
+    def sample_location_and_conditional_flow(self, x0, x1, y0=None, y1=None, return_noise=False):
         """
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2 ))
         and the conditional vector field ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0,
@@ -427,8 +431,8 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         ----------
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
-        x0, x1 = self.ot_sampler.sample_plan(x0, x1)
-        return super().sample_location_and_conditional_flow(x0, x1, return_noise)
+        x0, x1, y0, y1 = self.ot_sampler.sample_plan_with_labels(x0, x1, y0=y0, y1=y1)
+        return super().sample_location_and_conditional_flow(x0, x1, y0, y1, return_noise)
 
 
 class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):

@@ -53,3 +53,5 @@ seaborn>=0.12.2
 pandas
 
 git+https://github.com/patrick-kidger/torchcubicspline.git
+
+torchdiffeq==0.2.3
