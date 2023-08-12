@@ -451,8 +451,8 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
 class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
     """Albergo et al. 2023 stochastic interpolants class. This class inherits the
-    ConditionalFlowMatcher and override the compute_mu_t and compute_conditional_flow functions
-    in order to compute [3]'s stochastic interpolants.
+    ConditionalFlowMatcher and override the compute_mu_t and compute_conditional_flow functions in
+    order to compute [3]'s stochastic interpolants.
 
     [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
     """
