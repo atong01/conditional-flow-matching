@@ -452,7 +452,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
 class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
     def compute_mu_t(self, x0, x1, t):
-        """Compute the mean of the probability path $cos(pi t/2)x_0 + sin(pi t/2)x_1$, see (Eq.5) [3].
+        """Compute the mean of the probability path (Eq.5) from [3].
 
         Parameters
         ----------
@@ -464,11 +464,11 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Returns
         -------
-        mean mu_t: t * x1
+        mean mu_t: $cos(pi t/2)x_0 + sin(pi t/2)x_1$
 
         References
         ----------
-        [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
         """
         return torch.cos(math.pi / 2 * t) * x0 + torch.sin(math.pi / 2 * t) * x1
 
