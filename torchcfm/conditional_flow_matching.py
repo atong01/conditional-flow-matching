@@ -29,7 +29,7 @@ def pad_t_like_x(t, x):
     -------
     x: Tensor (bs, C, W, H)
     t: Vector (bs)
-    t reshapes (bs, 1, 1, 1)
+    pad_t_like_x(t, x): Tensor (bs, 1, 1, 1)
     """
     if isinstance(t, float):
         return t
