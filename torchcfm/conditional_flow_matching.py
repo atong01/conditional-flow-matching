@@ -273,7 +273,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
     """
 
     def compute_mu_t(self, x0, x1, t):
-        """Compute the mean of the probability path tx1, see (Eq.20) [3].
+        """Compute the mean of the probability path tx1, see (Eq.20) [2].
 
         Parameters
         ----------
@@ -289,14 +289,14 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [3] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
         """
         del x0
         return t * x1
 
     def compute_sigma_t(self, t):
         """
-        Compute the mean of the probability path N(t * x1, 1 -(1 - sigma)t), see (Eq.20) [3].
+        Compute the mean of the probability path N(t * x1, 1 -(1 - sigma)t), see (Eq.20) [2].
 
         Parameters
         ----------
@@ -312,13 +312,13 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [3] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
         """
         return 1 - (1 - self.sigma) * t
 
     def compute_conditional_flow(self, x0, x1, t, xt):
         """
-        Compute the conditional vector field ut(x1|x0) = (x1 - (1 - sigma) t)/(1 - (1 - sigma)t), see Eq.(21) [3].
+        Compute the conditional vector field ut(x1|x0) = (x1 - (1 - sigma) t)/(1 - (1 - sigma)t), see Eq.(21) [2].
 
         Parameters
         ----------
@@ -452,8 +452,50 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
 class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
     def compute_mu_t(self, x0, x1, t):
+        """Compute the mean of the probability path $cos(pi t/2)x_0 + sin(pi t/2)x_1$, see (Eq.5) [3].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs)
+
+        Returns
+        -------
+        mean mu_t: t * x1
+
+        References
+        ----------
+        [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        """
         return torch.cos(math.pi / 2 * t) * x0 + torch.sin(math.pi / 2 * t) * x1
 
     def compute_conditional_flow(self, x0, x1, t, xt):
+        """Compute the conditional vector field similar to [3].
+
+        ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0,
+        see Eq.(21) [3].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, dim)
+            represents the source minibatch
+        t : float, shape (bs)
+        xt : Tensor, shape (bs, dim)
+            represents the samples drawn from probability path pt
+
+        Returns
+        -------
+        ut : conditional vector field
+        ut(x1|x0) = pi/2 (cos(pi*t/2) x_1 - sin(\pi*t/2) x_0)
+
+        References
+        ----------
+        [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
+        """
         del xt
         return math.pi / 2 * (torch.cos(math.pi / 2 * t) * x1 - torch.sin(math.pi / 2 * t) * x0)
