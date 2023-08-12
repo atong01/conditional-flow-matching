@@ -471,7 +471,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Returns
         -------
-        mean mu_t: cos(pi t/2)x_0 + sin(pi t/2)x_1
+        mean mu_t: cos(pi t/2)x0 + sin(pi t/2)x1
 
         References
         ----------
@@ -482,7 +482,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
     def compute_conditional_flow(self, x0, x1, t, xt):
         """Compute the conditional vector field similar to [3].
 
-        ut(x1|x0) = pi/2 (cos(pi*t/2) x_1 - sin(\pi*t/2) x_0),
+        ut(x1|x0) = pi/2 (cos(pi*t/2) x1 - sin(pi*t/2) x0),
         see Eq.(21) [3].
 
         Parameters
@@ -498,7 +498,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         Returns
         -------
         ut : conditional vector field
-        ut(x1|x0) = pi/2 (cos(pi*t/2) x_1 - sin(\pi*t/2) x_0)
+        ut(x1|x0) = pi/2 (cos(pi*t/2) x1 - sin(\pi*t/2) x0)
 
         References
         ----------
