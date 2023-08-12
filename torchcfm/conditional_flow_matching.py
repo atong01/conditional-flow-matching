@@ -24,7 +24,7 @@ def pad_t_like_x(t, x):
     Returns
     -------
     t : Tensor, shape (bs, number of x dimensions)
-    
+
     Example
     -------
     x: Tensor (bs, C, W, H)
