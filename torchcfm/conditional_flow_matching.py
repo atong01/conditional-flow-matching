@@ -48,8 +48,7 @@ class ConditionalFlowMatcher:
     """
 
     def __init__(self, sigma: float = 0.0):
-        r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter 
-        $\sigma$.
+        r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter $\sigma$.
 
         Parameters
         ----------
@@ -221,8 +220,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
     """
 
     def __init__(self, sigma: float = 0.0):
-        r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter
-        $\sigma$.
+        r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter $\sigma$.
 
         Parameters
         ----------
