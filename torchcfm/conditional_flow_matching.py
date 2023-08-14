@@ -82,7 +82,7 @@ class ConditionalFlowMatcher:
 
     def compute_sigma_t(self, t):
         """
-        Compute the standard devation of the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
+        Compute the standard deviation of the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
 
         Parameters
         ----------
