@@ -13,6 +13,24 @@ from .optimal_transport import OTPlanSampler
 
 
 def pad_t_like_x(t, x):
+    """Function to reshape the time vector t by the number of dimensions of x.
+
+    Parameters
+    ----------
+    x : Tensor, shape (bs, *dim)
+        represents the source minibatch
+    t : FloatTensor, shape (bs)
+
+    Returns
+    -------
+    t : Tensor, shape (bs, number of x dimensions)
+
+    Example
+    -------
+    x: Tensor (bs, C, W, H)
+    t: Vector (bs)
+    pad_t_like_x(t, x): Tensor (bs, 1, 1, 1)
+    """
     if isinstance(t, float):
         return t
     return t.reshape(-1, *([1] * (x.dim() - 1)))
@@ -30,8 +48,7 @@ class ConditionalFlowMatcher:
     """
 
     def __init__(self, sigma: float = 0.0):
-        r"""Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS] hyper-
-        parameter $\sigma$.
+        r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter $\sigma$.
 
         Parameters
         ----------
@@ -45,11 +62,11 @@ class ConditionalFlowMatcher:
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        t : float, shape (bs, 1)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -64,15 +81,15 @@ class ConditionalFlowMatcher:
 
     def compute_sigma_t(self, t):
         """
-        Compute the mean of the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
+        Compute the standard deviation of the probability path N(t * x1 + (1 - t) * x0, sigma), see (Eq.14) [1].
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        t : float, shape (bs, 1)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -91,17 +108,17 @@ class ConditionalFlowMatcher:
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        t : float, shape (bs, 1)
-        epsilon : Tensor, shape (bs, dim)
+        t : FloatTensor, shape (bs)
+        epsilon : Tensor, shape (bs, *dim)
             noise sample from N(0, 1)
 
         Returns
         -------
-        xt : Tensor, shape (bs, dim)
+        xt : Tensor, shape (bs, *dim)
 
         References
         ----------
@@ -118,12 +135,12 @@ class ConditionalFlowMatcher:
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        t : float, shape (bs, 1)
-        xt : Tensor, shape (bs, dim)
+        t : FloatTensor, shape (bs)
+        xt : Tensor, shape (bs, *dim)
             represents the samples drawn from probability path pt
 
         Returns
@@ -147,9 +164,9 @@ class ConditionalFlowMatcher:
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
         return_noise : bool
             return the noise sample epsilon
@@ -157,11 +174,11 @@ class ConditionalFlowMatcher:
 
         Returns
         -------
-        t : float, shape (bs, 1)
-        xt : Tensor, shape (bs, dim)
+        t : FloatTensor, shape (bs)
+        xt : Tensor, shape (bs, *dim)
             represents the samples drawn from probability path pt
         ut : conditional vector field ut(x1|x0) = x1 - x0
-        (optionally) eps: Tensor, shape (bs, dim) such that xt = mu_t + sigma_t * epsilon
+        (optionally) eps: Tensor, shape (bs, *dim) such that xt = mu_t + sigma_t * epsilon
 
         References
         ----------
@@ -177,11 +194,11 @@ class ConditionalFlowMatcher:
             return t, xt, ut
 
     def compute_lambda(self, t):
-        """Compute the lambda function, see Eq.(XXX) [1].
+        """Compute the lambda function, see Eq.(23) [3].
 
         Parameters
         ----------
-        t : float, shape (bs, 1)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -189,7 +206,7 @@ class ConditionalFlowMatcher:
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [4] Simulation-free Schrodinger bridges via score and flow matching, Preprint, Tong et al.
         """
         sigma_t = self.compute_sigma_t(t)
         return 2 * sigma_t / (self.sigma**2 + 1e-8)
@@ -203,8 +220,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
     """
 
     def __init__(self, sigma: float = 0.0):
-        r"""Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS] hyper-
-        parameter $\sigma$.
+        r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter $\sigma$.
 
         Parameters
         ----------
@@ -222,20 +238,20 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
         return_noise : bool
             return the noise sample epsilon
 
         Returns
         -------
-        t : float, shape (bs, 1)
-        xt : Tensor, shape (bs, dim)
+        t : FloatTensor, shape (bs)
+        xt : Tensor, shape (bs, *dim)
             represents the samples drawn from probability path pt
         ut : conditional vector field ut(x1|x0) = x1 - x0
-        (optionally) epsilon : Tensor, shape (bs, dim) such that xt = mu_t + sigma_t * epsilon
+        (optionally) epsilon : Tensor, shape (bs, *dim) such that xt = mu_t + sigma_t * epsilon
 
         References
         ----------
@@ -254,15 +270,15 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
     """
 
     def compute_mu_t(self, x0, x1, t):
-        """Compute the mean of the probability path tx1, see (Eq.20) [3].
+        """Compute the mean of the probability path tx1, see (Eq.20) [2].
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        t : float, shape (bs, 1)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -270,45 +286,45 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [3] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
         """
         del x0
         return t * x1
 
     def compute_sigma_t(self, t):
         """
-        Compute the mean of the probability path N(t * x1, 1 -(1 - sigma)t), see (Eq.20) [3].
+        Compute the standard deviation of the probability path N(t x1, 1 - (1 - sigma) t), see (Eq.20) [2].
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        t : float, shape (bs, 1)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
-        standard deviation sigma 1 -(1 - sigma)t
+        standard deviation sigma 1 - (1 - sigma) t
 
         References
         ----------
-        [3] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
         """
         return 1 - (1 - self.sigma) * t
 
     def compute_conditional_flow(self, x0, x1, t, xt):
         """
-        Compute the conditional vector field ut(x1|x0) = (x1 - (1 - sigma) t)/(1 - (1 - sigma)t), see Eq.(21) [3].
+        Compute the conditional vector field ut(x1|x0) = (x1 - (1 - sigma) t)/(1 - (1 - sigma)t), see Eq.(21) [2].
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        t : float, shape (bs, 1)
-        xt : Tensor, shape (bs, dim)
+        t : FloatTensor, shape (bs)
+        xt : Tensor, shape (bs, *dim)
             represents the samples drawn from probability path pt
 
         Returns
@@ -346,16 +362,16 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
     def compute_sigma_t(self, t):
         """
-        Compute the mean of the probability path N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2),
+        Compute the standard deviation of the probability path N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2),
         see (Eq.20) [1].
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        t : float, shape (bs, 1)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -375,12 +391,12 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        t : float, shape (bs, 1)
-        xt : Tensor, shape (bs, dim)
+        t : FloatTensor, shape (bs)
+        xt : Tensor, shape (bs, *dim)
             represents the samples drawn from probability path pt
 
         Returns
@@ -407,9 +423,9 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, dim)
+        x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
-        x1 : Tensor, shape (bs, dim)
+        x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
         return_noise: bool
             return the noise sample epsilon
@@ -417,11 +433,11 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Returns
         -------
-        t : float, shape (bs, 1)
-        xt : Tensor, shape (bs, dim)
+        t : FloatTensor, shape (bs)
+        xt : Tensor, shape (bs, *dim)
             represents the samples drawn from probability path pt
         ut : conditional vector field ut(x1|x0) = x1 - x0
-        (optionally) epsilon : Tensor, shape (bs, dim) such that xt = mu_t + sigma_t * epsilon
+        (optionally) epsilon : Tensor, shape (bs, *dim) such that xt = mu_t + sigma_t * epsilon
 
         References
         ----------
@@ -432,9 +448,58 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
 
 class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
+    """Albergo et al. 2023 trigonometric interpolants class. This class inherits the
+    ConditionalFlowMatcher and override the compute_mu_t and compute_conditional_flow functions in
+    order to compute [3]'s trigonometric interpolants.
+
+    [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
+    """
+
     def compute_mu_t(self, x0, x1, t):
+        r"""Compute the mean of the probability path (Eq.5) from [3].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+        t : FloatTensor, shape (bs)
+
+        Returns
+        -------
+        mean mu_t: cos(pi t/2)x0 + sin(pi t/2)x1
+
+        References
+        ----------
+        [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
+        """
         return torch.cos(math.pi / 2 * t) * x0 + torch.sin(math.pi / 2 * t) * x1
 
     def compute_conditional_flow(self, x0, x1, t, xt):
+        r"""Compute the conditional vector field similar to [3].
+
+        ut(x1|x0) = pi/2 (cos(pi*t/2) x1 - sin(pi*t/2) x0),
+        see Eq.(21) [3].
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+        t : FloatTensor, shape (bs)
+        xt : Tensor, shape (bs, *dim)
+            represents the samples drawn from probability path pt
+
+        Returns
+        -------
+        ut : conditional vector field
+        ut(x1|x0) = pi/2 (cos(pi*t/2) x1 - sin(\pi*t/2) x0)
+
+        References
+        ----------
+        [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
+        """
         del xt
         return math.pi / 2 * (torch.cos(math.pi / 2 * t) * x1 - torch.sin(math.pi / 2 * t) * x0)
