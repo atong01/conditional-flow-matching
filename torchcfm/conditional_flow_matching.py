@@ -293,7 +293,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
     def compute_sigma_t(self, t):
         """
-        Compute the mean of the probability path N(t x1, 1 - (1 - sigma) t), see (Eq.20) [2].
+        Compute the standard deviation of the probability path N(t x1, 1 - (1 - sigma) t), see (Eq.20) [2].
 
         Parameters
         ----------
@@ -362,7 +362,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
     def compute_sigma_t(self, t):
         """
-        Compute the mean of the probability path N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2),
+        Compute the standard deviation of the probability path N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2),
         see (Eq.20) [1].
 
         Parameters
