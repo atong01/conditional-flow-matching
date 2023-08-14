@@ -295,7 +295,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
     def compute_sigma_t(self, t):
         """
-        Compute the mean of the probability path N(t * x1, 1 - (1 - sigma) * t), see (Eq.20) [2].
+        Compute the mean of the probability path N(t x1, 1 - (1 - sigma) t), see (Eq.20) [2].
 
         Parameters
         ----------
@@ -307,7 +307,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Returns
         -------
-        standard deviation sigma 1 - (1 - sigma) * t
+        standard deviation sigma 1 - (1 - sigma) t
 
         References
         ----------
