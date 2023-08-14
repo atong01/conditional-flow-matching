@@ -48,8 +48,8 @@ class ConditionalFlowMatcher:
     """
 
     def __init__(self, sigma: float = 0.0):
-        r"""Initialize the ConditionalFlowMatcher class. It requires the [GIVE MORE DETAILS] hyper-
-        parameter $\sigma$.
+        r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter 
+        $\sigma$.
 
         Parameters
         ----------
@@ -195,7 +195,7 @@ class ConditionalFlowMatcher:
             return t, xt, ut
 
     def compute_lambda(self, t):
-        """Compute the lambda function, see Eq.(XXX) [1].
+        """Compute the lambda function, see Eq.(23) [3].
 
         Parameters
         ----------
@@ -207,7 +207,7 @@ class ConditionalFlowMatcher:
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [4] Simulation-free Schrodinger bridges via score and flow matching, Preprint, Tong et al.
         """
         sigma_t = self.compute_sigma_t(t)
         return 2 * sigma_t / (self.sigma**2 + 1e-8)
