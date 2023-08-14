@@ -19,7 +19,7 @@ def pad_t_like_x(t, x):
     ----------
     x : Tensor, shape (bs, dim)
         represents the source minibatch
-    t : float, shape (bs)
+    t : FloatTensor, shape (bs)
 
     Returns
     -------
@@ -67,7 +67,7 @@ class ConditionalFlowMatcher:
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -90,7 +90,7 @@ class ConditionalFlowMatcher:
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -113,7 +113,7 @@ class ConditionalFlowMatcher:
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
         epsilon : Tensor, shape (bs, dim)
             noise sample from N(0, 1)
 
@@ -140,7 +140,7 @@ class ConditionalFlowMatcher:
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, dim)
             represents the samples drawn from probability path pt
 
@@ -175,7 +175,7 @@ class ConditionalFlowMatcher:
 
         Returns
         -------
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, dim)
             represents the samples drawn from probability path pt
         ut : conditional vector field ut(x1|x0) = x1 - x0
@@ -199,7 +199,7 @@ class ConditionalFlowMatcher:
 
         Parameters
         ----------
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -249,7 +249,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Returns
         -------
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, dim)
             represents the samples drawn from probability path pt
         ut : conditional vector field ut(x1|x0) = x1 - x0
@@ -280,7 +280,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -303,7 +303,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -325,7 +325,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, dim)
             represents the samples drawn from probability path pt
 
@@ -373,7 +373,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -397,7 +397,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, dim)
             represents the samples drawn from probability path pt
 
@@ -435,7 +435,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Returns
         -------
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, dim)
             represents the samples drawn from probability path pt
         ut : conditional vector field ut(x1|x0) = x1 - x0
@@ -466,7 +466,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
 
         Returns
         -------
@@ -490,7 +490,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
             represents the source minibatch
         x1 : Tensor, shape (bs, dim)
             represents the source minibatch
-        t : float, shape (bs)
+        t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, dim)
             represents the samples drawn from probability path pt
 
