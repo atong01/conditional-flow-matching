@@ -89,14 +89,3 @@ for epoch in range(n_epochs):
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': loss,
             }, 'weights/reproduced_cifar10_weights_epoch_{}.pt'.format(epoch))
-
-## Generate new samples
-with torch.no_grad():
-    traj = node.trajectory(
-        torch.randn(100, 3, 32, 32).to(device),
-        t_span=torch.linspace(0, 1, 100).to(device),
-    )
-grid = make_grid(
-    traj[-1, :100].view([-1, 3, 32, 32]).clip(-1, 1), value_range=(-1, 1), padding=0, nrow=10
-)
-imshow(grid.detach().cpu())
