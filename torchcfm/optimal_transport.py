@@ -8,9 +8,8 @@ import torch
 
 
 class OTPlanSampler:
-    """OTPlanSampler implements sampling coordinates according to an OT plan
-    (wrt squared Euclidean cost) with different implementations of the plan
-    calculation."""
+    """OTPlanSampler implements sampling coordinates according to an OT plan (wrt squared Euclidean
+    cost) with different implementations of the plan calculation."""
 
     def __init__(
         self,
@@ -27,11 +26,9 @@ class OTPlanSampler:
         elif method == "sinkhorn":
             self.ot_fn = partial(pot.sinkhorn, reg=reg)
         elif method == "unbalanced":
-            self.ot_fn = partial(pot.unbalanced.sinkhorn_knopp_unbalanced,
-                                 reg=reg, reg_m=reg_m)
+            self.ot_fn = partial(pot.unbalanced.sinkhorn_knopp_unbalanced, reg=reg, reg_m=reg_m)
         elif method == "partial":
-            self.ot_fn = partial(pot.partial.entropic_partial_wasserstein,
-                                 reg=reg)
+            self.ot_fn = partial(pot.partial.entropic_partial_wasserstein, reg=reg)
         else:
             raise ValueError(f"Unknown method: {method}")
         self.reg = reg
@@ -40,9 +37,8 @@ class OTPlanSampler:
         self.kwargs = kwargs
 
     def get_map(self, x0, x1):
-        """
-        Compute the OT plan (wrt squared Euclidean cost) between a source and a
-        target minibatch.
+        """Compute the OT plan (wrt squared Euclidean cost) between a source and a target
+        minibatch.
 
         Parameters
         ----------
@@ -74,8 +70,7 @@ class OTPlanSampler:
         return p
 
     def sample_map(self, pi, batch_size):
-        r"""
-        Draw source and target samples from pi  $(x,z) \sim \pi$
+        r"""Draw source and target samples from pi  $(x,z) \sim \pi$
 
         Parameters
         ----------
@@ -91,15 +86,12 @@ class OTPlanSampler:
         """
         p = pi.flatten()
         p = p / p.sum()
-        choices = np.random.choice(pi.shape[0] * pi.shape[1], p=p,
-                                   size=batch_size)
+        choices = np.random.choice(pi.shape[0] * pi.shape[1], p=p, size=batch_size)
         return np.divmod(choices, pi.shape[1])
 
     def sample_plan(self, x0, x1):
-        r"""
-        Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source
-        and a target minibatch and draw source and target samples from pi
-        $(x,z) \sim \pi$
+        r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
+        minibatch and draw source and target samples from pi $(x,z) \sim \pi$
 
         Parameters
         ----------
@@ -148,6 +140,25 @@ def wasserstein(
     power: int = 2,
     **kwargs,
 ) -> float:
+    """Compute the Wasserstein (1 or 2) distance (wrt Euclidean cost) between a source and a target
+    distributions.
+
+    Parameters
+    ----------
+    x0 : Tensor, shape (bs, *dim)
+        represents the source minibatch
+    x1 : Tensor, shape (bs, *dim)
+        represents the source minibatch
+    method : str (default : None)
+        Use exact Wasserstein or an entropic regularization
+    reg : float (default : 0.05)
+        Entropic regularization coefficients
+    power : int (default : 2)
+        power of the Wasserstein distance (1 or 2)
+    Returns
+    -------
+    ret : Wasserstein distance (float)
+    """
     assert power == 1 or power == 2
     # ot_fn should take (a, b, M) as arguments where a, b are marginals and
     # M is a cost matrix
