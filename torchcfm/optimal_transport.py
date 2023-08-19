@@ -112,7 +112,19 @@ class OTPlanSampler:
         return x0[i], x1[j]
 
     def sample_trajectory(self, X):
-        # Assume X is [batch, times, dim]
+        """Compute the OT trajectories between different sample populations moving from the source
+        to the target distribution.
+
+        Parameters
+        ----------
+        X : Tensor, (bs, times, *dim)
+            different populations of samples moving from the source to the target distribution.
+
+        Returns
+        -------
+        to_return : Tensor, (bs, times, *dim)
+            represents the OT sampled trajectories over time.
+        """
         times = X.shape[1]
         pis = []
         for t in range(times - 1):
@@ -157,7 +169,8 @@ def wasserstein(
         power of the Wasserstein distance (1 or 2)
     Returns
     -------
-    ret : Wasserstein distance (float)
+    ret : float
+        Wasserstein distance
     """
     assert power == 1 or power == 2
     # ot_fn should take (a, b, M) as arguments where a, b are marginals and
