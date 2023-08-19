@@ -37,6 +37,21 @@ class OTPlanSampler:
         self.kwargs = kwargs
 
     def get_map(self, x0, x1):
+        """Compute the OT plan (wrt squared Euclidean cost) between a source and a target
+        minibatch.
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+
+        Returns
+        -------
+        p : numpy array, shape (bs, bs)
+            represents the OT plan between minibatches
+        """
         a, b = pot.unif(x0.shape[0]), pot.unif(x1.shape[0])
         if x0.dim() > 2:
             x0 = x0.reshape(x0.shape[0], -1)
@@ -55,18 +70,61 @@ class OTPlanSampler:
         return p
 
     def sample_map(self, pi, batch_size):
+        r"""Draw source and target samples from pi  $(x,z) \sim \pi$
+
+        Parameters
+        ----------
+        pi : numpy array, shape (bs, bs)
+            represents the source minibatch
+        batch_size : int
+            represents the OT plan between minibatches
+
+        Returns
+        -------
+        (i_s, i_j) : tuple of numpy arrays, shape (bs, bs)
+            represents the indices of source and target data samples from $\pi$
+        """
         p = pi.flatten()
         p = p / p.sum()
         choices = np.random.choice(pi.shape[0] * pi.shape[1], p=p, size=batch_size)
         return np.divmod(choices, pi.shape[1])
 
     def sample_plan(self, x0, x1):
+        r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
+        minibatch and draw source and target samples from pi $(x,z) \sim \pi$
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+
+        Returns
+        -------
+        x0[i] : Tensor, shape (bs, *dim)
+            represents the source minibatch drawn from $\pi$
+        x1[j] : Tensor, shape (bs, *dim)
+            represents the source minibatch drawn from $\pi$
+        """
         pi = self.get_map(x0, x1)
         i, j = self.sample_map(pi, x0.shape[0])
         return x0[i], x1[j]
 
     def sample_trajectory(self, X):
-        # Assume X is [batch, times, dim]
+        """Compute the OT trajectories between different sample populations moving from the source
+        to the target distribution.
+
+        Parameters
+        ----------
+        X : Tensor, (bs, times, *dim)
+            different populations of samples moving from the source to the target distribution.
+
+        Returns
+        -------
+        to_return : Tensor, (bs, times, *dim)
+            represents the OT sampled trajectories over time.
+        """
         times = X.shape[1]
         pis = []
         for t in range(times - 1):
@@ -94,6 +152,26 @@ def wasserstein(
     power: int = 2,
     **kwargs,
 ) -> float:
+    """Compute the Wasserstein (1 or 2) distance (wrt Euclidean cost) between a source and a target
+    distributions.
+
+    Parameters
+    ----------
+    x0 : Tensor, shape (bs, *dim)
+        represents the source minibatch
+    x1 : Tensor, shape (bs, *dim)
+        represents the source minibatch
+    method : str (default : None)
+        Use exact Wasserstein or an entropic regularization
+    reg : float (default : 0.05)
+        Entropic regularization coefficients
+    power : int (default : 2)
+        power of the Wasserstein distance (1 or 2)
+    Returns
+    -------
+    ret : float
+        Wasserstein distance
+    """
     assert power == 1 or power == 2
     # ot_fn should take (a, b, M) as arguments where a, b are marginals and
     # M is a cost matrix
