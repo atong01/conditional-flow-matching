@@ -14,15 +14,7 @@ from torchcfm.conditional_flow_matching import *
 from torchcfm.models.unet.unet import UNetModelWrapper
 
 
-def imshow(img):
-    img = img / 2 + 0.5     # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.savefig('imgs/cifar10_generated_images.png')
-    plt.show()
-
-
-savedir = "weights/"
+savedir = "weights/reproduced/"
 os.makedirs(savedir, exist_ok=True)
 
 use_cuda = torch.cuda.is_available()
@@ -50,7 +42,7 @@ sigma = 0.0
 model = UNetModelWrapper(
     dim=(3, 32, 32),
     num_res_blocks=2,
-    num_channels=64,
+    num_channels=256,
     channel_mult=[1, 2, 2, 2],
     num_heads=4,
     num_head_channels=64,
@@ -64,13 +56,15 @@ if torch.cuda.device_count() > 1:
 
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
-opt_scheduler = scheduler.PolyLRScheduler(warmup_t=45000, warmup_lr_init=1e-8, t_initial=196*n_epochs, optimizer=optimizer)
+opt_scheduler = scheduler.PolyLRScheduler(warmup_t=45000, warmup_lr_init=1e-8, 
+                                          t_initial=196*n_epochs, optimizer=optimizer)
+
 # FM = ConditionalFlowMatcher(sigma=sigma)
 FM = ExactOptimalTransportConditionalFlowMatcher(sigma=sigma)
 node = NeuralODE(model, solver="euler", sensitivity="adjoint", atol=1e-4, rtol=1e-4)
 
-for epoch in range(n_epochs):
-    for i, data in tqdm(enumerate(trainloader)):
+for epoch in tqdm(range(n_epochs)):
+    for i, data in enumerate(trainloader):
         optimizer.zero_grad()
         x1 = data[0].to(device)
         x0 = torch.randn_like(x1)
@@ -83,9 +77,10 @@ for epoch in range(n_epochs):
         
     ## Saving the weights
     if (epoch + 1)%100==0:
+        print(i)
         torch.save({
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': loss,
-            }, 'weights/reproduced_cifar10_weights_epoch_{}.pt'.format(epoch))
+            }, 'weights/reproduced/reproduced_cifar10_weights_epoch_{}.pt'.format(epoch))
