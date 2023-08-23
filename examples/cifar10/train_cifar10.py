@@ -82,6 +82,10 @@ for epoch in tqdm(range(n_epochs)):
             'loss': loss,
             }, savedir+'reproduced_cifar10_weights_epoch_{}.pt'.format(epoch))
 
+if torch.cuda.device_count() > 1:
+    print("Send the model over 1 GPU for inference")
+    model = model.module.to(device)
+    
 node = NeuralODE(model, solver="euler", sensitivity="adjoint", atol=1e-4, rtol=1e-4)
 
 with torch.no_grad():
