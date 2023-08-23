@@ -902,7 +902,7 @@ class UNetModelWrapper(UNetModel):
 
         return super().__init__(
             image_size=image_size,
-            in_channels=1,
+            in_channels=dim[0],
             model_channels=num_channels,
             out_channels=(dim[0] if not learn_sigma else dim[0] * 2),
             num_res_blocks=num_res_blocks,
