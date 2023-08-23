@@ -3,6 +3,7 @@
 This repository is used to reproduce the CIFAR-10 experiments from [1](https://arxiv.org/abs/2302.00482). It is a repository in construction and we will add more features and details in the future (including FID computations and pre-trained weights). We have followed the experimental details provided in [2](https://openreview.net/forum?id=PqvMRDCJT9t).
 
 To reproduce the experiment and save the weights, install the requirements from the main repository and then run:
+
 ```bash
 python3 train_cifar10.py
 ```
