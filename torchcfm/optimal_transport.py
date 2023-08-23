@@ -132,7 +132,11 @@ class OTPlanSampler:
         x0[i] : Tensor, shape (bs, *dim)
             represents the source minibatch drawn from $\pi$
         x1[j] : Tensor, shape (bs, *dim)
-            represents the source minibatch drawn from $\pi$
+            represents the target minibatch drawn from $\pi$
+        y0[i] : Tensor, shape (bs, *dim)
+            represents the source label minibatch drawn from $\pi$
+        y1[j] : Tensor, shape (bs, *dim)
+            represents the target label minibatch drawn from $\pi$
         """
         pi = self.get_map(x0, x1)
         i, j = self.sample_map(pi, x0.shape[0])
