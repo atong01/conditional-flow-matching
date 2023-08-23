@@ -65,7 +65,7 @@ class ConditionalFlowMatcher:
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         t : FloatTensor, shape (bs)
 
         Returns
@@ -85,10 +85,6 @@ class ConditionalFlowMatcher:
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, *dim)
-            represents the source minibatch
-        x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
         t : FloatTensor, shape (bs)
 
         Returns
@@ -111,7 +107,7 @@ class ConditionalFlowMatcher:
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         t : FloatTensor, shape (bs)
         epsilon : Tensor, shape (bs, *dim)
             noise sample from N(0, 1)
@@ -138,7 +134,7 @@ class ConditionalFlowMatcher:
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, *dim)
             represents the samples drawn from probability path pt
@@ -167,7 +163,7 @@ class ConditionalFlowMatcher:
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         return_noise : bool
             return the noise sample epsilon
 
@@ -241,7 +237,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         return_noise : bool
             return the noise sample epsilon
 
@@ -277,7 +273,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         t : FloatTensor, shape (bs)
 
         Returns
@@ -297,10 +293,6 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, *dim)
-            represents the source minibatch
-        x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
         t : FloatTensor, shape (bs)
 
         Returns
@@ -322,7 +314,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, *dim)
             represents the samples drawn from probability path pt
@@ -367,10 +359,6 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Parameters
         ----------
-        x0 : Tensor, shape (bs, *dim)
-            represents the source minibatch
-        x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
         t : FloatTensor, shape (bs)
 
         Returns
@@ -394,7 +382,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, *dim)
             represents the samples drawn from probability path pt
@@ -426,7 +414,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         return_noise: bool
             return the noise sample epsilon
 
@@ -463,7 +451,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         t : FloatTensor, shape (bs)
 
         Returns
@@ -487,7 +475,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         x0 : Tensor, shape (bs, *dim)
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
-            represents the source minibatch
+            represents the target minibatch
         t : FloatTensor, shape (bs)
         xt : Tensor, shape (bs, *dim)
             represents the samples drawn from probability path pt
