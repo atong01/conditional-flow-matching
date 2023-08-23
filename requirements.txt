@@ -47,6 +47,7 @@ scprep
 scanpy
 lightning-bolts
 timm
+torchdiffeq==0.2.3
 
 # --------- notebook reqs -------- #
 seaborn>=0.12.2
