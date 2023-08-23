@@ -2,7 +2,6 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import torchsde
 from torchdyn.core import NeuralODE
 from torchvision import datasets, transforms
 from torchvision.transforms import ToPILImage
@@ -38,7 +37,6 @@ num_iter_per_epoch = int(50000/batch_size)
 #################################
 
 sigma = 0.0
-#model = UNetModel(dim=(1, 28, 28), num_channels=32, num_res_blocks=1).to(device)
 model = UNetModelWrapper(
     dim=(3, 32, 32),
     num_res_blocks=2,
@@ -61,7 +59,6 @@ opt_scheduler = scheduler.PolyLRScheduler(warmup_t=45000, warmup_lr_init=1e-8,
 
 # FM = ConditionalFlowMatcher(sigma=sigma)
 FM = ExactOptimalTransportConditionalFlowMatcher(sigma=sigma)
-node = NeuralODE(model, solver="euler", sensitivity="adjoint", atol=1e-4, rtol=1e-4)
 
 for epoch in tqdm(range(n_epochs)):
     for i, data in enumerate(trainloader):
@@ -83,4 +80,20 @@ for epoch in tqdm(range(n_epochs)):
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': loss,
-            }, 'weights/reproduced/reproduced_cifar10_weights_epoch_{}.pt'.format(epoch))
+            }, savedir+'reproduced_cifar10_weights_epoch_{}.pt'.format(epoch))
+
+node = NeuralODE(model, solver="euler", sensitivity="adjoint", atol=1e-4, rtol=1e-4)
+
+with torch.no_grad():
+    traj = node.trajectory(
+        torch.randn(60, 3, 32, 32).to(device),
+        t_span=torch.linspace(0, 1, 100).to(device),
+    )
+grid = make_grid(
+    traj[-1, :].view([-1, 3, 32, 32]).clip(-1, 1), value_range=(-1, 1), padding=0, nrow=10
+)
+
+img = grid.detach().cpu() / 2 + 0.5     # unnormalize
+npimg = img.numpy()
+plt.imshow(np.transpose(npimg, (1, 2, 0)))
+plt.savefig(savedir+'generated_cifar_reproduced.png')
