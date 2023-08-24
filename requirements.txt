@@ -36,18 +36,19 @@ pytest            # tests
 
 
 # --------- pkg reqs -------- #
+lightning-bolts
 matplotlib
 numpy
 scipy
 scikit-learn
+torchdyn
 pot
 scprep
 scanpy
-lightning-bolts
 timm
 
 # --------- notebook reqs -------- #
 seaborn>=0.12.2
 pandas
 
-git+https://github.com/patrick-kidger/torchcubicspline.git
+# git+https://github.com/patrick-kidger/torchcubicspline.git
