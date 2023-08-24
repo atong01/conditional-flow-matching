@@ -41,7 +41,7 @@ matplotlib
 numpy
 scipy
 scikit-learn
-torchdyn!=1.0.4   # 1.0.4 is broken on pypi
+torchdyn>=1.0.5   # 1.0.4 is broken on pypi
 pot
 scprep
 scanpy
