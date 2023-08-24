@@ -41,7 +41,7 @@ matplotlib
 numpy
 scipy
 scikit-learn
-torchdyn
+torchdyn!=1.0.4   # 1.0.4 is broken on pypi
 pot
 scprep
 scanpy
@@ -50,5 +50,3 @@ timm
 # --------- notebook reqs -------- #
 seaborn>=0.12.2
 pandas
-
-# git+https://github.com/patrick-kidger/torchcubicspline.git
