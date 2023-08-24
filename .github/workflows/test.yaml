@@ -1,8 +1,5 @@
 name: Tests
 
-env:
-  SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
-
 on:
   push:
     branches: [main]
@@ -18,8 +15,6 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-
-    timeout-minutes: 10
 
     steps:
       - name: Checkout
