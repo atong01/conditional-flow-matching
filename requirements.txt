@@ -15,7 +15,7 @@ torchmetrics==0.11.0
 hydra-core==1.2.0
 hydra-colorlog==1.2.0
 hydra-optuna-sweeper==1.2.0
-hydra-submitit-launcher
+# hydra-submitit-launcher
 
 # --------- loggers --------- #
 wandb
@@ -36,16 +36,18 @@ pytest            # tests
 
 
 # --------- pkg reqs -------- #
-lightning-bolts
 matplotlib
 numpy
 scipy
 scikit-learn
 torchdyn>=1.0.5   # 1.0.4 is broken on pypi
 pot
-scprep
-scanpy
-timm
+
+# -------- optional requirements ------- # 
+# lightning-bolts
+# scprep
+# scanpy
+# timm
 
 # --------- notebook reqs -------- #
 seaborn>=0.12.2
