@@ -6,11 +6,12 @@ import torch
 from timm import scheduler
 from torchdyn.core import NeuralODE
 from torchvision import datasets, transforms
-from torchvision.transforms import ToPILImage
 from torchvision.utils import make_grid
 from tqdm import tqdm
 
-from torchcfm.conditional_flow_matching import *
+from torchcfm.conditional_flow_matching import (
+    ExactOptimalTransportConditionalFlowMatcher,
+)
 from torchcfm.models.unet.unet import UNetModelWrapper
 
 savedir = "weights/reproduced/"
@@ -99,7 +100,10 @@ with torch.no_grad():
         t_span=torch.linspace(0, 1, 100).to(device),
     )
 grid = make_grid(
-    traj[-1, :].view([-1, 3, 32, 32]).clip(-1, 1), value_range=(-1, 1), padding=0, nrow=10
+    traj[-1, :].view([-1, 3, 32, 32]).clip(-1, 1),
+    value_range=(-1, 1),
+    padding=0,
+    nrow=10,
 )
 
 img = grid.detach().cpu() / 2 + 0.5  # unnormalize

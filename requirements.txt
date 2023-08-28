@@ -36,18 +36,16 @@ pytest            # tests
 
 
 # --------- pkg reqs -------- #
+lightning-bolts
 matplotlib
 numpy
 scipy
 scikit-learn
+scprep
+scanpy
+timm
 torchdyn>=1.0.5   # 1.0.4 is broken on pypi
 pot
-
-# -------- optional requirements ------- # 
-# lightning-bolts
-# scprep
-# scanpy
-# timm
 
 # --------- notebook reqs -------- #
 seaborn>=0.12.2
