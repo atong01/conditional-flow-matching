@@ -44,7 +44,8 @@ scikit-learn
 scprep
 scanpy
 timm
-torchdyn>=1.0.5   # 1.0.4 is broken on pypi
+torchdyn==1.0.3   # 1.0.4 is broken on pypi
+#torchdyn>=1.0.5   # 1.0.4 is broken on pypi
 pot
 
 # --------- notebook reqs -------- #
