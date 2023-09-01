@@ -50,7 +50,7 @@ class DivergenceFreeNet(SimpleDenseNet):
     def energy(self, x):
         return self.model(x)
 
-    def forward(self, t, x):
+    def forward(self, t, x, *args, **kwargs):
         """Ignore t run model."""
         if t.dim() < 2:
             t = t.repeat(x.shape[0])[:, None]
@@ -64,7 +64,7 @@ class TimeInvariantVelocityNet(SimpleDenseNet):
     def __init__(self, dim: int, *args, **kwargs):
         super().__init__(input_size=dim, target_size=dim, *args, **kwargs)
 
-    def forward(self, t, x):
+    def forward(self, t, x, *args, **kwargs):
         """Ignore t run model."""
         del t
         return self.model(x)
@@ -74,7 +74,7 @@ class VelocityNet(SimpleDenseNet):
     def __init__(self, dim: int, *args, **kwargs):
         super().__init__(input_size=dim + 1, target_size=dim, *args, **kwargs)
 
-    def forward(self, t, x):
+    def forward(self, t, x, *args, **kwargs):
         """Ignore t run model."""
         if t.dim() < 1 or t.shape[0] != x.shape[0]:
             t = t.repeat(x.shape[0])[:, None]
