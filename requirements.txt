@@ -36,7 +36,7 @@ pytest            # tests
 
 
 # --------- pkg reqs -------- #
-lightning-bolts
+# lightning-bolts
 matplotlib
 numpy
 scipy
