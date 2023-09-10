@@ -273,7 +273,7 @@ class AugmentedVectorField(nn.Module):
         self.dim = dim
         self.augmentation_list = augmentation_list
 
-    def forward(self, t, state, augmented_input=True):
+    def forward(self, t, state, augmented_input=True, *args, **kwargs):
         n_aug = len(self.augmentation_list)
 
         class SharedContext:

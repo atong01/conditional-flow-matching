@@ -1,8 +1,5 @@
 name: Tests
 
-env:
-  SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
-
 on:
   push:
     branches: [main]
@@ -16,24 +13,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest"]
+        os: [ubuntu-latest, ubuntu-20.04, macos-latest, windows-latest]
         python-version: ["3.8", "3.9", "3.10"]
-
-    timeout-minutes: 10
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r runner-requirements.txt
           pip install pytest
           pip install sh
           pip install -e .
@@ -44,7 +39,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest -v
+          pytest -v runner
 
   # upload code coverage report
   code-coverage:
@@ -55,21 +50,21 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r runner-requirements.txt
           pip install pytest
           pip install pytest-cov[toml]
           pip install sh
           pip install -e .
 
       - name: Run tests and collect coverage
-        run: pytest --cov src # NEEDS TO BE UPDATED WHEN CHANGING THE NAME OF "src" FOLDER
+        run: pytest runner --cov runner # NEEDS TO BE UPDATED WHEN CHANGING THE NAME OF "src" FOLDER
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
