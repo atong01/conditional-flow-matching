@@ -1,0 +1,52 @@
+# Note if using Conda it is recommended to install torch separately.
+# For most of testing the following commands were run to set up the environment
+# This was tested with torch==1.12.1
+# conda create -n ti-env python=3.10
+# conda activate ti-env
+# pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+# pip install -r requirements.txt
+# --------- pytorch --------- #
+torch>=1.11.0,<2.0.0
+torchvision>=0.11.0
+pytorch-lightning==1.8.3
+torchmetrics==0.11.0
+
+# --------- hydra --------- #
+hydra-core==1.2.0
+hydra-colorlog==1.2.0
+hydra-optuna-sweeper==1.2.0
+# hydra-submitit-launcher
+
+# --------- loggers --------- #
+wandb
+# neptune-client
+# mlflow
+# comet-ml
+
+# --------- others --------- #
+black
+isort
+flake8
+Flake8-pyproject  # for configuration via pyproject
+pyrootutils       # standardizing the project root setup
+pre-commit        # hooks for applying linters on commit
+rich              # beautiful text formatting in terminal
+pytest            # tests
+# sh              # for running bash commands in some tests (linux/macos only)
+
+
+# --------- pkg reqs -------- #
+lightning-bolts
+matplotlib
+numpy
+scipy
+scikit-learn
+scprep
+scanpy
+timm
+torchdyn>=1.0.5   # 1.0.4 is broken on pypi
+pot
+
+# --------- notebook reqs -------- #
+seaborn>=0.12.2
+pandas
