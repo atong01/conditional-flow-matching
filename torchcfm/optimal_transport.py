@@ -110,10 +110,9 @@ class OTPlanSampler:
         pi = self.get_map(x0, x1)
         i, j = self.sample_map(pi, x0.shape[0])
         return x0[i], x1[j]
-    
+
     def sample_plan_with_labels(self, x0, x1, y0=None, y1=None):
-        r"""
-        Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
+        r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
         minibatch and draw source and target labeled samples from pi $(x,z) \sim \pi$
 
         Parameters

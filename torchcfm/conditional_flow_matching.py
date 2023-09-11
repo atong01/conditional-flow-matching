@@ -255,8 +255,10 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         """
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
         return super().sample_location_and_conditional_flow(x0, x1, return_noise)
-    
-    def guided_sample_location_and_conditional_flow(self, x0, x1, y0=None, y1=None, return_noise=False):
+
+    def guided_sample_location_and_conditional_flow(
+        self, x0, x1, y0=None, y1=None, return_noise=False
+    ):
         r"""
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1]
@@ -472,8 +474,10 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         """
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
         return super().sample_location_and_conditional_flow(x0, x1, return_noise)
-    
-    def guided_sample_location_and_conditional_flow(self, x0, x1, y0=None, y1=None, return_noise=False):
+
+    def guided_sample_location_and_conditional_flow(
+        self, x0, x1, y0=None, y1=None, return_noise=False
+    ):
         r"""
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1]
