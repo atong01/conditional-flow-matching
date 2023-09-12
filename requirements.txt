@@ -11,3 +11,4 @@ scanpy
 timm
 torchdyn>=1.0.5   # 1.0.4 is broken on pypi
 pot
+torchdiffeq==0.2.3

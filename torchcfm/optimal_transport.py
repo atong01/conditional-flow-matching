@@ -111,6 +111,41 @@ class OTPlanSampler:
         i, j = self.sample_map(pi, x0.shape[0])
         return x0[i], x1[j]
 
+    def sample_plan_with_labels(self, x0, x1, y0=None, y1=None):
+        r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
+        minibatch and draw source and target labeled samples from pi $(x,z) \sim \pi$
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, *dim)
+            represents the target minibatch
+        y0 : Tensor, shape (bs)
+            represents the source label minibatch
+        y1 : Tensor, shape (bs)
+            represents the target label minibatch
+
+        Returns
+        -------
+        x0[i] : Tensor, shape (bs, *dim)
+            represents the source minibatch drawn from $\pi$
+        x1[j] : Tensor, shape (bs, *dim)
+            represents the target minibatch drawn from $\pi$
+        y0[i] : Tensor, shape (bs, *dim)
+            represents the source label minibatch drawn from $\pi$
+        y1[j] : Tensor, shape (bs, *dim)
+            represents the target label minibatch drawn from $\pi$
+        """
+        pi = self.get_map(x0, x1)
+        i, j = self.sample_map(pi, x0.shape[0])
+        return (
+            x0[i],
+            x1[j],
+            y0[i] if y0 is not None else None,
+            y1[j] if y1 is not None else None,
+        )
+
     def sample_trajectory(self, X):
         """Compute the OT trajectories between different sample populations moving from the source
         to the target distribution.
