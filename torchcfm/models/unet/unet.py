@@ -920,3 +920,6 @@ class UNetModelWrapper(UNetModel):
             resblock_updown=resblock_updown,
             use_new_attention_order=use_new_attention_order,
         )
+
+    def forward(self, t, x, y=None, *args, **kwargs):
+        return super().forward(t, x, y=y)
