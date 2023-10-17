@@ -7,10 +7,9 @@ import torch
 from pytorch_lightning import LightningDataModule
 from pytorch_lightning.trainer.supporters import CombinedLoader
 from sklearn.preprocessing import StandardScaler
+from src import utils
 from torch.utils.data import DataLoader, Sampler, TensorDataset, random_split
 from torchdyn.datasets import ToyDataset
-
-from src import utils
 
 from .components.base import BaseLightningDataModule
 from .components.time_dataset import load_dataset
