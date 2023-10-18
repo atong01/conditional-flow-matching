@@ -2,10 +2,15 @@
 
 This repository is used to reproduce the CIFAR-10 experiments from [1](https://arxiv.org/abs/2302.00482). It is a repository in construction and we will add more features and details in the future (including FID computations and pre-trained weights). We have followed the experimental details provided in [2](https://openreview.net/forum?id=PqvMRDCJT9t).
 
-To reproduce the experiment and save the weights, install the requirements from the main repository and then run:
+To reproduce the experiment and save the weights, install the requirements from the main repository and then run (runs on a single RTX 2080 GPU):
 
 ```bash
-python3 train_cifar10.py
+python3 train_cifar10.py --lr 2e-4 --ema_decay 0.9999 --batch_size 128 --total_steps 800001 --save_step 20000
+```
+
+To run a script closer to the original Flow Matching paper, use the following script(might require several GPUs):
+```bash
+python3 train_cifar10.py --lr 2e-4 --ema_decay 0.9999 --num_channel 256 --batch_size 256 --total_steps 400001 --save_step 20000
 ```
 
 If you find this code useful in your research, please cite the following papers (expand for BibTeX):
