@@ -92,6 +92,8 @@ def train(argv):
     ).to(
         device
     )  # new dropout + bs of 128
+    
+    print(net_model)
 
     ema_model = copy.deepcopy(net_model)
     optim = torch.optim.Adam(net_model.parameters(), lr=FLAGS.lr)

@@ -13,3 +13,4 @@ torchdyn>=1.0.7   # 1.0.4 is broken on pypi
 pot
 torchdiffeq==0.2.3
 absl-py
+clean-fid
