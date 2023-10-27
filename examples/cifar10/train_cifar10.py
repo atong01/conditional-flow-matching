@@ -1,10 +1,16 @@
 # Inspired from https://github.com/w86763777/pytorch-ddpm/tree/master.
+
+# Authors: Kilian Fatras
+#          Alexander Tong
+
 import copy
 import os
 
 import torch
 from absl import app, flags
-from torchcfm.conditional_flow_matching import *
+from torchcfm.conditional_flow_matching import (
+    ConditionalFlowMatcher, ExactOptimalTransportConditionalFlowMatcher,
+    TargetConditionalFlowMatcher)
 from torchcfm.models.unet.unet import UNetModelWrapper
 from torchdyn.core import NeuralODE
 from torchvision import datasets, transforms
@@ -13,6 +19,9 @@ from tqdm import trange
 from utils_cifar import *
 
 FLAGS = flags.FLAGS
+
+flags.DEFINE_string("model", "otcfm", help="flow matching model type")
+flags.DEFINE_string("output_dir", "./results/", help="output_directory")
 # UNet
 flags.DEFINE_integer("num_channel", 128, help="base channel of UNet")
 
@@ -20,21 +29,19 @@ flags.DEFINE_integer("num_channel", 128, help="base channel of UNet")
 flags.DEFINE_float("lr", 2e-4, help="target learning rate")  ## TRY 2e-4
 flags.DEFINE_float("grad_clip", 1.0, help="gradient norm clipping")
 flags.DEFINE_integer(
-    "total_steps", 800001, help="total training steps"
+    "total_steps", 400001, help="total training steps"
 )  # Lipman et al uses 400k but double batch size
 flags.DEFINE_integer("img_size", 32, help="image size")
 flags.DEFINE_integer("warmup", 5000, help="learning rate warmup")
 flags.DEFINE_integer("batch_size", 128, help="batch size")  ##Lipman et al uses 128
 flags.DEFINE_integer("num_workers", 4, help="workers of Dataloader")
-flags.DEFINE_float(
-    "ema_decay", 0.9999, help="ema decay rate"
-)
+flags.DEFINE_float("ema_decay", 0.9999, help="ema decay rate")
 flags.DEFINE_bool("parallel", False, help="multi gpu training")
 
 # Evaluation
 flags.DEFINE_integer(
     "save_step",
-    5000,
+    20000,
     help="frequency of saving checkpoints, 0 to disable during training",
 )
 flags.DEFINE_integer(
@@ -48,14 +55,20 @@ flags.DEFINE_integer(
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
+
 def warmup_lr(step):
     return min(step, FLAGS.warmup) / FLAGS.warmup
 
 
 def train(argv):
-    print("lr, total_steps, ema decay, save_step:", 
-          FLAGS.lr, FLAGS.total_steps, FLAGS.ema_decay, FLAGS.save_step)
-    
+    print(
+        "lr, total_steps, ema decay, save_step:",
+        FLAGS.lr,
+        FLAGS.total_steps,
+        FLAGS.ema_decay,
+        FLAGS.save_step,
+    )
+
     #### DATASETS/DATALOADER
     dataset = datasets.CIFAR10(
         root="./data",
@@ -92,8 +105,6 @@ def train(argv):
     ).to(
         device
     )  # new dropout + bs of 128
-    
-    print(net_model)
 
     ema_model = copy.deepcopy(net_model)
     optim = torch.optim.Adam(net_model.parameters(), lr=FLAGS.lr)
@@ -102,29 +113,32 @@ def train(argv):
         net_model = torch.nn.DataParallel(net_model)
         ema_model = torch.nn.DataParallel(ema_model)
 
-    net_node = NeuralODE(
-        net_model, solver="euler", sensitivity="adjoint"
-    )
-    ema_node = NeuralODE(
-        ema_model, solver="euler", sensitivity="adjoint"
-    )
+    net_node = NeuralODE(net_model, solver="euler", sensitivity="adjoint")
+    ema_node = NeuralODE(ema_model, solver="euler", sensitivity="adjoint")
     # show model size
     model_size = 0
     for param in net_model.parameters():
         model_size += param.data.nelement()
     print("Model params: %.2f M" % (model_size / 1024 / 1024))
 
-    savedir = "./results/"
-    os.makedirs(savedir, exist_ok=True)
-
     #################################
     #            OT-CFM
     #################################
 
     sigma = 0.0
-    # FM = ConditionalFlowMatcher(sigma=sigma)
-    FM = ExactOptimalTransportConditionalFlowMatcher(sigma=sigma)
-    # FM = TargetConditionalFlowMatcher(sigma=sigma)
+    if FLAGS.model == "otcfm":
+        FM = ExactOptimalTransportConditionalFlowMatcher(sigma=sigma)
+    elif FLAGS.model == "cfm":
+        FM = ConditionalFlowMatcher(sigma=sigma)
+    elif FLAGS.model == "fm":
+        FM = TargetConditionalFlowMatcher(sigma=sigma)
+    else:
+        raise NotImplementedError(
+            f"Unknown model {FLAGS.model}, must be one of ['otcfm', 'cfm', 'fm']"
+        )
+
+    savedir = FLAGS.output_dir + FLAGS.model + "/"
+    os.makedirs(savedir, exist_ok=True)
 
     with trange(FLAGS.total_steps, dynamic_ncols=True) as pbar:
         for step in pbar:
@@ -144,10 +158,8 @@ def train(argv):
 
             # sample and Saving the weights
             if FLAGS.save_step > 0 and step % FLAGS.save_step == 0:
-                generate_samples(net_node, net_model, 
-                                 savedir, step, net_="normal")
-                generate_samples(ema_node, ema_model, 
-                                 savedir, step, net_="ema")
+                generate_samples(net_node, net_model, savedir, step, net_="normal")
+                generate_samples(ema_node, ema_model, savedir, step, net_="ema")
                 torch.save(
                     {
                         "net_model": net_model.state_dict(),
