@@ -1,10 +1,12 @@
 import torch
 from torchdyn.core import NeuralODE
-#from torchvision.transforms import ToPILImage
+
+# from torchvision.transforms import ToPILImage
 from torchvision.utils import make_grid, save_image
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
+
 
 def generate_samples(node_, model, savedir, step, net_="normal"):
     model.eval()
@@ -15,9 +17,7 @@ def generate_samples(node_, model, savedir, step, net_="normal"):
         )
     traj = traj[-1, :].view([-1, 3, 32, 32]).clip(-1, 1)
     traj = traj / 2 + 0.5
-    save_image(
-        traj, savedir + "{}_generated_FM_images_step_{}.png".format(net_, step), nrow=8
-    )
+    save_image(traj, savedir + f"{net_}_generated_FM_images_step_{step}.png", nrow=8)
 
     model.train()
 

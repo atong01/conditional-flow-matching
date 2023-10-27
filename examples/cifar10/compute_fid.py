@@ -1,3 +1,8 @@
+# Inspired from https://github.com/w86763777/pytorch-ddpm/tree/master.
+
+# Authors: Kilian Fatras
+#          Alexander Tong
+
 import os
 import sys
 
@@ -5,9 +10,10 @@ import matplotlib.pyplot as plt
 import torch
 from absl import app, flags
 from cleanfid import fid
-from torchcfm.models.unet.unet import UNetModelWrapper
 from torchdiffeq import odeint
 from torchdyn.core import NeuralODE
+
+from torchcfm.models.unet.unet import UNetModelWrapper
 
 FLAGS = flags.FLAGS
 # UNet
@@ -21,7 +27,7 @@ flags.DEFINE_integer("integration_steps", 100, help="number of inference steps")
 flags.DEFINE_string("integration_method", "dopri5", help="integration method to use")
 flags.DEFINE_integer("step", 400000, help="training steps")
 flags.DEFINE_integer("num_gen", 50000, help="number of samples to generate")
-flags.DEFINE_float("tol", 1e-5, help="Integrator tolerence (absolute and relative)")
+flags.DEFINE_float("tol", 1e-5, help="Integrator tolerance (absolute and relative)")
 FLAGS(sys.argv)
 
 
@@ -73,7 +79,9 @@ def gen_1_img(unused_latent):
         else:
             print("Use method: ", FLAGS.integration_method)
             t_span = torch.linspace(0, 1, 2).to(device)
-            traj = odeint(new_net, x, t_span, rtol=FLAGS.tol, atol=FLAGS.tol, method=FLAGS.integration_method)
+            traj = odeint(
+                new_net, x, t_span, rtol=FLAGS.tol, atol=FLAGS.tol, method=FLAGS.integration_method
+            )
     traj = traj[-1, :]  # .view([-1, 3, 32, 32]).clip(-1, 1)
     img = (traj * 127.5 + 128).clip(0, 255).to(torch.uint8)  # .permute(1, 2, 0)
     return img
@@ -95,4 +103,3 @@ print()
 print("Total NFE: ", new_net.nfe)
 print()
 print("FID: ", score)
-

@@ -8,15 +8,17 @@ import os
 
 import torch
 from absl import app, flags
-from torchcfm.conditional_flow_matching import (
-    ConditionalFlowMatcher, ExactOptimalTransportConditionalFlowMatcher,
-    TargetConditionalFlowMatcher)
-from torchcfm.models.unet.unet import UNetModelWrapper
 from torchdyn.core import NeuralODE
 from torchvision import datasets, transforms
 from tqdm import trange
+from utils_cifar import ema, generate_samples, infiniteloop
 
-from utils_cifar import *
+from torchcfm.conditional_flow_matching import (
+    ConditionalFlowMatcher,
+    ExactOptimalTransportConditionalFlowMatcher,
+    TargetConditionalFlowMatcher,
+)
+from torchcfm.models.unet.unet import UNetModelWrapper
 
 FLAGS = flags.FLAGS
 
@@ -26,14 +28,14 @@ flags.DEFINE_string("output_dir", "./results/", help="output_directory")
 flags.DEFINE_integer("num_channel", 128, help="base channel of UNet")
 
 # Training
-flags.DEFINE_float("lr", 2e-4, help="target learning rate")  ## TRY 2e-4
+flags.DEFINE_float("lr", 2e-4, help="target learning rate")  # TRY 2e-4
 flags.DEFINE_float("grad_clip", 1.0, help="gradient norm clipping")
 flags.DEFINE_integer(
     "total_steps", 400001, help="total training steps"
 )  # Lipman et al uses 400k but double batch size
 flags.DEFINE_integer("img_size", 32, help="image size")
 flags.DEFINE_integer("warmup", 5000, help="learning rate warmup")
-flags.DEFINE_integer("batch_size", 128, help="batch size")  ##Lipman et al uses 128
+flags.DEFINE_integer("batch_size", 128, help="batch size")  # Lipman et al uses 128
 flags.DEFINE_integer("num_workers", 4, help="workers of Dataloader")
 flags.DEFINE_float("ema_decay", 0.9999, help="ema decay rate")
 flags.DEFINE_bool("parallel", False, help="multi gpu training")
@@ -47,9 +49,7 @@ flags.DEFINE_integer(
 flags.DEFINE_integer(
     "eval_step", 0, help="frequency of evaluating model, 0 to disable during training"
 )
-flags.DEFINE_integer(
-    "num_images", 50000, help="the number of generated images for evaluation"
-)
+flags.DEFINE_integer("num_images", 50000, help="the number of generated images for evaluation")
 
 
 use_cuda = torch.cuda.is_available()
@@ -69,7 +69,7 @@ def train(argv):
         FLAGS.save_step,
     )
 
-    #### DATASETS/DATALOADER
+    # DATASETS/DATALOADER
     dataset = datasets.CIFAR10(
         root="./data",
         train=True,
@@ -92,7 +92,7 @@ def train(argv):
 
     datalooper = infiniteloop(dataloader)
 
-    #### MODELS
+    # MODELS
     net_model = UNetModelWrapper(
         dim=(3, 32, 32),
         num_res_blocks=2,
@@ -149,9 +149,7 @@ def train(argv):
             vt = net_model(t, xt)
             loss = torch.mean((vt - ut) ** 2)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(
-                net_model.parameters(), FLAGS.grad_clip
-            )  # new
+            torch.nn.utils.clip_grad_norm_(net_model.parameters(), FLAGS.grad_clip)  # new
             optim.step()
             sched.step()
             ema(net_model, ema_model, FLAGS.ema_decay)  # new
@@ -168,7 +166,7 @@ def train(argv):
                         "optim": optim.state_dict(),
                         "step": step,
                     },
-                    savedir + "cifar10_weights_step_{}.pt".format(step),
+                    savedir + f"cifar10_weights_step_{step}.pt",
                 )
 
 

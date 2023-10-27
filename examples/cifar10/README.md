@@ -9,6 +9,7 @@ python3 train_cifar10.py --lr 2e-4 --ema_decay 0.9999 --batch_size 128 --total_s
 ```
 
 To run a script closer to the original Flow Matching paper, use the following script(might require several GPUs):
+
 ```bash
 python3 train_cifar10.py --lr 2e-4 --ema_decay 0.9999 --num_channel 256 --batch_size 256 --total_steps 400001 --save_step 20000
 ```
