@@ -2,15 +2,12 @@ import os
 import sys
 
 import matplotlib.pyplot as plt
-from absl import app, flags
 import torch
-from torchdyn.core import NeuralODE
-
-from torchcfm.conditional_flow_matching import *
-from torchcfm.models.unet.unet import UNetModelWrapper
-
+from absl import app, flags
 from cleanfid import fid
-
+from torchcfm.models.unet.unet import UNetModelWrapper
+from torchdiffeq import odeint
+from torchdyn.core import NeuralODE
 
 FLAGS = flags.FLAGS
 # UNet
@@ -18,20 +15,20 @@ flags.DEFINE_integer("num_channel", 128, help="base channel of UNet")
 
 # Training
 flags.DEFINE_bool("parallel", False, help="multi gpu training")
-
+flags.DEFINE_string("input_dir", "./results", help="output_directory")
+flags.DEFINE_string("model", "otcfm", help="flow matching model type")
+flags.DEFINE_integer("integration_steps", 100, help="number of inference steps")
+flags.DEFINE_string("integration_method", "dopri5", help="integration method to use")
+flags.DEFINE_integer("step", 400000, help="training steps")
+flags.DEFINE_integer("num_gen", 50000, help="number of samples to generate")
+flags.DEFINE_float("tol", 1e-5, help="Integrator tolerence (absolute and relative)")
 FLAGS(sys.argv)
 
-print('num_channel: ', FLAGS.num_channel)
-#savedir = "results/cifar10_weights_step_400000.pt"
-#os.makedirs(savedir, exist_ok=True)
 
+# Define the model
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
 
-print("loading model")
-####
-# LOAD MODEL
-###
 new_net = UNetModelWrapper(
     dim=(3, 32, 32),
     num_res_blocks=2,
@@ -40,39 +37,62 @@ new_net = UNetModelWrapper(
     num_heads=4,
     num_head_channels=64,
     attention_resolutions="16",
-    dropout=0.1).to(device)
-
-print("model loaded")
-#if FLAGS.parallel:
-#    new_net = torch.nn.DataParallel(new_net).cuda() 
+    dropout=0.1,
+).to(device)
 
 
-PATH = 'results/cifar10_weights_step_400000.pt'
+# Load the model
+PATH = f"{FLAGS.input_dir}/{FLAGS.model}/cifar10_weights_step_{FLAGS.step}.pt"
 print("path: ", PATH)
 checkpoint = torch.load(PATH)
-new_net.load_state_dict(checkpoint['ema_model'])
+state_dict = checkpoint["ema_model"]
+try:
+    new_net.load_state_dict(state_dict)
+except RuntimeError:
+    from collections import OrderedDict
 
-#if FLAGS.parallel:
-#    new_net = new_net.module.to(device)
-
+    new_state_dict = OrderedDict()
+    for k, v in state_dict.items():
+        new_state_dict[k[7:]] = v
+    new_net.load_state_dict(new_state_dict)
 new_net.eval()
 
-####
-# Define ODE
-###
-node = NeuralODE(new_net, solver="euler", sensitivity="adjoint", atol=1e-4, rtol=1e-4)
+
+# Define the integration method if euler is used
+if FLAGS.integration_method == "euler":
+    node = NeuralODE(new_net, solver=FLAGS.integration_method)
+
 
 def gen_1_img(unused_latent):
     with torch.no_grad():
-        traj = node.trajectory(
-            torch.randn(500, 3, 32, 32).to(device),
-            t_span=torch.linspace(0, 1, 100).to(device),
-        )
-    traj = traj[-1, :]#.view([-1, 3, 32, 32]).clip(-1, 1)
-    img = (traj * 127.5 + 128).clip(0, 255).to(torch.uint8)#.permute(1, 2, 0)
+        x = torch.randn(500, 3, 32, 32).to(device)
+        if FLAGS.integration_method == "euler":
+            print("Use method: ", FLAGS.integration_method)
+            t_span = torch.linspace(0, 1, FLAGS.integration_steps + 1).to(device)
+            traj = node.trajectory(x, t_span=t_span)
+        else:
+            print("Use method: ", FLAGS.integration_method)
+            t_span = torch.linspace(0, 1, 2).to(device)
+            traj = odeint(new_net, x, t_span, rtol=FLAGS.tol, atol=FLAGS.tol, method=FLAGS.integration_method)
+    traj = traj[-1, :]  # .view([-1, 3, 32, 32]).clip(-1, 1)
+    img = (traj * 127.5 + 128).clip(0, 255).to(torch.uint8)  # .permute(1, 2, 0)
     return img
 
-print("Start computing FID")
-score = fid.compute_fid(gen=gen_1_img, dataset_name="cifar10", batch_size=500, dataset_res=32, num_gen=50_000, dataset_split="train", mode='legacy_tensorflow')
 
-print('FID: ', score)
+print("Start computing FID")
+score = fid.compute_fid(
+    gen=gen_1_img,
+    dataset_name="cifar10",
+    batch_size=500,
+    dataset_res=32,
+    num_gen=FLAGS.num_gen,
+    dataset_split="train",
+    mode="legacy_tensorflow",
+)
+print()
+print("FID has been computed")
+print()
+print("Total NFE: ", new_net.nfe)
+print()
+print("FID: ", score)
+
