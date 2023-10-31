@@ -26,11 +26,9 @@ python src/train.py trainer.max_epochs=20 datamodule.batch_size=64
 
 You can also train a large set of models in parallel with SLURM as shown in `scripts/two-dim-cfm.sh` which trains the models used in the first 3 lines of Table 2.
 
-
 ## Code Contributions
 
 This repo is extracted from a larger private codebase which loses the original commit history which contains work from other authors of the papers.
-
 
 ## Project Structure
 

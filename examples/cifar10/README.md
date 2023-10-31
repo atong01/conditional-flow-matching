@@ -9,16 +9,19 @@ This repository is used to reproduce the CIFAR-10 experiments from [1](https://a
 To reproduce the experiments and save the weights, install the requirements from the main repository and then run (runs on a single RTX 2080 GPU):
 
 - For the OT-Conditional Flow Matching method:
+
 ```bash
 python3 train_cifar10.py --model "otcfm" --lr 2e-4 --ema_decay 0.9999 --batch_size 128 --total_steps 400001 --save_step 20000
 ```
 
 - For the Conditional Flow Matching method:
+
 ```bash
 python3 train_cifar10.py --model "cfm" --lr 2e-4 --ema_decay 0.9999 --batch_size 128 --total_steps 400001 --save_step 20000
 ```
 
 - For the original Flow Matching method:
+
 ```bash
 python3 train_cifar10.py --model "fm" --lr 2e-4 --ema_decay 0.9999 --batch_size 128 --total_steps 400001 --save_step 20000
 ```
@@ -29,11 +32,7 @@ To compute the FID from the OT-CFM model at end of training, run:
 python3 compute_fid.py --model "otcfm" --step 400000 --integration_method dopri5
 ```
 
-For the other models, change the "otcfm" argument by "cfm" or "fm". For easy reproducibility of our results, we provide the saved weights of our different methods trained for 400000 iterations. 
-
-- [Trained OT-CFM weights](http://alextong.net)
-- [Trained CFM weights](http://alextong.net)
-- [Trained FM weights](http://alextong.net)
+For the other models, change the "otcfm" argument by "cfm" or "fm". For easy reproducibility of our results, we will provide soon the saved weights of our different methods trained for 400000 iterations.
 
 To recompute the FID, change the PATH variable with where you have saved the downloaded weights.
 
