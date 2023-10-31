@@ -3,7 +3,7 @@
 This repository is used to reproduce the CIFAR-10 experiments from [1](https://arxiv.org/abs/2302.00482). We have designed a novel experimental procedure that helps us to reach an __FID of 3.5__ on the Cifar10 dataset.
 
 <p align="center">
-<img src="../../assets/169_generated_samples_otcfm.gif" width="600"/>
+<img src="../../assets/169_generated_samples_otcfm.png" width="600"/>
 </p>
 
 To reproduce the experiments and save the weights, install the requirements from the main repository and then run (runs on a single RTX 2080 GPU):
