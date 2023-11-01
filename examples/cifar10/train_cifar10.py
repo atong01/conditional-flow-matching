@@ -1,112 +1,174 @@
+# Inspired from https://github.com/w86763777/pytorch-ddpm/tree/master.
+
+# Authors: Kilian Fatras
+#          Alexander Tong
+
+import copy
 import os
 
-import matplotlib.pyplot as plt
-import numpy as np
 import torch
-from timm import scheduler
+from absl import app, flags
 from torchdyn.core import NeuralODE
 from torchvision import datasets, transforms
-from torchvision.utils import make_grid
-from tqdm import tqdm
+from tqdm import trange
+from utils_cifar import ema, generate_samples, infiniteloop
 
 from torchcfm.conditional_flow_matching import (
+    ConditionalFlowMatcher,
     ExactOptimalTransportConditionalFlowMatcher,
+    TargetConditionalFlowMatcher,
 )
 from torchcfm.models.unet.unet import UNetModelWrapper
 
-savedir = "weights/reproduced/"
-os.makedirs(savedir, exist_ok=True)
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string("model", "otcfm", help="flow matching model type")
+flags.DEFINE_string("output_dir", "./results/", help="output_directory")
+# UNet
+flags.DEFINE_integer("num_channel", 128, help="base channel of UNet")
+
+# Training
+flags.DEFINE_float("lr", 2e-4, help="target learning rate")  # TRY 2e-4
+flags.DEFINE_float("grad_clip", 1.0, help="gradient norm clipping")
+flags.DEFINE_integer(
+    "total_steps", 400001, help="total training steps"
+)  # Lipman et al uses 400k but double batch size
+flags.DEFINE_integer("img_size", 32, help="image size")
+flags.DEFINE_integer("warmup", 5000, help="learning rate warmup")
+flags.DEFINE_integer("batch_size", 128, help="batch size")  # Lipman et al uses 128
+flags.DEFINE_integer("num_workers", 4, help="workers of Dataloader")
+flags.DEFINE_float("ema_decay", 0.9999, help="ema decay rate")
+flags.DEFINE_bool("parallel", False, help="multi gpu training")
+
+# Evaluation
+flags.DEFINE_integer(
+    "save_step",
+    20000,
+    help="frequency of saving checkpoints, 0 to disable during training",
+)
+flags.DEFINE_integer(
+    "eval_step", 0, help="frequency of evaluating model, 0 to disable during training"
+)
+flags.DEFINE_integer("num_images", 50000, help="the number of generated images for evaluation")
+
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
-batch_size = 256
-n_epochs = 1000
-
-transform = transforms.Compose(
-    [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
-)
-
-trainset = datasets.CIFAR10(root="./data", train=True, download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(
-    trainset, batch_size=batch_size, shuffle=True, num_workers=1
-)
-
-num_iter_per_epoch = int(50000 / batch_size)
-
-#################################
-#            OT-CFM
-#################################
-
-sigma = 0.0
-model = UNetModelWrapper(
-    dim=(3, 32, 32),
-    num_res_blocks=2,
-    num_channels=256,
-    channel_mult=[1, 2, 2, 2],
-    num_heads=4,
-    num_head_channels=64,
-    attention_resolutions="16",
-    dropout=0,
-).to(device)
-
-if torch.cuda.device_count() > 1:
-    print("Let's use", torch.cuda.device_count(), "GPUs!")
-    # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
-    model = torch.nn.DataParallel(model).cuda()
 
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
-opt_scheduler = scheduler.PolyLRScheduler(
-    warmup_t=45000, warmup_lr_init=1e-8, t_initial=196 * n_epochs, optimizer=optimizer
-)
+def warmup_lr(step):
+    return min(step, FLAGS.warmup) / FLAGS.warmup
 
-# FM = ConditionalFlowMatcher(sigma=sigma)
-FM = ExactOptimalTransportConditionalFlowMatcher(sigma=sigma)
 
-for epoch in tqdm(range(n_epochs)):
-    for i, data in enumerate(trainloader):
-        optimizer.zero_grad()
-        x1 = data[0].to(device)
-        x0 = torch.randn_like(x1)
-        t, xt, ut = FM.sample_location_and_conditional_flow(x0, x1)
-        vt = model(t, xt)
-        loss = torch.mean((vt - ut) ** 2)
-        loss.backward()
-        optimizer.step()
-        opt_scheduler.step(epoch * (num_iter_per_epoch + 1) + i)
+def train(argv):
+    print(
+        "lr, total_steps, ema decay, save_step:",
+        FLAGS.lr,
+        FLAGS.total_steps,
+        FLAGS.ema_decay,
+        FLAGS.save_step,
+    )
 
-    # Saving the weights
-    if (epoch + 1) % 100 == 0:
-        print(i)
-        torch.save(
-            {
-                "epoch": epoch,
-                "model_state_dict": model.state_dict(),
-                "optimizer_state_dict": optimizer.state_dict(),
-                "loss": loss,
-            },
-            savedir + f"reproduced_cifar10_weights_epoch_{epoch}.pt",
+    # DATASETS/DATALOADER
+    dataset = datasets.CIFAR10(
+        root="./data",
+        train=True,
+        download=True,
+        transform=transforms.Compose(
+            [
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            ]
+        ),
+    )
+    dataloader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=FLAGS.batch_size,
+        shuffle=True,
+        num_workers=FLAGS.num_workers,
+        drop_last=True,
+    )
+
+    datalooper = infiniteloop(dataloader)
+
+    # MODELS
+    net_model = UNetModelWrapper(
+        dim=(3, 32, 32),
+        num_res_blocks=2,
+        num_channels=FLAGS.num_channel,
+        channel_mult=[1, 2, 2, 2],
+        num_heads=4,
+        num_head_channels=64,
+        attention_resolutions="16",
+        dropout=0.1,
+    ).to(
+        device
+    )  # new dropout + bs of 128
+
+    ema_model = copy.deepcopy(net_model)
+    optim = torch.optim.Adam(net_model.parameters(), lr=FLAGS.lr)
+    sched = torch.optim.lr_scheduler.LambdaLR(optim, lr_lambda=warmup_lr)
+    if FLAGS.parallel:
+        net_model = torch.nn.DataParallel(net_model)
+        ema_model = torch.nn.DataParallel(ema_model)
+
+    net_node = NeuralODE(net_model, solver="euler", sensitivity="adjoint")
+    ema_node = NeuralODE(ema_model, solver="euler", sensitivity="adjoint")
+    # show model size
+    model_size = 0
+    for param in net_model.parameters():
+        model_size += param.data.nelement()
+    print("Model params: %.2f M" % (model_size / 1024 / 1024))
+
+    #################################
+    #            OT-CFM
+    #################################
+
+    sigma = 0.0
+    if FLAGS.model == "otcfm":
+        FM = ExactOptimalTransportConditionalFlowMatcher(sigma=sigma)
+    elif FLAGS.model == "cfm":
+        FM = ConditionalFlowMatcher(sigma=sigma)
+    elif FLAGS.model == "fm":
+        FM = TargetConditionalFlowMatcher(sigma=sigma)
+    else:
+        raise NotImplementedError(
+            f"Unknown model {FLAGS.model}, must be one of ['otcfm', 'cfm', 'fm']"
         )
 
-if torch.cuda.device_count() > 1:
-    print("Send the model over 1 GPU for inference")
-    model = model.module.to(device)
+    savedir = FLAGS.output_dir + FLAGS.model + "/"
+    os.makedirs(savedir, exist_ok=True)
 
-node = NeuralODE(model, solver="euler", sensitivity="adjoint", atol=1e-4, rtol=1e-4)
+    with trange(FLAGS.total_steps, dynamic_ncols=True) as pbar:
+        for step in pbar:
+            optim.zero_grad()
+            x1 = next(datalooper).to(device)
+            x0 = torch.randn_like(x1)
+            t, xt, ut = FM.sample_location_and_conditional_flow(x0, x1)
+            vt = net_model(t, xt)
+            loss = torch.mean((vt - ut) ** 2)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(net_model.parameters(), FLAGS.grad_clip)  # new
+            optim.step()
+            sched.step()
+            ema(net_model, ema_model, FLAGS.ema_decay)  # new
 
-with torch.no_grad():
-    traj = node.trajectory(
-        torch.randn(60, 3, 32, 32).to(device),
-        t_span=torch.linspace(0, 1, 100).to(device),
-    )
-grid = make_grid(
-    traj[-1, :].view([-1, 3, 32, 32]).clip(-1, 1),
-    value_range=(-1, 1),
-    padding=0,
-    nrow=10,
-)
+            # sample and Saving the weights
+            if FLAGS.save_step > 0 and step % FLAGS.save_step == 0:
+                generate_samples(net_node, net_model, savedir, step, net_="normal")
+                generate_samples(ema_node, ema_model, savedir, step, net_="ema")
+                torch.save(
+                    {
+                        "net_model": net_model.state_dict(),
+                        "ema_model": ema_model.state_dict(),
+                        "sched": sched.state_dict(),
+                        "optim": optim.state_dict(),
+                        "step": step,
+                    },
+                    savedir + f"cifar10_weights_step_{step}.pt",
+                )
 
-img = grid.detach().cpu() / 2 + 0.5  # unnormalize
-npimg = img.numpy()
-plt.imshow(np.transpose(npimg, (1, 2, 0)))
-plt.savefig(savedir + "generated_cifar_reproduced.png")
+
+if __name__ == "__main__":
+    app.run(train)

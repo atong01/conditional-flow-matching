@@ -171,3 +171,5 @@ slurm*.out
 *.jpg
 
 notebooks/figures/
+
+.DS_Store
