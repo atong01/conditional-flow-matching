@@ -23,7 +23,7 @@ install_requires = [
 
 version_py = os.path.join(os.path.dirname(__file__), "torchcfm", "version.py")
 version = open(version_py).read().strip().split("=")[-1].replace('"', "").strip()
-readme = open("README.md").read()
+readme = open("README.md", encoding="utf8").read()
 setup(
     name="torchcfm",
     version=version,
