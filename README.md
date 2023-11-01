@@ -115,6 +115,7 @@ List of implemented papers:
 Run a simple minimal example here [![Run in Google Colab](https://img.shields.io/static/v1?label=Run%20in&message=Google%20Colab&color=orange&logo=Google%20Cloud)](https://colab.research.google.com/github/atong01/conditional-flow-matching/blob/master/examples/notebooks/training-8gaussians-to-moons.ipynb). Or install the more efficient code locally with these steps.
 
 TorchCFM is now on [pypi](https://pypi.org/project/torchcfm/)! You can install it with:
+
 ```bash
 pip install torchcfm
 ```
