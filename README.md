@@ -136,6 +136,9 @@ conda activate torchcfm
 
 # install requirements
 pip install -r requirements.txt
+
+# install torchcfm
+pip install -e .
 ```
 
 To run our jupyter notebooks, use the following commands after installing our package.
