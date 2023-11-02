@@ -8,7 +8,7 @@ scipy
 scikit-learn
 scprep
 scanpy
-torchdyn>=1.0.7   # 1.0.4 is broken on pypi
+torchdyn>=1.0.6   # 1.0.4 is broken on pypi
 pot
 torchdiffeq
 absl-py
