@@ -14,7 +14,7 @@ To reproduce the experiments and save the weights, install the requirements from
 python3 train_cifar10.py --model "otcfm" --lr 2e-4 --ema_decay 0.9999 --batch_size 128 --total_steps 400001 --save_step 20000
 ```
 
-- For the Conditional Flow Matching method:
+- For the Independant-Conditional Flow Matching (I-CFM) method:
 
 ```bash
 python3 train_cifar10.py --model "icfm" --lr 2e-4 --ema_decay 0.9999 --batch_size 128 --total_steps 400001 --save_step 20000
