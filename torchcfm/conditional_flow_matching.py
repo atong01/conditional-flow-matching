@@ -338,6 +338,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
         [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
         """
         del x0
+        t = pad_t_like_x(t, x1)
         return t * x1
 
     def compute_sigma_t(self, t):
@@ -381,6 +382,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
         [1] Flow Matching for Generative Modelling, ICLR, Lipman et al.
         """
         del x0
+        t = pad_t_like_x(t, x1)
         return (x1 - (1 - self.sigma) * xt) / (1 - (1 - self.sigma) * t)
 
 
@@ -562,6 +564,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         ----------
         [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
         """
+        t = pad_t_like_x(t, x0)
         return torch.cos(math.pi / 2 * t) * x0 + torch.sin(math.pi / 2 * t) * x1
 
     def compute_conditional_flow(self, x0, x1, t, xt):
@@ -590,4 +593,5 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
         """
         del xt
+        t = pad_t_like_x(t, x0)
         return math.pi / 2 * (torch.cos(math.pi / 2 * t) * x1 - torch.sin(math.pi / 2 * t) * x0)
