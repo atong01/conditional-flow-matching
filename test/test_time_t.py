@@ -10,12 +10,22 @@ from torchcfm.conditional_flow_matching import (
     SchrodingerBridgeConditionalFlowMatcher,
     VariancePreservingConditionalFlowMatcher
 )
-from torchcfm.utils import *
+
+import pytest
 
 seed=1994
 batch_size=128
 
+@pytest.mark.parametrize(
+        "FM", 
+        [ConditionalFlowMatcher(sigma=0.0),
+        ExactOptimalTransportConditionalFlowMatcher(sigma=0.0),
+        TargetConditionalFlowMatcher(sigma=0.0),
+        SchrodingerBridgeConditionalFlowMatcher(sigma=0.0),
+        VariancePreservingConditionalFlowMatcher(sigma=0.0)]
+)
 def test_random_Tensor_t(FM):
+    print('HERE')
     # Test sample_location_and_conditional_flow functions
     x0 = torch.randn(batch_size, 2)
     x1 = torch.randn(batch_size, 2)
@@ -29,7 +39,12 @@ def test_random_Tensor_t(FM):
     
     assert any(t_given==t_random)
 
-def guided_test_random_Tensor_t(FM):
+@pytest.mark.parametrize(
+        "FM", 
+        [ExactOptimalTransportConditionalFlowMatcher(sigma=0.0),
+        SchrodingerBridgeConditionalFlowMatcher(sigma=0.0)]
+)
+def test_guided_random_Tensor_t(FM):
     # Test guided_sample_location_and_conditional_flow functions
     x0 = torch.randn(batch_size, 2)
     y0 = torch.randint(high=10, size=(batch_size,1))
@@ -45,20 +60,3 @@ def guided_test_random_Tensor_t(FM):
 
     assert any(t_given==t_random)
     
-
-ICFM = ConditionalFlowMatcher(sigma=0.0)
-OTCFM = ExactOptimalTransportConditionalFlowMatcher(sigma=0.0)
-FM = TargetConditionalFlowMatcher(sigma=0.0)
-SBCFM = SchrodingerBridgeConditionalFlowMatcher(sigma=0.0)
-SI = VariancePreservingConditionalFlowMatcher(sigma=0.0)
-
-list_FM = [ICFM, OTCFM, SBCFM, FM, SI]
-
-for FM in list_FM:
-    test_random_Tensor_t(FM)
-
-
-list_FM = [OTCFM, SBCFM]
-
-for FM in list_FM:
-    guided_test_random_Tensor_t(FM)

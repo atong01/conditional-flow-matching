@@ -13,3 +13,4 @@ pot
 torchdiffeq
 absl-py
 clean-fid
+pytest
