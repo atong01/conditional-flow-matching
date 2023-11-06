@@ -36,4 +36,7 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     packages=find_packages(),
+    extras_require = {
+        'examples': ['seaborn', 'pandas', 'xgboost', 'scikit-learn', 'ForestDiffusion']
+    }
 )
