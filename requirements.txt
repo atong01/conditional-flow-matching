@@ -13,3 +13,8 @@ pot
 torchdiffeq
 absl-py
 clean-fid
+
+# Forest-flow example
+xgboost
+scikit-learn
+ForestDiffusion
