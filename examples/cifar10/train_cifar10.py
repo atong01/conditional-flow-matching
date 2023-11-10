@@ -128,13 +128,13 @@ def train(argv):
     sigma = 0.0
     if FLAGS.model == "otcfm":
         FM = ExactOptimalTransportConditionalFlowMatcher(sigma=sigma)
-    elif FLAGS.model == "cfm":
+    elif FLAGS.model == "icfm":
         FM = ConditionalFlowMatcher(sigma=sigma)
     elif FLAGS.model == "fm":
         FM = TargetConditionalFlowMatcher(sigma=sigma)
     else:
         raise NotImplementedError(
-            f"Unknown model {FLAGS.model}, must be one of ['otcfm', 'cfm', 'fm']"
+            f"Unknown model {FLAGS.model}, must be one of ['otcfm', 'icfm', 'fm']"
         )
 
     savedir = FLAGS.output_dir + FLAGS.model + "/"

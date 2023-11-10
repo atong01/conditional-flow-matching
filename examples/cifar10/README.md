@@ -14,10 +14,10 @@ To reproduce the experiments and save the weights, install the requirements from
 python3 train_cifar10.py --model "otcfm" --lr 2e-4 --ema_decay 0.9999 --batch_size 128 --total_steps 400001 --save_step 20000
 ```
 
-- For the Conditional Flow Matching method:
+- For the Independent Conditional Flow Matching (I-CFM) method:
 
 ```bash
-python3 train_cifar10.py --model "cfm" --lr 2e-4 --ema_decay 0.9999 --batch_size 128 --total_steps 400001 --save_step 20000
+python3 train_cifar10.py --model "icfm" --lr 2e-4 --ema_decay 0.9999 --batch_size 128 --total_steps 400001 --save_step 20000
 ```
 
 - For the original Flow Matching method:
@@ -32,9 +32,9 @@ To compute the FID from the OT-CFM model at end of training, run:
 python3 compute_fid.py --model "otcfm" --step 400000 --integration_method dopri5
 ```
 
-For the other models, change the "otcfm" argument by "cfm" or "fm". For easy reproducibility of our results, you can download the model weights at 400000 iterations here:
+For the other models, change the "otcfm" argument by "icfm" or "fm". For easy reproducibility of our results, you can download the model weights at 400000 iterations here:
 
-- [cfm weights](https://github.com/atong01/conditional-flow-matching/releases/download/1.0.4/cfm_cifar10_weights_step_400000.pt)
+- [icfm weights](https://github.com/atong01/conditional-flow-matching/releases/download/1.0.4/cfm_cifar10_weights_step_400000.pt)
 
 - [otcfm weights](https://github.com/atong01/conditional-flow-matching/releases/download/1.0.4/otcfm_cifar10_weights_step_400000.pt)
 
