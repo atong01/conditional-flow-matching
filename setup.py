@@ -36,7 +36,5 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     packages=find_packages(),
-    extras_require = {
-        'forest-flow': ['xgboost', 'scikit-learn', 'ForestDiffusion']
-    }
+    extras_require={"forest-flow": ["xgboost", "scikit-learn", "ForestDiffusion"]},
 )
