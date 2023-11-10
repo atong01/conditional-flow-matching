@@ -326,6 +326,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
         [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
         """
         del x0
+        t = pad_t_like_x(t, x1)
         return t * x1
 
     def compute_sigma_t(self, t):
@@ -369,6 +370,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
         [1] Flow Matching for Generative Modelling, ICLR, Lipman et al.
         """
         del x0
+        t = pad_t_like_x(t, x1)
         return (x1 - (1 - self.sigma) * xt) / (1 - (1 - self.sigma) * t)
 
 
