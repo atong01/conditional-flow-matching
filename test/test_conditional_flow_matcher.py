@@ -1,4 +1,4 @@
-"""Tests for time Tensor t."""
+"""Tests for Conditional Flow Matcher classers."""
 
 # Author: Kilian Fatras <kilian.fatras@mila.quebec>
 
@@ -9,8 +9,7 @@ from torchcfm.optimal_transport import OTPlanSampler
 
 from torchcfm.conditional_flow_matching import (
     ConditionalFlowMatcher,
-    ExactOptimalTransportConditionalFlowMatcher,
-    SchrodingerBridgeConditionalFlowMatcher
+    ExactOptimalTransportConditionalFlowMatcher
 )
 
 seed = 1994
@@ -24,7 +23,7 @@ sigma = 0.5
         ConditionalFlowMatcher(sigma=sigma),
     ],
 )
-def test_random_sample_location_and_vector_field(FM):
+def test_I_CFM_class(FM):
     # Test sample_location_and_conditional_flow functions
     x0 = torch.randn(batch_size, 2, 2)
     x1 = torch.randn(batch_size, 2, 2)
@@ -53,7 +52,7 @@ def test_random_sample_location_and_vector_field(FM):
         ExactOptimalTransportConditionalFlowMatcher(sigma=sigma),
     ],
 )
-def test_random_sample_location_and_vector_field_OT(FM):
+def test_OT_CFM_class(FM):
     # Test sample_location_and_conditional_flow functions
     x0 = torch.randn(batch_size, 2, 2)
     x1 = torch.randn(batch_size, 2, 2)
