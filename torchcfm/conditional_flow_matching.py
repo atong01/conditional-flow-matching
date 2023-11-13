@@ -54,7 +54,16 @@ class ConditionalFlowMatcher:
         ----------
         sigma : float
         """
-        self.sigma = sigma
+        self._sigma = sigma
+
+    @property
+    def sigma(self):
+        if isinstance(self._sigma, float):
+            return self._sigma
+        elif isinstance(self._sigma, int):
+            return float(self._sigma)
+        else:
+            raise ValueError("Sigma must be a float or int.")
 
     def compute_mu_t(self, x0, x1, t):
         """
