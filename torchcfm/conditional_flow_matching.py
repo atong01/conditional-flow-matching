@@ -230,7 +230,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         sigma : float
         ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
         """
-        self.sigma = sigma
+        super().__init__(sigma)
         self.ot_sampler = OTPlanSampler(method="exact")
 
     def sample_location_and_conditional_flow(self, x0, x1, return_noise=False):
@@ -398,7 +398,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         sigma : float
         ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
         """
-        self.sigma = sigma
+        super().__init__(sigma)
         self.ot_method = ot_method
         self.ot_sampler = OTPlanSampler(method=ot_method, reg=2 * self.sigma**2)
 
