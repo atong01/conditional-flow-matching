@@ -19,6 +19,21 @@ class OTPlanSampler:
         normalize_cost=False,
         **kwargs,
     ):
+        r"""Initialize the OTPlanSampler class.
+
+        Parameters
+        ----------
+        method : str
+            The method used to compute the OT plan. Can be one of "exact", "sinkhorn",
+            "unbalanced", or "partial".
+        reg : float (default : 0.05)
+            Entropic regularization coefficients.
+        reg_m : float (default : 1.0)
+            Marginal relaxation term for unbalanced OT (`method='unbalanced'`).
+        normalize_cost : bool (default : False)
+            Whether to normalize the cost matrix by its maximum value.
+            It should be set to `False` when using minibatches.
+        """
         # ot_fn should take (a, b, M) as arguments where a, b are marginals and
         # M is a cost matrix
         if method == "exact":
