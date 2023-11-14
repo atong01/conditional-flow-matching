@@ -6,6 +6,7 @@
 # License: MIT License
 
 import math
+from typing import Union
 
 import torch
 
@@ -31,7 +32,7 @@ def pad_t_like_x(t, x):
     t: Vector (bs)
     pad_t_like_x(t, x): Tensor (bs, 1, 1, 1)
     """
-    if isinstance(t, float):
+    if isinstance(t, (float, int)):
         return t
     return t.reshape(-1, *([1] * (x.dim() - 1)))
 
@@ -47,21 +48,14 @@ class ConditionalFlowMatcher:
     - score function $\nabla log p_t(x|x0, x1)$
     """
 
-    def __init__(self, sigma: float = 0.0):
+    def __init__(self, sigma: Union[float, int] = 0.0):
         r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter $\sigma$.
 
         Parameters
         ----------
-        sigma : float
+        sigma : Union[float, int]
         """
-        self._sigma = sigma
-
-    @property
-    def sigma(self):
-        if isinstance(self._sigma, int):
-            return float(self._sigma)
-        else:
-            return self._sigma
+        self.sigma = sigma
 
     def compute_mu_t(self, x0, x1, t):
         """
@@ -222,12 +216,12 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
     It overrides the sample_location_and_conditional_flow.
     """
 
-    def __init__(self, sigma: float = 0.0):
+    def __init__(self, sigma: Union[float, int] = 0.0):
         r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter $\sigma$.
 
         Parameters
         ----------
-        sigma : float
+        sigma : Union[float, int]
         ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
         """
         super().__init__(sigma)
@@ -389,13 +383,13 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
     sample_location_and_conditional_flow functions.
     """
 
-    def __init__(self, sigma: float = 1.0, ot_method="exact"):
+    def __init__(self, sigma: Union[float, int] = 1.0, ot_method="exact"):
         r"""Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the hyper-
         parameter $\sigma$ and the entropic OT map.
 
         Parameters
         ----------
-        sigma : float
+        sigma : Union[float, int]
         ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
         """
         super().__init__(sigma)
