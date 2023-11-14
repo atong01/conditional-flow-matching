@@ -195,5 +195,3 @@ def test_VPCFM_class(FM):
         assert torch.all(xt.eq(computed_xt))
         assert torch.all(eps.eq(epsilon))
         assert any(t_given_init == t)
-
-test_VPCFM_class(VariancePreservingConditionalFlowMatcher(sigma=0.5))
