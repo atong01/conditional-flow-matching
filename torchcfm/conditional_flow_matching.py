@@ -546,6 +546,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         ----------
         [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
         """
+        t = pad_t_like_x(t, x0)
         return torch.cos(math.pi / 2 * t) * x0 + torch.sin(math.pi / 2 * t) * x1
 
     def compute_conditional_flow(self, x0, x1, t, xt):
@@ -574,4 +575,5 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
         """
         del xt
+        t = pad_t_like_x(t, x0)
         return math.pi / 2 * (torch.cos(math.pi / 2 * t) * x1 - torch.sin(math.pi / 2 * t) * x0)
