@@ -29,7 +29,7 @@ def random_samples(n_dim, batch_size=TEST_BATCH_SIZE):
         return [torch.randn(batch_size, 2, 2, 2), torch.randn(batch_size, 2, 2, 2)]
 
 
-def computed_mu_x_u_t(method, x0, x1, t_given, sigma_t, epsilon):
+def compute_xt_ut(method, x0, x1, t_given, sigma_t, epsilon):
     if method == "vp_cfm":
         mu_t = torch.cos(math.pi / 2 * t_given) * x0 + torch.sin(math.pi / 2 * t_given) * x1
         computed_xt = mu_t + sigma_t * epsilon
@@ -109,7 +109,7 @@ def test_fm(method, sigma_int, sigma, n_dim):
     t_given = t_given_init.reshape(-1, *([1] * (x0.dim() - 1)))
 
     epsilon = torch.randn_like(x0)
-    computed_xt, computed_ut = computed_mu_x_u_t(method, x0, x1, t_given, sigma_t, epsilon)
+    computed_xt, computed_ut = compute_xt_ut(method, x0, x1, t_given, sigma_t, epsilon)
 
     assert torch.all(ut.eq(computed_ut))
     assert torch.all(xt.eq(computed_xt))
