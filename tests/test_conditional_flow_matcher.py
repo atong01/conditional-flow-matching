@@ -87,9 +87,10 @@ def sample_plan(method, x0, x1, sigma):
 
 
 @pytest.mark.parametrize("method", ["vp_cfm", "t_cfm", "sb_cfm", "exact_ot_cfm", "i_cfm"])
+@pytest.mark.parametrize("sigma_int", [False, True])
 @pytest.mark.parametrize("n_dim", [1, 3])
-def test_fm(method, n_dim):
-    sigma = TEST_SIGMA
+def test_fm(method, sigma_int, n_dim):
+    sigma = int(TEST_SIGMA) if sigma_int else TEST_SIGMA
     batch_size = TEST_BATCH_SIZE
     FM = get_flow_matcher(method, sigma)
     x0, x1 = random_samples(batch_size=batch_size, n_dim=n_dim)
