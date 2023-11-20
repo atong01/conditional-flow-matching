@@ -69,7 +69,7 @@ class OTPlanSampler:
             print(x0, x1)
         return p
 
-    def sample_map(self, pi, batch_size):
+    def sample_map(self, pi, batch_size, replace=True):
         r"""Draw source and target samples from pi  $(x,z) \sim \pi$
 
         Parameters
@@ -86,10 +86,10 @@ class OTPlanSampler:
         """
         p = pi.flatten()
         p = p / p.sum()
-        choices = np.random.choice(pi.shape[0] * pi.shape[1], p=p, size=batch_size)
+        choices = np.random.choice(pi.shape[0] * pi.shape[1], p=p, size=batch_size, replace=replace)
         return np.divmod(choices, pi.shape[1])
 
-    def sample_plan(self, x0, x1):
+    def sample_plan(self, x0, x1, replace=True):
         r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
         minibatch and draw source and target samples from pi $(x,z) \sim \pi$
 
@@ -108,10 +108,10 @@ class OTPlanSampler:
             represents the source minibatch drawn from $\pi$
         """
         pi = self.get_map(x0, x1)
-        i, j = self.sample_map(pi, x0.shape[0])
+        i, j = self.sample_map(pi, x0.shape[0], replace=replace)
         return x0[i], x1[j]
 
-    def sample_plan_with_labels(self, x0, x1, y0=None, y1=None):
+    def sample_plan_with_labels(self, x0, x1, y0=None, y1=None, replace=True):
         r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
         minibatch and draw source and target labeled samples from pi $(x,z) \sim \pi$
 
@@ -138,7 +138,7 @@ class OTPlanSampler:
             represents the target label minibatch drawn from $\pi$
         """
         pi = self.get_map(x0, x1)
-        i, j = self.sample_map(pi, x0.shape[0])
+        i, j = self.sample_map(pi, x0.shape[0], replace=replace)
         return (
             x0[i],
             x1[j],
