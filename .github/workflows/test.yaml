@@ -1,4 +1,4 @@
-name: Runner Tests
+name: TorchCFM Tests
 
 on:
   push:
