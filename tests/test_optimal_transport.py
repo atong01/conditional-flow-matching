@@ -60,6 +60,3 @@ def test_sample_plan(batch_size=128, seed=1980):
 
     assert torch.equal(new_x0, sampled_x0)
     assert torch.equal(new_x1, sampled_x1)
-
-
-test_sample_plan()
