@@ -86,7 +86,9 @@ class OTPlanSampler:
         """
         p = pi.flatten()
         p = p / p.sum()
-        choices = np.random.choice(pi.shape[0] * pi.shape[1], p=p, size=batch_size, replace=replace)
+        choices = np.random.choice(
+            pi.shape[0] * pi.shape[1], p=p, size=batch_size, replace=replace
+        )
         return np.divmod(choices, pi.shape[1])
 
     def sample_plan(self, x0, x1, replace=True):
