@@ -78,6 +78,8 @@ class OTPlanSampler:
             represents the source minibatch
         batch_size : int
             represents the OT plan between minibatches
+        replace : bool
+            represents sampling or without replacement from the OT plan
 
         Returns
         -------
@@ -101,6 +103,8 @@ class OTPlanSampler:
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
+        replace : bool
+            represents sampling or without replacement from the OT plan
 
         Returns
         -------
@@ -127,6 +131,8 @@ class OTPlanSampler:
             represents the source label minibatch
         y1 : Tensor, shape (bs)
             represents the target label minibatch
+        replace : bool
+            represents sampling or without replacement from the OT plan
 
         Returns
         -------
