@@ -383,9 +383,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
     sample_location_and_conditional_flow functions.
     """
 
-    def __init__(
-        self, sigma: float = 1.0, ot_method="exact"
-    ):  # TODO: should the default be "sinkhorn"?
+    def __init__(self, sigma: float = 1.0, ot_method="exact"):
         r"""Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the hyper-
         parameter $\sigma$ and the entropic OT map.
 
@@ -393,6 +391,10 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         ----------
         sigma : float
         ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
+            we use exact as the default as we found this to perform better
+            (more accurate and faster) in practice for reasonable batch sizes.
+            We note that as batchsize --> infinity the correct choice is the
+            sinkhorn method theoretically.
         """
         if sigma <= 0:
             raise ValueError(f"Sigma must be strictly positive, got {sigma}.")
