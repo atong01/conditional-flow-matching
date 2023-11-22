@@ -19,6 +19,7 @@ from torchcfm.optimal_transport import OTPlanSampler
 
 TEST_SEED = 1994
 TEST_BATCH_SIZE = 128
+SIGMA_CONDITION = {"sb_cfm": lambda x: x<= 0, }
 
 
 def random_samples(n_dim, batch_size=TEST_BATCH_SIZE):
@@ -92,26 +93,32 @@ def sample_plan(method, x0, x1, sigma):
 def test_fm(method, sigma_int, sigma, n_dim):
     sigma = int(sigma) if sigma_int else float(sigma)
     batch_size = TEST_BATCH_SIZE
-    FM = get_flow_matcher(method, sigma)
-    x0, x1 = random_samples(batch_size=batch_size, n_dim=n_dim)
-    torch.manual_seed(TEST_SEED)
-    np.random.seed(TEST_SEED)
-    t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)
 
-    if method in ["sb_cfm", "exact_ot_cfm"]:
+    if method in SIGMA_CONDITION.keys() and SIGMA_CONDITION[method](sigma):
+        with pytest.raises(ValueError):
+            get_flow_matcher(method, sigma)
+            
+    else:
+        FM = get_flow_matcher(method, sigma)
+        x0, x1 = random_samples(batch_size=batch_size, n_dim=n_dim)
         torch.manual_seed(TEST_SEED)
         np.random.seed(TEST_SEED)
-        x0, x1 = sample_plan(method, x0, x1, sigma)
+        t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)
 
-    torch.manual_seed(TEST_SEED)
-    sigma_t = torch.FloatTensor([sigma]).reshape(-1, *([1] * (x0.dim() - 1)))
-    t_given_init = torch.rand(batch_size)
-    t_given = t_given_init.reshape(-1, *([1] * (x0.dim() - 1)))
+        if method in ["sb_cfm", "exact_ot_cfm"]:
+            torch.manual_seed(TEST_SEED)
+            np.random.seed(TEST_SEED)
+            x0, x1 = sample_plan(method, x0, x1, sigma)
 
-    epsilon = torch.randn_like(x0)
-    computed_xt, computed_ut = compute_xt_ut(method, x0, x1, t_given, sigma_t, epsilon)
+        torch.manual_seed(TEST_SEED)
+        sigma_t = torch.FloatTensor([sigma]).reshape(-1, *([1] * (x0.dim() - 1)))
+        t_given_init = torch.rand(batch_size)
+        t_given = t_given_init.reshape(-1, *([1] * (x0.dim() - 1)))
 
-    assert torch.all(ut.eq(computed_ut))
-    assert torch.all(xt.eq(computed_xt))
-    assert torch.all(eps.eq(epsilon))
-    assert any(t_given_init == t)
+        epsilon = torch.randn_like(x0)
+        computed_xt, computed_ut = compute_xt_ut(method, x0, x1, t_given, sigma_t, epsilon)
+
+        assert torch.all(ut.eq(computed_ut))
+        assert torch.all(xt.eq(computed_xt))
+        assert torch.all(eps.eq(epsilon))
+        assert any(t_given_init == t)
