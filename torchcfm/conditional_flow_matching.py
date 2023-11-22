@@ -383,7 +383,9 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
     sample_location_and_conditional_flow functions.
     """
 
-    def __init__(self, sigma: float = 1.0, ot_method="exact"): # TODO: should the default be "sinkhorn"?
+    def __init__(
+        self, sigma: float = 1.0, ot_method="exact"
+    ):  # TODO: should the default be "sinkhorn"?
         r"""Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the hyper-
         parameter $\sigma$ and the entropic OT map.
 
@@ -393,7 +395,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
         """
         if sigma <= 0:
-            raise ValueError("Sigma must be strictly positive, got {}.".format(sigma))
+            raise ValueError(f"Sigma must be strictly positive, got {sigma}.")
         elif sigma < 1e-3:
             warnings.warn("Small sigma values may lead to numerical instability.")
         self.sigma = sigma
