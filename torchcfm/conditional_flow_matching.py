@@ -32,7 +32,7 @@ def pad_t_like_x(t, x):
     t: Vector (bs)
     pad_t_like_x(t, x): Tensor (bs, 1, 1, 1)
     """
-    if isinstance(t, float):
+    if isinstance(t, (float, int)):
         return t
     return t.reshape(-1, *([1] * (x.dim() - 1)))
 
