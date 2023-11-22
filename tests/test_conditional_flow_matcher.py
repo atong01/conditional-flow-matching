@@ -14,11 +14,15 @@ from torchcfm.conditional_flow_matching import (
     SchrodingerBridgeConditionalFlowMatcher,
     TargetConditionalFlowMatcher,
     VariancePreservingConditionalFlowMatcher,
+    pad_t_like_x,
 )
 from torchcfm.optimal_transport import OTPlanSampler
 
 TEST_SEED = 1994
 TEST_BATCH_SIZE = 128
+SIGMA_CONDITION = {
+    "sb_cfm": lambda x: x <= 0,
+}
 
 
 def random_samples(n_dim, batch_size=TEST_BATCH_SIZE):
@@ -29,8 +33,9 @@ def random_samples(n_dim, batch_size=TEST_BATCH_SIZE):
         return [torch.randn(batch_size, 2, 2, 2), torch.randn(batch_size, 2, 2, 2)]
 
 
-def compute_xt_ut(method, x0, x1, t_given, sigma_t, epsilon):
+def compute_xt_ut(method, x0, x1, t_given, sigma, epsilon):
     if method == "vp_cfm":
+        sigma_t = sigma
         mu_t = torch.cos(math.pi / 2 * t_given) * x0 + torch.sin(math.pi / 2 * t_given) * x1
         computed_xt = mu_t + sigma_t * epsilon
         computed_ut = (
@@ -39,15 +44,15 @@ def compute_xt_ut(method, x0, x1, t_given, sigma_t, epsilon):
             * (torch.cos(math.pi / 2 * t_given) * x1 - torch.sin(math.pi / 2 * t_given) * x0)
         )
     elif method == "t_cfm":
+        sigma_t = 1 - (1 - sigma) * t_given
         mu_t = t_given * x1
-        std = t_given * sigma_t - t_given + 1
-        computed_xt = mu_t + std * epsilon
-        computed_ut = (x1 - (1 - sigma_t) * computed_xt) / (1 - (1 - sigma_t) * t_given)
+        computed_xt = mu_t + sigma_t * epsilon
+        computed_ut = (x1 - (1 - sigma) * computed_xt) / sigma_t
 
     elif method == "sb_cfm":
-        std = sigma_t * torch.sqrt(t_given * (1 - t_given))
+        sigma_t = sigma * torch.sqrt(t_given * (1 - t_given))
         mu_t = t_given * x1 + (1 - t_given) * x0
-        computed_xt = mu_t + std * epsilon
+        computed_xt = mu_t + sigma_t * epsilon
         computed_ut = (
             (1 - 2 * t_given)
             / (2 * t_given * (1 - t_given) + 1e-8)
@@ -56,6 +61,7 @@ def compute_xt_ut(method, x0, x1, t_given, sigma_t, epsilon):
             - x0
         )
     elif method in ["exact_ot_cfm", "i_cfm"]:
+        sigma_t = sigma
         mu_t = t_given * x1 + (1 - t_given) * x0
         computed_xt = mu_t + sigma_t * epsilon
         computed_ut = x1 - x0
@@ -87,31 +93,42 @@ def sample_plan(method, x0, x1, sigma):
 
 @pytest.mark.parametrize("method", ["vp_cfm", "t_cfm", "sb_cfm", "exact_ot_cfm", "i_cfm"])
 @pytest.mark.parametrize("sigma_int", [False, True])
-@pytest.mark.parametrize("sigma", [0.5, 1.5])
+@pytest.mark.parametrize(
+    "sigma",
+    [
+        0.5,
+        1.5,
+    ],
+)
 @pytest.mark.parametrize("n_dim", [1, 3])
 def test_fm(method, sigma_int, sigma, n_dim):
     sigma = int(sigma) if sigma_int else float(sigma)
     batch_size = TEST_BATCH_SIZE
-    FM = get_flow_matcher(method, sigma)
-    x0, x1 = random_samples(batch_size=batch_size, n_dim=n_dim)
-    torch.manual_seed(TEST_SEED)
-    np.random.seed(TEST_SEED)
-    t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)
 
-    if method in ["sb_cfm", "exact_ot_cfm"]:
+    if method in SIGMA_CONDITION.keys() and SIGMA_CONDITION[method](sigma):
+        with pytest.raises(ValueError):
+            get_flow_matcher(method, sigma)
+
+    else:
+        FM = get_flow_matcher(method, sigma)
+        x0, x1 = random_samples(batch_size=batch_size, n_dim=n_dim)
         torch.manual_seed(TEST_SEED)
         np.random.seed(TEST_SEED)
-        x0, x1 = sample_plan(method, x0, x1, sigma)
+        t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)
 
-    torch.manual_seed(TEST_SEED)
-    sigma_t = torch.FloatTensor([sigma]).reshape(-1, *([1] * (x0.dim() - 1)))
-    t_given_init = torch.rand(batch_size)
-    t_given = t_given_init.reshape(-1, *([1] * (x0.dim() - 1)))
+        if method in ["sb_cfm", "exact_ot_cfm"]:
+            torch.manual_seed(TEST_SEED)
+            np.random.seed(TEST_SEED)
+            x0, x1 = sample_plan(method, x0, x1, sigma)
 
-    epsilon = torch.randn_like(x0)
-    computed_xt, computed_ut = compute_xt_ut(method, x0, x1, t_given, sigma_t, epsilon)
+        torch.manual_seed(TEST_SEED)
+        t_given_init = torch.rand(batch_size)
+        t_given = t_given_init.reshape(-1, *([1] * (x0.dim() - 1)))
+        sigma_pad = pad_t_like_x(sigma, x0)
+        epsilon = torch.randn_like(x0)
+        computed_xt, computed_ut = compute_xt_ut(method, x0, x1, t_given, sigma_pad, epsilon)
 
-    assert torch.all(ut.eq(computed_ut))
-    assert torch.all(xt.eq(computed_xt))
-    assert torch.all(eps.eq(epsilon))
-    assert any(t_given_init == t)
+        assert torch.all(ut.eq(computed_ut))
+        assert torch.all(xt.eq(computed_xt))
+        assert torch.all(eps.eq(epsilon))
+        assert any(t_given_init == t)
