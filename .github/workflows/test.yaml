@@ -41,7 +41,7 @@ jobs:
           pytest -v --ignore=examples --ignore=runner
 
   # upload code coverage report
-  code-coverage:
+  code-coverage-torchcfm:
     runs-on: ubuntu-latest
 
     steps:
@@ -62,7 +62,11 @@ jobs:
           pip install -e .
 
       - name: Run tests and collect coverage
-        run: pytest . --cov torchcfm --ignore=examples --ignore=runner
+        run: pytest . --cov torchcfm
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
+        with:
+          name: codecov-torchcfm
+          verbose: true
+          fail_ci_if_error: true
