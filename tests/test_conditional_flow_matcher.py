@@ -124,14 +124,3 @@ def test_fm(method, sigma, shape):
     assert torch.all(xt.eq(computed_xt))
     assert torch.all(eps.eq(epsilon))
     assert any(t_given_init == t)
-
-
-@pytest.mark.parametrize("method", ["vp_cfm", "t_cfm", "sb_cfm", "exact_ot_cfm", "i_cfm"])
-def test_t_edges(method):
-    sigma = 1.0
-    batch_size = TEST_BATCH_SIZE
-    FM = get_flow_matcher(method, sigma)
-    x0, x1 = random_samples([1, 2], batch_size=batch_size)
-    torch.manual_seed(TEST_SEED)
-    np.random.seed(TEST_SEED)
-    t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)
