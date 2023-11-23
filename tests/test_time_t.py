@@ -23,7 +23,7 @@ batch_size = 128
         ConditionalFlowMatcher(sigma=0.0),
         ExactOptimalTransportConditionalFlowMatcher(sigma=0.0),
         TargetConditionalFlowMatcher(sigma=0.0),
-        SchrodingerBridgeConditionalFlowMatcher(sigma=0.0),
+        SchrodingerBridgeConditionalFlowMatcher(sigma=0.1),
         VariancePreservingConditionalFlowMatcher(sigma=0.0),
     ],
 )
@@ -46,7 +46,7 @@ def test_random_Tensor_t(FM):
     "FM",
     [
         ExactOptimalTransportConditionalFlowMatcher(sigma=0.0),
-        SchrodingerBridgeConditionalFlowMatcher(sigma=0.0),
+        SchrodingerBridgeConditionalFlowMatcher(sigma=0.1),
     ],
 )
 def test_guided_random_Tensor_t(FM):
