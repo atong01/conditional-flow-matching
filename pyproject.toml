@@ -35,3 +35,6 @@ count = true
 
 [tool.bandit]
 skips = ["B101", "B311"]
+
+[tool.isort]
+known_first_party = ["tests", "src"]

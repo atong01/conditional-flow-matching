@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 import torch
+
 from src.datamodules.distribution_datamodule import (
     SKLearnDataModule,
     TorchDynDataModule,
