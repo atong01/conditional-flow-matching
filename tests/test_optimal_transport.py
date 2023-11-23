@@ -9,7 +9,7 @@ import ot
 import pytest
 import torch
 
-from torchcfm.optimal_transport import OTPlanSampler
+from torchcfm.optimal_transport import OTPlanSampler, wasserstein
 
 ot_sampler = OTPlanSampler(method="exact")
 
@@ -60,3 +60,28 @@ def test_sample_plan(batch_size=128, seed=1980):
 
     assert torch.equal(new_x0, sampled_x0)
     assert torch.equal(new_x1, sampled_x1)
+
+
+def test_wasserstein(batch_size=128, seed=1980):
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    x0 = torch.randn(batch_size, 2, 2, 2)
+    x1 = torch.randn(batch_size, 2, 2, 2)
+
+    M = torch.cdist(x0.reshape(x0.shape[0], -1), x1.reshape(x1.shape[0], -1))
+    pot_W22 = ot.emd2(ot.unif(x0.shape[0]), ot.unif(x1.shape[0]), (M**2).numpy())
+    pot_W2 = np.sqrt(pot_W22)
+    W2 = wasserstein(x0, x1, 'exact')
+
+    pot_W1 = ot.emd2(ot.unif(x0.shape[0]), ot.unif(x1.shape[0]), M.numpy())
+    W1 = wasserstein(x0, x1, 'exact', power=1)
+
+    pot_eot = ot.sinkhorn2(ot.unif(x0.shape[0]), ot.unif(x1.shape[0]), M.numpy(), reg=0.01, numItermax=int(1e7))
+    eot = wasserstein(x0, x1, 'sinkhorn', reg=0.01, power=1)
+
+    with pytest.raises(ValueError) as excinfo:
+        eot = wasserstein(x0, x1, 'noname', reg=0.01, power=1)
+
+    assert pot_W2==W2
+    assert pot_W1==W1
+    assert pot_eot==eot

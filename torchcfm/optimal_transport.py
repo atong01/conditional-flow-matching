@@ -257,7 +257,7 @@ def wasserstein(
     M = torch.cdist(x0, x1)
     if power == 2:
         M = M**2
-    ret = ot_fn(a, b, M.detach().cpu().numpy(), numItermax=1e7)
+    ret = ot_fn(a, b, M.detach().cpu().numpy(), numItermax=int(1e7))
     if power == 2:
         ret = math.sqrt(ret)
     return ret
