@@ -25,12 +25,11 @@ SIGMA_CONDITION = {
 }
 
 
-def random_samples(n_dim, batch_size=TEST_BATCH_SIZE):
+def random_samples(shape, batch_size=TEST_BATCH_SIZE):
     """Generate random samples of different dimensions."""
-    if n_dim == 1:
-        return [torch.randn(batch_size, 2), torch.randn(batch_size, 2)]
-    elif n_dim == 3:
-        return [torch.randn(batch_size, 2, 2, 2), torch.randn(batch_size, 2, 2, 2)]
+    if isinstance(shape, int):
+        shape = [shape]
+    return [torch.randn(batch_size, *shape), torch.randn(batch_size, *shape)]
 
 
 def compute_xt_ut(method, x0, x1, t_given, sigma, epsilon):
@@ -92,43 +91,47 @@ def sample_plan(method, x0, x1, sigma):
 
 
 @pytest.mark.parametrize("method", ["vp_cfm", "t_cfm", "sb_cfm", "exact_ot_cfm", "i_cfm"])
-@pytest.mark.parametrize("sigma_int", [False, True])
-@pytest.mark.parametrize(
-    "sigma",
-    [
-        0.5,
-        1.5,
-    ],
-)
-@pytest.mark.parametrize("n_dim", [1, 3])
-def test_fm(method, sigma_int, sigma, n_dim):
-    sigma = int(sigma) if sigma_int else float(sigma)
+# Test both integer and floating sigma
+@pytest.mark.parametrize("sigma", [0.0, 0.5, 1.5, 0, 1])
+@pytest.mark.parametrize("shape", [[1], [2], [1, 2], [3, 4, 5]])
+def test_fm(method, sigma, shape):
     batch_size = TEST_BATCH_SIZE
 
     if method in SIGMA_CONDITION.keys() and SIGMA_CONDITION[method](sigma):
         with pytest.raises(ValueError):
             get_flow_matcher(method, sigma)
+        return
 
-    else:
-        FM = get_flow_matcher(method, sigma)
-        x0, x1 = random_samples(batch_size=batch_size, n_dim=n_dim)
+    FM = get_flow_matcher(method, sigma)
+    x0, x1 = random_samples(shape, batch_size=batch_size)
+    torch.manual_seed(TEST_SEED)
+    np.random.seed(TEST_SEED)
+    t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)
+
+    if method in ["sb_cfm", "exact_ot_cfm"]:
         torch.manual_seed(TEST_SEED)
         np.random.seed(TEST_SEED)
-        t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)
+        x0, x1 = sample_plan(method, x0, x1, sigma)
 
-        if method in ["sb_cfm", "exact_ot_cfm"]:
-            torch.manual_seed(TEST_SEED)
-            np.random.seed(TEST_SEED)
-            x0, x1 = sample_plan(method, x0, x1, sigma)
+    torch.manual_seed(TEST_SEED)
+    t_given_init = torch.rand(batch_size)
+    t_given = t_given_init.reshape(-1, *([1] * (x0.dim() - 1)))
+    sigma_pad = pad_t_like_x(sigma, x0)
+    epsilon = torch.randn_like(x0)
+    computed_xt, computed_ut = compute_xt_ut(method, x0, x1, t_given, sigma_pad, epsilon)
 
-        torch.manual_seed(TEST_SEED)
-        t_given_init = torch.rand(batch_size)
-        t_given = t_given_init.reshape(-1, *([1] * (x0.dim() - 1)))
-        sigma_pad = pad_t_like_x(sigma, x0)
-        epsilon = torch.randn_like(x0)
-        computed_xt, computed_ut = compute_xt_ut(method, x0, x1, t_given, sigma_pad, epsilon)
+    assert torch.all(ut.eq(computed_ut))
+    assert torch.all(xt.eq(computed_xt))
+    assert torch.all(eps.eq(epsilon))
+    assert any(t_given_init == t)
 
-        assert torch.all(ut.eq(computed_ut))
-        assert torch.all(xt.eq(computed_xt))
-        assert torch.all(eps.eq(epsilon))
-        assert any(t_given_init == t)
+
+@pytest.mark.parametrize("method", ["vp_cfm", "t_cfm", "sb_cfm", "exact_ot_cfm", "i_cfm"])
+def test_t_edges(method):
+    sigma = 1.0
+    batch_size = TEST_BATCH_SIZE
+    FM = get_flow_matcher(method, sigma)
+    x0, x1 = random_samples([1, 2], batch_size=batch_size)
+    torch.manual_seed(TEST_SEED)
+    np.random.seed(TEST_SEED)
+    t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)

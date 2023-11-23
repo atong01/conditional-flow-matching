@@ -1,4 +1,5 @@
 import math
+import warnings
 from functools import partial
 from typing import Optional
 
@@ -16,9 +17,28 @@ class OTPlanSampler:
         method: str,
         reg: float = 0.05,
         reg_m: float = 1.0,
-        normalize_cost=False,
-        **kwargs,
-    ):
+        normalize_cost: bool = False,
+        warn: bool = True,
+    ) -> None:
+        """Initialize the OTPlanSampler class.
+
+        Parameters
+        ----------
+        method: str
+            choose which optimal transport solver you would like to use.
+            Currently supported are ["exact", "sinkhorn", "unbalanced",
+            "partial"] OT solvers.
+        reg: float, optional
+            regularization parameter to use for Sinkhorn-based iterative solvers.
+        reg_m: float, optional
+            regularization weight for unbalanced Sinkhorn-knopp solver.
+        normalize_cost: bool, optional
+            normalizes the cost matrix so that the maximum cost is 1. Helps
+            stabilize Sinkhorn-based solvers. Should not be used in the vast
+            majority of cases.
+        warn: bool, optional
+            if True, raises a warning if the algorithm does not converge
+        """
         # ot_fn should take (a, b, M) as arguments where a, b are marginals and
         # M is a cost matrix
         if method == "exact":
@@ -34,7 +54,7 @@ class OTPlanSampler:
         self.reg = reg
         self.reg_m = reg_m
         self.normalize_cost = normalize_cost
-        self.kwargs = kwargs
+        self.warn = warn
 
     def get_map(self, x0, x1):
         """Compute the OT plan (wrt squared Euclidean cost) between a source and a target
@@ -67,6 +87,10 @@ class OTPlanSampler:
             print(p)
             print("Cost mean, max", M.mean(), M.max())
             print(x0, x1)
+        if np.abs(p.sum()) < 1e-8:
+            if self.warn:
+                warnings.warn("Numerical errors in OT plan, reverting to uniform plan.")
+            p = np.ones_like(p) / p.size
         return p
 
     def sample_map(self, pi, batch_size, replace=True):
