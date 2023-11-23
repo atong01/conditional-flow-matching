@@ -1,4 +1,5 @@
 import math
+import warnings
 from functools import partial
 from typing import Optional
 
@@ -16,23 +17,27 @@ class OTPlanSampler:
         method: str,
         reg: float = 0.05,
         reg_m: float = 1.0,
-        normalize_cost=False,
-        **kwargs,
-    ):
-        r"""Initialize the OTPlanSampler class.
+        normalize_cost: bool = False,
+        warn: bool = True,
+    ) -> None:
+        """Initialize the OTPlanSampler class.
 
         Parameters
         ----------
-        method : str
-            The method used to compute the OT plan. Can be one of "exact", "sinkhorn",
-            "unbalanced", or "partial".
-        reg : float (default : 0.05)
-            Entropic regularization coefficients.
-        reg_m : float (default : 1.0)
-            Marginal relaxation term for unbalanced OT (`method='unbalanced'`).
-        normalize_cost : bool (default : False)
-            Whether to normalize the cost matrix by its maximum value.
-            It should be set to `False` when using minibatches.
+        method: str
+            choose which optimal transport solver you would like to use.
+            Currently supported are ["exact", "sinkhorn", "unbalanced",
+            "partial"] OT solvers.
+        reg: float, optional
+            regularization parameter to use for Sinkhorn-based iterative solvers.
+        reg_m: float, optional
+            regularization weight for unbalanced Sinkhorn-knopp solver.
+        normalize_cost: bool, optional
+            normalizes the cost matrix so that the maximum cost is 1. Helps
+            stabilize Sinkhorn-based solvers. Should not be used in the vast
+            majority of cases.
+        warn: bool, optional
+            if True, raises a warning if the algorithm does not converge
         """
         # ot_fn should take (a, b, M) as arguments where a, b are marginals and
         # M is a cost matrix
@@ -49,7 +54,7 @@ class OTPlanSampler:
         self.reg = reg
         self.reg_m = reg_m
         self.normalize_cost = normalize_cost
-        self.kwargs = kwargs
+        self.warn = warn
 
     def get_map(self, x0, x1):
         """Compute the OT plan (wrt squared Euclidean cost) between a source and a target
@@ -82,9 +87,13 @@ class OTPlanSampler:
             print(p)
             print("Cost mean, max", M.mean(), M.max())
             print(x0, x1)
+        if np.abs(p.sum()) < 1e-8:
+            if self.warn:
+                warnings.warn("Numerical errors in OT plan, reverting to uniform plan.")
+            p = np.ones_like(p) / p.size
         return p
 
-    def sample_map(self, pi, batch_size):
+    def sample_map(self, pi, batch_size, replace=True):
         r"""Draw source and target samples from pi  $(x,z) \sim \pi$
 
         Parameters
@@ -93,6 +102,8 @@ class OTPlanSampler:
             represents the source minibatch
         batch_size : int
             represents the OT plan between minibatches
+        replace : bool
+            represents sampling or without replacement from the OT plan
 
         Returns
         -------
@@ -101,10 +112,12 @@ class OTPlanSampler:
         """
         p = pi.flatten()
         p = p / p.sum()
-        choices = np.random.choice(pi.shape[0] * pi.shape[1], p=p, size=batch_size)
+        choices = np.random.choice(
+            pi.shape[0] * pi.shape[1], p=p, size=batch_size, replace=replace
+        )
         return np.divmod(choices, pi.shape[1])
 
-    def sample_plan(self, x0, x1):
+    def sample_plan(self, x0, x1, replace=True):
         r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
         minibatch and draw source and target samples from pi $(x,z) \sim \pi$
 
@@ -114,6 +127,8 @@ class OTPlanSampler:
             represents the source minibatch
         x1 : Tensor, shape (bs, *dim)
             represents the source minibatch
+        replace : bool
+            represents sampling or without replacement from the OT plan
 
         Returns
         -------
@@ -123,10 +138,10 @@ class OTPlanSampler:
             represents the source minibatch drawn from $\pi$
         """
         pi = self.get_map(x0, x1)
-        i, j = self.sample_map(pi, x0.shape[0])
+        i, j = self.sample_map(pi, x0.shape[0], replace=replace)
         return x0[i], x1[j]
 
-    def sample_plan_with_labels(self, x0, x1, y0=None, y1=None):
+    def sample_plan_with_labels(self, x0, x1, y0=None, y1=None, replace=True):
         r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
         minibatch and draw source and target labeled samples from pi $(x,z) \sim \pi$
 
@@ -140,6 +155,8 @@ class OTPlanSampler:
             represents the source label minibatch
         y1 : Tensor, shape (bs)
             represents the target label minibatch
+        replace : bool
+            represents sampling or without replacement from the OT plan
 
         Returns
         -------
@@ -153,7 +170,7 @@ class OTPlanSampler:
             represents the target label minibatch drawn from $\pi$
         """
         pi = self.get_map(x0, x1)
-        i, j = self.sample_map(pi, x0.shape[0])
+        i, j = self.sample_map(pi, x0.shape[0], replace=replace)
         return (
             x0[i],
             x1[j],
@@ -240,7 +257,7 @@ def wasserstein(
     M = torch.cdist(x0, x1)
     if power == 2:
         M = M**2
-    ret = ot_fn(a, b, M.detach().cpu().numpy(), numItermax=1e7)
+    ret = ot_fn(a, b, M.detach().cpu().numpy(), numItermax=int(1e7))
     if power == 2:
         ret = math.sqrt(ret)
     return ret

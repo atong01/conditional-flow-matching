@@ -1,4 +1,4 @@
-name: TorchCFM Tests
+name: Runner Tests
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, ubuntu-20.04, macos-latest, windows-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10"]
 
     steps:
       - name: Checkout
@@ -28,6 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -r runner-requirements.txt
           pip install pytest
           pip install sh
           pip install -e .
@@ -38,10 +39,10 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest -v --ignore=examples --ignore=runner
+          pytest -v runner
 
   # upload code coverage report
-  code-coverage-torchcfm:
+  code-coverage-runner:
     runs-on: ubuntu-latest
 
     steps:
@@ -56,17 +57,18 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -r runner-requirements.txt
           pip install pytest
           pip install pytest-cov[toml]
           pip install sh
           pip install -e .
 
       - name: Run tests and collect coverage
-        run: pytest . --cov torchcfm --ignore=runner --ignore=examples --ignore=torchcfm/models/
+        run: pytest runner --cov runner # NEEDS TO BE UPDATED WHEN CHANGING THE NAME OF "src" FOLDER
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          name: codecov-torchcfm
+          name: codecov-runner
           verbose: true
           fail_ci_if_error: true

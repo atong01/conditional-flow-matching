@@ -6,6 +6,7 @@
 # License: MIT License
 
 import math
+import warnings
 from typing import Union
 
 import torch
@@ -391,7 +392,15 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         ----------
         sigma : Union[float, int]
         ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
+            we use exact as the default as we found this to perform better
+            (more accurate and faster) in practice for reasonable batch sizes.
+            We note that as batchsize --> infinity the correct choice is the
+            sinkhorn method theoretically.
         """
+        if sigma <= 0:
+            raise ValueError(f"Sigma must be strictly positive, got {sigma}.")
+        elif sigma < 1e-3:
+            warnings.warn("Small sigma values may lead to numerical instability.")
         super().__init__(sigma)
         self.ot_method = ot_method
         self.ot_sampler = OTPlanSampler(method=ot_method, reg=2 * self.sigma**2)
@@ -547,6 +556,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         ----------
         [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
         """
+        t = pad_t_like_x(t, x0)
         return torch.cos(math.pi / 2 * t) * x0 + torch.sin(math.pi / 2 * t) * x1
 
     def compute_conditional_flow(self, x0, x1, t, xt):
@@ -575,4 +585,5 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
         """
         del xt
+        t = pad_t_like_x(t, x0)
         return math.pi / 2 * (torch.cos(math.pi / 2 * t) * x1 - torch.sin(math.pi / 2 * t) * x0)
