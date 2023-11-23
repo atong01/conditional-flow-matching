@@ -7,9 +7,6 @@ To run our jupyter notebooks, installing our package:
 ```bash
 cd ../../
 
-# install requirements
-pip install -r requirements.txt
-
 # install torchcfm
 pip install -e '.[forest-flow]'
 

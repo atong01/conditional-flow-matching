@@ -50,6 +50,3 @@ pot
 # --------- notebook reqs -------- #
 seaborn>=0.12.2
 pandas
-xgboost
-scikit-learn
-ForestDiffusion
