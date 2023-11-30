@@ -64,11 +64,10 @@ jobs:
           pip install -e .
 
       - name: Run tests and collect coverage
-        run: pytest runner --cov runner # NEEDS TO BE UPDATED WHEN CHANGING THE NAME OF "src" FOLDER
+        run: pytest runner --cov runner --cov-fail-under=30 # NEEDS TO BE UPDATED WHEN CHANGING THE NAME OF "src" FOLDER
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           name: codecov-runner
           verbose: true
-          fail_ci_if_error: true
