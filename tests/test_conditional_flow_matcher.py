@@ -92,7 +92,7 @@ def sample_plan(method, x0, x1, sigma):
 
 @pytest.mark.parametrize("method", ["vp_cfm", "t_cfm", "sb_cfm", "exact_ot_cfm", "i_cfm"])
 # Test both integer and floating sigma
-@pytest.mark.parametrize("sigma", [0.0, 0.5, 1.5, 0, 1])
+@pytest.mark.parametrize("sigma", [0.0, 5e-4, 0.5, 1.5, 0, 1])
 @pytest.mark.parametrize("shape", [[1], [2], [1, 2], [3, 4, 5]])
 def test_fm(method, sigma, shape):
     batch_size = TEST_BATCH_SIZE
