@@ -107,6 +107,7 @@ def test_fm(method, sigma, shape):
     torch.manual_seed(TEST_SEED)
     np.random.seed(TEST_SEED)
     t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)
+    _ = FM.compute_lambda(t)
 
     if method in ["sb_cfm", "exact_ot_cfm"]:
         torch.manual_seed(TEST_SEED)
