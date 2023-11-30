@@ -62,11 +62,10 @@ jobs:
           pip install -e .
 
       - name: Run tests and collect coverage
-        run: pytest . --cov torchcfm --ignore=runner --ignore=examples --ignore=torchcfm/models/
+        run: pytest . --cov torchcfm --ignore=runner --ignore=examples --ignore=torchcfm/models/ --cov-fail-under=30
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           name: codecov-torchcfm
           verbose: true
-          fail_ci_if_error: true

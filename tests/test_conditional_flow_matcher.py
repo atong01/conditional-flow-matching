@@ -92,7 +92,7 @@ def sample_plan(method, x0, x1, sigma):
 
 @pytest.mark.parametrize("method", ["vp_cfm", "t_cfm", "sb_cfm", "exact_ot_cfm", "i_cfm"])
 # Test both integer and floating sigma
-@pytest.mark.parametrize("sigma", [0.0, 0.5, 1.5, 0, 1])
+@pytest.mark.parametrize("sigma", [0.0, 5e-4, 0.5, 1.5, 0, 1])
 @pytest.mark.parametrize("shape", [[1], [2], [1, 2], [3, 4, 5]])
 def test_fm(method, sigma, shape):
     batch_size = TEST_BATCH_SIZE
@@ -107,6 +107,7 @@ def test_fm(method, sigma, shape):
     torch.manual_seed(TEST_SEED)
     np.random.seed(TEST_SEED)
     t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)
+    _ = FM.compute_lambda(t)
 
     if method in ["sb_cfm", "exact_ot_cfm"]:
         torch.manual_seed(TEST_SEED)

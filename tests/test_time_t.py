@@ -49,7 +49,8 @@ def test_random_Tensor_t(FM):
         SchrodingerBridgeConditionalFlowMatcher(sigma=0.1),
     ],
 )
-def test_guided_random_Tensor_t(FM):
+@pytest.mark.parametrize("return_noise", [True, False])
+def test_guided_random_Tensor_t(FM, return_noise):
     # Test guided_sample_location_and_conditional_flow functions
     x0 = torch.randn(batch_size, 2)
     y0 = torch.randint(high=10, size=(batch_size, 1))
@@ -58,13 +59,13 @@ def test_guided_random_Tensor_t(FM):
 
     torch.manual_seed(seed)
     t_given = torch.rand(batch_size)
-    t_given, xt, ut, y0, y1 = FM.guided_sample_location_and_conditional_flow(
-        x0, x1, y0=y0, y1=y1, t=t_given
-    )
+    t_given = FM.guided_sample_location_and_conditional_flow(
+        x0, x1, y0=y0, y1=y1, t=t_given, return_noise=return_noise
+    )[0]
 
     torch.manual_seed(seed)
-    t_random, xt, ut, y0, y1 = FM.guided_sample_location_and_conditional_flow(
-        x0, x1, y0=y0, y1=y1, t=None
-    )
+    t_random = FM.guided_sample_location_and_conditional_flow(
+        x0, x1, y0=y0, y1=y1, t=None, return_noise=return_noise
+    )[0]
 
     assert any(t_given == t_random)
