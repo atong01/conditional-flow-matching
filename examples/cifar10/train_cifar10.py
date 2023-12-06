@@ -33,7 +33,6 @@ flags.DEFINE_float("grad_clip", 1.0, help="gradient norm clipping")
 flags.DEFINE_integer(
     "total_steps", 400001, help="total training steps"
 )  # Lipman et al uses 400k but double batch size
-flags.DEFINE_integer("img_size", 32, help="image size")
 flags.DEFINE_integer("warmup", 5000, help="learning rate warmup")
 flags.DEFINE_integer("batch_size", 128, help="batch size")  # Lipman et al uses 128
 flags.DEFINE_integer("num_workers", 4, help="workers of Dataloader")
@@ -46,10 +45,6 @@ flags.DEFINE_integer(
     20000,
     help="frequency of saving checkpoints, 0 to disable during training",
 )
-flags.DEFINE_integer(
-    "eval_step", 0, help="frequency of evaluating model, 0 to disable during training"
-)
-flags.DEFINE_integer("num_images", 50000, help="the number of generated images for evaluation")
 
 
 use_cuda = torch.cuda.is_available()
