@@ -108,8 +108,7 @@ def train(argv):
         net_model = torch.nn.DataParallel(net_model)
         ema_model = torch.nn.DataParallel(ema_model)
 
-    net_node = NeuralODE(net_model, solver="euler", sensitivity="adjoint")
-    ema_node = NeuralODE(ema_model, solver="euler", sensitivity="adjoint")
+    print("Training is using {} GPUs!".format(torch.cuda.device_count()))
     # show model size
     model_size = 0
     for param in net_model.parameters():
@@ -151,8 +150,8 @@ def train(argv):
 
             # sample and Saving the weights
             if FLAGS.save_step > 0 and step % FLAGS.save_step == 0:
-                generate_samples(net_node, net_model, savedir, step, net_="normal")
-                generate_samples(ema_node, ema_model, savedir, step, net_="ema")
+                generate_samples(net_model, FLAGS.parallel, savedir, step, net_="normal")
+                generate_samples(ema_model, FLAGS.parallel, savedir, step, net_="ema")
                 torch.save(
                     {
                         "net_model": net_model.state_dict(),
