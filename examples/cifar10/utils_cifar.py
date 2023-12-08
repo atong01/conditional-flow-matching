@@ -10,16 +10,19 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 def generate_samples(model, parallel, savedir, step, net_="normal"):
     model.eval()
+    
+    model_ = model
     if parallel:
-        model = model.module.to(device)
-    node_ = NeuralODE(model, solver="euler", sensitivity="adjoint")
+        model_ = model_.module.to(device)
+    
+    node_ = NeuralODE(model_, solver="euler", sensitivity="adjoint")
     with torch.no_grad():
         traj = node_.trajectory(
             torch.randn(64, 3, 32, 32).to(device),
             t_span=torch.linspace(0, 1, 100).to(device),
         )
-    traj = traj[-1, :].view([-1, 3, 32, 32]).clip(-1, 1)
-    traj = traj / 2 + 0.5
+        traj = traj[-1, :].view([-1, 3, 32, 32]).clip(-1, 1)
+        traj = traj / 2 + 0.5
     save_image(traj, savedir + f"{net_}_generated_FM_images_step_{step}.png", nrow=8)
 
     model.train()
