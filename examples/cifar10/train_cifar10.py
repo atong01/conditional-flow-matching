@@ -107,7 +107,7 @@ def train(argv):
     if FLAGS.parallel:
         net_model = torch.nn.DataParallel(net_model)
         ema_model = torch.nn.DataParallel(ema_model)
-        print(f"Training is using {torch.cuda.device_count()} GPUs!")
+
     # show model size
     model_size = 0
     for param in net_model.parameters():
