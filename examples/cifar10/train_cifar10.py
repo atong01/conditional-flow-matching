@@ -159,7 +159,7 @@ def train(argv):
                         "optim": optim.state_dict(),
                         "step": step,
                     },
-                    savedir + f"cifar10_weights_step_{step}.pt",
+                    savedir + f"para_cifar10_weights_step_{step}.pt",
                 )
 
 

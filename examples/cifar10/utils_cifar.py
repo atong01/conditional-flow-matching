@@ -1,3 +1,5 @@
+import copy
+
 import torch
 from torchdyn.core import NeuralODE
 
@@ -10,11 +12,11 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 def generate_samples(model, parallel, savedir, step, net_="normal"):
     model.eval()
-    
-    model_ = model
+
+    model_ = copy.deepcopy(model)
     if parallel:
         model_ = model_.module.to(device)
-    
+
     node_ = NeuralODE(model_, solver="euler", sensitivity="adjoint")
     with torch.no_grad():
         traj = node_.trajectory(
