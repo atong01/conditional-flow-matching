@@ -10,11 +10,11 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 
 def generate_samples(
-        node_, model, savedir, step, net_="normal", batch_size=512,
-        num_gen=1000):
+    node_, model, savedir, step, net_="normal", batch_size=512, num_gen=1000
+):
     model.eval()
     gen_path = savedir + f"{net_}_generated_FM_images_step_{step}.png"
-    for batch in tqdm(range(num_gen//batch_size + 1)):
+    for batch in tqdm(range(num_gen // batch_size + 1)):
         with torch.no_grad():
             traj = node_.trajectory(
                 torch.randn(64, 3, 32, 32).to(device),
