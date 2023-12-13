@@ -106,7 +106,7 @@ def train(argv):
     sched = torch.optim.lr_scheduler.LambdaLR(optim, lr_lambda=warmup_lr)
     if FLAGS.parallel:
         print(
-            "Warning: parallel training is performing slighlty worse than single GPU training due to statistics computation in dataparallel. We recommend to train over a single GPU, which requires around 8 Gb of GPU memory."
+            "Warning: parallel training is performing slightly worse than single GPU training due to statistics computation in dataparallel. We recommend to train over a single GPU, which requires around 8 Gb of GPU memory."
         )
         net_model = torch.nn.DataParallel(net_model)
         ema_model = torch.nn.DataParallel(ema_model)
