@@ -11,10 +11,12 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 
 def generate_samples(model, parallel, savedir, step, net_="normal"):
+    """Generate 64 images (8 x 8) for sanity check along training."""
     model.eval()
 
     model_ = copy.deepcopy(model)
     if parallel:
+        # Send the models from GPU to CPU for inference with NeuralODE from Torchdyn
         model_ = model_.module.to(device)
 
     node_ = NeuralODE(model_, solver="euler", sensitivity="adjoint")
