@@ -20,7 +20,6 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("num_channel", 128, help="base channel of UNet")
 
 # Training
-flags.DEFINE_bool("parallel", False, help="multi gpu training")
 flags.DEFINE_string("input_dir", "./results", help="output_directory")
 flags.DEFINE_string("model", "otcfm", help="flow matching model type")
 flags.DEFINE_integer("integration_steps", 100, help="number of inference steps")

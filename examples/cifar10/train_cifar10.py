@@ -33,7 +33,6 @@ flags.DEFINE_float("grad_clip", 1.0, help="gradient norm clipping")
 flags.DEFINE_integer(
     "total_steps", 400001, help="total training steps"
 )  # Lipman et al uses 400k but double batch size
-flags.DEFINE_integer("img_size", 32, help="image size")
 flags.DEFINE_integer("warmup", 5000, help="learning rate warmup")
 flags.DEFINE_integer("batch_size", 128, help="batch size")  # Lipman et al uses 128
 flags.DEFINE_integer("num_workers", 4, help="workers of Dataloader")
@@ -46,10 +45,6 @@ flags.DEFINE_integer(
     20000,
     help="frequency of saving checkpoints, 0 to disable during training",
 )
-flags.DEFINE_integer(
-    "eval_step", 0, help="frequency of evaluating model, 0 to disable during training"
-)
-flags.DEFINE_integer("num_images", 50000, help="the number of generated images for evaluation")
 
 
 use_cuda = torch.cuda.is_available()
@@ -110,11 +105,12 @@ def train(argv):
     optim = torch.optim.Adam(net_model.parameters(), lr=FLAGS.lr)
     sched = torch.optim.lr_scheduler.LambdaLR(optim, lr_lambda=warmup_lr)
     if FLAGS.parallel:
+        print(
+            "Warning: parallel training is performing slightly worse than single GPU training due to statistics computation in dataparallel. We recommend to train over a single GPU, which requires around 8 Gb of GPU memory."
+        )
         net_model = torch.nn.DataParallel(net_model)
         ema_model = torch.nn.DataParallel(ema_model)
 
-    net_node = NeuralODE(net_model, solver="euler", sensitivity="adjoint")
-    ema_node = NeuralODE(ema_model, solver="euler", sensitivity="adjoint")
     # show model size
     model_size = 0
     for param in net_model.parameters():
@@ -156,8 +152,8 @@ def train(argv):
 
             # sample and Saving the weights
             if FLAGS.save_step > 0 and step % FLAGS.save_step == 0:
-                generate_samples(net_node, net_model, savedir, step, net_="normal")
-                generate_samples(ema_node, ema_model, savedir, step, net_="ema")
+                generate_samples(net_model, FLAGS.parallel, savedir, step, net_="normal")
+                generate_samples(ema_model, FLAGS.parallel, savedir, step, net_="ema")
                 torch.save(
                     {
                         "net_model": net_model.state_dict(),
