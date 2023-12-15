@@ -64,24 +64,3 @@ def plot_trajectories(traj):
     plt.xticks([])
     plt.yticks([])
     plt.show()
-
-
-class SDE(torch.nn.Module):
-    noise_type = "diagonal"
-    sde_type = "ito"
-
-    def __init__(self, ode_drift, score, input_size=(3, 32, 32), sigma=0.1):
-        super().__init__()
-        self.drift = ode_drift
-        self.score = score
-        self.input_size = input_size
-        self.sigma = sigma
-
-    # Drift
-    def f(self, t, y):
-        y = y.view(-1, *self.input_size)
-        return self.drift(t, y).flatten(start_dim=1) + self.score(t, y).flatten(start_dim=1)
-
-    # Diffusion
-    def g(self, t, y):
-        return torch.ones_like(y) * self.sigma
