@@ -89,8 +89,8 @@ def sinkhorn_knopp_unbalanced(
     >>> b=[.5, .5]
     >>> M=[[0., 1.],[1., 0.]]
     >>> ot.unbalanced.sinkhorn_knopp_unbalanced(a, b, M, 1., 1.)
-    array([[0.51122823, 0.18807035],
-           [0.18807035, 0.51122823]])
+    array([[0.51122814, 0.18807032],
+           [0.18807032, 0.51122814]])
 
     References
     ----------
