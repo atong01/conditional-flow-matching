@@ -17,6 +17,7 @@ from torchcfm.conditional_flow_matching import (
     ConditionalFlowMatcher,
     ExactOptimalTransportConditionalFlowMatcher,
     TargetConditionalFlowMatcher,
+    VariancePreservingConditionalFlowMatcher,
 )
 from torchcfm.models.unet.unet import UNetModelWrapper
 
@@ -128,9 +129,11 @@ def train(argv):
         FM = ConditionalFlowMatcher(sigma=sigma)
     elif FLAGS.model == "fm":
         FM = TargetConditionalFlowMatcher(sigma=sigma)
+    elif FLAGS.model == "si":
+        FM = VariancePreservingConditionalFlowMatcher(sigma=sigma)
     else:
         raise NotImplementedError(
-            f"Unknown model {FLAGS.model}, must be one of ['otcfm', 'icfm', 'fm']"
+            f"Unknown model {FLAGS.model}, must be one of ['otcfm', 'icfm', 'fm', 'si']"
         )
 
     savedir = FLAGS.output_dir + FLAGS.model + "/"
@@ -162,7 +165,7 @@ def train(argv):
                         "optim": optim.state_dict(),
                         "step": step,
                     },
-                    savedir + f"cifar10_weights_step_{step}.pt",
+                    savedir + f"{FLAGS.model}_cifar10_weights_step_{step}.pt",
                 )
 
 

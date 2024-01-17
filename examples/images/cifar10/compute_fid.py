@@ -47,7 +47,7 @@ new_net = UNetModelWrapper(
 
 
 # Load the model
-PATH = f"{FLAGS.input_dir}/{FLAGS.model}/cifar10_weights_step_{FLAGS.step}.pt"
+PATH = f"{FLAGS.input_dir}/{FLAGS.model}/{FLAGS.model}_cifar10_weights_step_{FLAGS.step}.pt"
 print("path: ", PATH)
 checkpoint = torch.load(PATH)
 state_dict = checkpoint["ema_model"]
