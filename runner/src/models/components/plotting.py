@@ -31,10 +31,12 @@ def plot_scatter_and_flow(obs, model, title="stream", wandb_logger=None):
     points_real = 50
     Y, X, T = np.mgrid[wmin:wmax:points, wmin:wmax:points, 0 : ts - 1 : 7j]
     gridpoints = torch.tensor(
-        np.stack([X.flatten(), Y.flatten()], axis=1), requires_grad=True
+        np.stack([X.flatten(), Y.flatten()], axis=1), requires_grad=True, device=device
     ).type(torch.float32)
-    times = torch.tensor(T.flatten(), requires_grad=True).type(torch.float32)[:, None]
-    out = model(times.to(device), gridpoints.to(device))
+    times = torch.tensor(T.flatten(), requires_grad=True, device=device).type(torch.float32)[
+        :, None
+    ]
+    out = model(times, gridpoints)
     out = out.reshape([points_real, points_real, 7, dim])
     out = out.cpu().detach().numpy()
     # Stream over time

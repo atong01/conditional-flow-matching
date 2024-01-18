@@ -70,14 +70,14 @@ if FLAGS.integration_method == "euler":
 
 def gen_1_img(unused_latent):
     with torch.no_grad():
-        x = torch.randn(500, 3, 32, 32).to(device)
+        x = torch.randn(500, 3, 32, 32, device=device)
         if FLAGS.integration_method == "euler":
             print("Use method: ", FLAGS.integration_method)
-            t_span = torch.linspace(0, 1, FLAGS.integration_steps + 1).to(device)
+            t_span = torch.linspace(0, 1, FLAGS.integration_steps + 1, device=device)
             traj = node.trajectory(x, t_span=t_span)
         else:
             print("Use method: ", FLAGS.integration_method)
-            t_span = torch.linspace(0, 1, 2).to(device)
+            t_span = torch.linspace(0, 1, 2, device=device)
             traj = odeint(
                 new_net, x, t_span, rtol=FLAGS.tol, atol=FLAGS.tol, method=FLAGS.integration_method
             )
