@@ -143,7 +143,7 @@ class CFMLitModule(LightningModule):
 
     def preprocess_batch(self, X, training=False):
         """Converts a batch of data into matched a random pair of (x0, x1)"""
-        t_select = torch.zeros(1).to(X.device)
+        t_select = torch.zeros(1, device=X.device)
         if self.is_trajectory:
             batch_size, times, dim = X.shape
             if not hasattr(self.datamodule, "HAS_JOINT_PLANS"):
@@ -168,7 +168,7 @@ class CFMLitModule(LightningModule):
 
             if training and self.hparams.leaveout_timepoint > 0:
                 # Select random except for the leftout timepoint
-                t_select = torch.randint(times - 2, size=(batch_size,)).to(X.device)
+                t_select = torch.randint(times - 2, size=(batch_size,), device=X.device)
                 t_select[t_select >= self.hparams.leaveout_timepoint] += 1
             else:
                 t_select = torch.randint(times - 1, size=(batch_size,))
@@ -623,12 +623,12 @@ class RectifiedFlowLitModule(CFMLitModule):
 
     def preprocess_batch(self, X, training=False):
         """Converts a batch of data into matched a random pair of (x0, x1)"""
-        t_select = torch.zeros(1).to(X.device)
+        t_select = torch.zeros(1, device=X.device)
         if self.is_trajectory:
             batch_size, times, dim = X.shape
             if training and self.hparams.leaveout_timepoint > 0:
                 # Select random except for the leftout timepoint
-                t_select = torch.randint(times - 2, size=(batch_size,)).to(X.device)
+                t_select = torch.randint(times - 2, size=(batch_size,), device=X.device)
                 t_select[t_select >= self.hparams.leaveout_timepoint] += 1
             else:
                 t_select = torch.randint(times - 1, size=(batch_size,))
@@ -1011,7 +1011,7 @@ class SF2MLitModule(CFMLitModule):
             # Randomly sample a batch from the stored data.
             idx = torch.randint(self.stored_data.shape[0], size=(X.shape[0],))
             X = self.stored_data[idx]
-            t_select = torch.zeros(1).to(X.device)
+            t_select = torch.zeros(1, device=X.device)
             return X[:, 0], X[:, 1], t_select
         return super().preprocess_batch(X, training)
 
