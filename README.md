@@ -196,6 +196,13 @@ Before making an issue, please verify that:
 
 Suggestions for improvements are always welcome!
 
+## Sponsors
+
+TorchCFM development and maintenance are financially supported by:
+<p align="center">
+<img src="assets/DF_logo.png" width="300"/>
+</p>
+
 ## License
 
 Conditional-Flow-Matching is licensed under the MIT License.
