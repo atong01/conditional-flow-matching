@@ -199,6 +199,7 @@ Suggestions for improvements are always welcome!
 ## Sponsors
 
 TorchCFM development and maintenance are financially supported by:
+
 <p align="center">
 <img src="assets/DF_logo.png" width="300"/>
 </p>
