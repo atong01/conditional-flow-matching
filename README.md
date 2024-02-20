@@ -204,6 +204,11 @@ TorchCFM development and maintenance are financially supported by:
 <img src="assets/DF_logo.png" width="300"/>
 </p>
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./DF_logo_dark.png">
+  <img alt="DF logo changing depending on mode.'" src="./DF_logo.png">
+</picture>
+
 ## License
 
 Conditional-Flow-Matching is licensed under the MIT License.
