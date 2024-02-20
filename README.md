@@ -201,13 +201,11 @@ Suggestions for improvements are always welcome!
 TorchCFM development and maintenance are financially supported by:
 
 <p align="center">
-<img src="assets/DF_logo.png" width="300"/>
-</p>
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/DF_logo_dark.png" width="300"/>
   <img alt="DF logo changing depending on mode.'" src="assets/DF_logo.png" width="300"/>
 </picture>
+</p>
 
 ## License
 
