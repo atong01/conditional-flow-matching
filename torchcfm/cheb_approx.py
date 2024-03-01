@@ -34,4 +34,5 @@ def expm_multiply(
 
 @torch.no_grad()
 def compute_chebychev_coeff_all(eigval, t, K):
-    return 2.0 * ive(torch.arange(0, K + 1), -t * eigval)
+    eigval = eigval.detach().cpu()
+    return 2.0 * ive(torch.arange(0, K + 1, device=eigval.device), -t * eigval)

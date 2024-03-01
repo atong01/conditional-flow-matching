@@ -38,7 +38,7 @@ def scanpy_knn_from_data(
         adata, n_neighbors=k, use_rep="X_pca" if projection else None
     )
     return norm_sym_laplacian(
-        torch.tensor(adata.obsp["connectivities"].toarray())
+        torch.tensor(adata.obsp["connectivities"].toarray(), device=data.device)
     )
 
 
