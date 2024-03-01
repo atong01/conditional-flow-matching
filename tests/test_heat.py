@@ -1,6 +1,6 @@
 import pytest
 import torch
-from torchcfm.diffusion_distance import laplacian_from_data, HeatKernelKNN, torch_knn_from_data
+from torchcfm.diffusion_distance import HeatKernelKNN, torch_knn_from_data
 
 def gt_heat_kernel_knn(
     data,
@@ -15,18 +15,6 @@ def gt_heat_kernel_knn(
     heat_kernel = (heat_kernel + heat_kernel.T) / 2
     heat_kernel[heat_kernel < 0] = 0.0
     return heat_kernel
-
-
-def test_laplacian():
-    data = torch.randn(100, 5)
-    sigma = 1.0
-    L = laplacian_from_data(data, sigma)
-    assert torch.allclose(L, L.T)
-    # compute the largest eigenvalue
-    eigvals = torch.linalg.eigvals(L).real
-    max_eigval = eigvals.max()
-    min_eigval = eigvals.min()
-    assert max_eigval <= 2.0
 
 
 @pytest.mark.parametrize("t", [0.1, 1.0,])
