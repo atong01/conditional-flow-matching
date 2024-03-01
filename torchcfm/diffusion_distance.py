@@ -104,7 +104,7 @@ class HeatKernelKNN(BaseHeatKernel):
         t: float = 1.0,
         projection: bool = False,
         proj_dim: int = 100,
-        graph_type: str = "torch",
+        graph_type: str = "scanpy",
     ):
         super().__init__(t=t, order=order)
         assert (
