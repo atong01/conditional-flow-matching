@@ -63,11 +63,14 @@ A. Tong, N. Malkin, G. Huguet, Y. Zhang, J. Rector-Brooks, K. Fatras, G. Wolf, Y
 </summary>
 
 ```bibtex
-@article{tong2023improving,
-  title={Improving and Generalizing Flow-Based Generative Models with Minibatch Optimal Transport},
-  author={Tong, Alexander and Malkin, Nikolay and Huguet, Guillaume and Zhang, Yanlei and {Rector-Brooks}, Jarrid and Fatras, Kilian and Wolf, Guy and Bengio, Yoshua},
-  year={2023},
-  journal={arXiv preprint 2302.00482}
+@article{tong2024improving,
+title={Improving and generalizing flow-based generative models with minibatch optimal transport},
+author={Alexander Tong and Kilian FATRAS and Nikolay Malkin and Guillaume Huguet and Yanlei Zhang and Jarrid Rector-Brooks and Guy Wolf and Yoshua Bengio},
+journal={Transactions on Machine Learning Research},
+issn={2835-8856},
+year={2024},
+url={https://openreview.net/forum?id=CD9Snc73AW},
+note={Expert Certification}
 }
 ```
 
