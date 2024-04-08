@@ -27,7 +27,7 @@ flags.DEFINE_string("integration_method", "dopri5", help="integration method to 
 flags.DEFINE_integer("step", 400000, help="training steps")
 flags.DEFINE_integer("num_gen", 50000, help="number of samples to generate")
 flags.DEFINE_float("tol", 1e-5, help="Integrator tolerance (absolute and relative)")
-flags.DEFINE_float("batch_size_fid", 1024, help="Batch size to compute FID")
+flags.DEFINE_integer("batch_size_fid", 1024, help="Batch size to compute FID")
 
 FLAGS(sys.argv)
 
