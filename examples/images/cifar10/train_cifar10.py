@@ -54,10 +54,6 @@ flags.DEFINE_integer(
 )
 
 
-use_cuda = torch.cuda.is_available()
-device = torch.device("cuda" if use_cuda else "cpu")
-
-
 def warmup_lr(step):
     return min(step, FLAGS.warmup) / FLAGS.warmup
 
@@ -152,7 +148,7 @@ def train(rank, world_size, argv):
     with trange(FLAGS.total_steps, dynamic_ncols=True) as pbar:
         for step in pbar:
             optim.zero_grad()
-            x1 = next(datalooper).to(device)
+            x1 = next(datalooper).to(rank)
             x0 = torch.randn_like(x1)
             t, xt, ut = FM.sample_location_and_conditional_flow(x0, x1)
             vt = net_model(t, xt)
@@ -186,6 +182,8 @@ def main(argv):
     if FLAGS.parallel and world_size > 1:
         train(rank=int(os.getenv("RANK", 0)), world_size=world_size, argv=argv)
     else:
+        use_cuda = torch.cuda.is_available()
+        device = torch.device("cuda" if use_cuda else "cpu")
         train(rank=device, world_size=world_size, argv=argv)
 
 
