@@ -1,6 +1,8 @@
 import copy
+import os
 
 import torch
+from torch import distributed as dist
 from torchdyn.core import NeuralODE
 
 # from torchvision.transforms import ToPILImage
@@ -8,6 +10,34 @@ from torchvision.utils import make_grid, save_image
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
+
+
+def setup(
+    rank: int,
+    world_size: int,
+    master_addr: str = "localhost",
+    master_port: str = "12355",
+    backend: str = "nccl",
+):
+    """Initialize the distributed environment.
+
+    Args:
+        rank: Rank of the current process.
+        world_size: Number of processes participating in the job.
+        master_addr: IP address of the master node.
+        master_port: Port number of the master node.
+        backend: Backend to use.
+    """
+
+    os.environ["MASTER_ADDR"] = master_addr
+    os.environ["MASTER_PORT"] = master_port
+
+    # initialize the process group
+    dist.init_process_group(
+        backend=backend,
+        rank=rank,
+        world_size=world_size,
+    )
 
 
 def generate_samples(model, parallel, savedir, step, net_="normal"):

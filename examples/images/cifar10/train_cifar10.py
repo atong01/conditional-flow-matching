@@ -8,10 +8,12 @@ import os
 
 import torch
 from absl import app, flags
+from torch.nn.parallel import DistributedDataParallel
+from torch.utils.data import DistributedSampler
 from torchdyn.core import NeuralODE
 from torchvision import datasets, transforms
 from tqdm import trange
-from utils_cifar import ema, generate_samples, infiniteloop
+from utils_cifar import ema, generate_samples, infiniteloop, setup
 
 from torchcfm.conditional_flow_matching import (
     ConditionalFlowMatcher,
@@ -39,6 +41,10 @@ flags.DEFINE_integer("batch_size", 128, help="batch size")  # Lipman et al uses 
 flags.DEFINE_integer("num_workers", 4, help="workers of Dataloader")
 flags.DEFINE_float("ema_decay", 0.9999, help="ema decay rate")
 flags.DEFINE_bool("parallel", False, help="multi gpu training")
+flags.DEFINE_string(
+    "master_addr", "localhost", help="master address for Distributed Data Parallel"
+)
+flags.DEFINE_string("master_port", "12355", help="master port for Distributed Data Parallel")
 
 # Evaluation
 flags.DEFINE_integer(
@@ -56,7 +62,7 @@ def warmup_lr(step):
     return min(step, FLAGS.warmup) / FLAGS.warmup
 
 
-def train(argv):
+def train(rank, world_size, argv):
     print(
         "lr, total_steps, ema decay, save_step:",
         FLAGS.lr,
@@ -64,6 +70,12 @@ def train(argv):
         FLAGS.ema_decay,
         FLAGS.save_step,
     )
+
+    if FLAGS.parallel and world_size > 1:
+        # When using `DistributedDataParallel`, we need to divide the batch
+        # size ourselves based on the total number of GPUs of the current node.
+        FLAGS.batch_size = int(FLAGS.batch_size / world_size)
+        setup(rank, world_size, FLAGS.master_addr, FLAGS.master_port)
 
     # DATASETS/DATALOADER
     dataset = datasets.CIFAR10(
@@ -81,7 +93,8 @@ def train(argv):
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=FLAGS.batch_size,
-        shuffle=True,
+        sampler=DistributedSampler(dataset) if FLAGS.parallel else None,
+        shuffle=False if FLAGS.parallel else True,
         num_workers=FLAGS.num_workers,
         drop_last=True,
     )
@@ -99,18 +112,15 @@ def train(argv):
         attention_resolutions="16",
         dropout=0.1,
     ).to(
-        device
+        rank
     )  # new dropout + bs of 128
 
     ema_model = copy.deepcopy(net_model)
     optim = torch.optim.Adam(net_model.parameters(), lr=FLAGS.lr)
     sched = torch.optim.lr_scheduler.LambdaLR(optim, lr_lambda=warmup_lr)
     if FLAGS.parallel:
-        print(
-            "Warning: parallel training is performing slightly worse than single GPU training due to statistics computation in dataparallel. We recommend to train over a single GPU, which requires around 8 Gb of GPU memory."
-        )
-        net_model = torch.nn.DataParallel(net_model)
-        ema_model = torch.nn.DataParallel(ema_model)
+        net_model = DistributedDataParallel(net_model, device_ids=[rank])
+        ema_model = DistributedDataParallel(ema_model, device_ids=[rank])
 
     # show model size
     model_size = 0
@@ -169,5 +179,15 @@ def train(argv):
                 )
 
 
+def main(argv):
+    # get world size (number of GPUs)
+    world_size = int(os.getenv("WORLD_SIZE", 1))
+
+    if FLAGS.parallel and world_size > 1:
+        train(rank=int(os.getenv("RANK", 0)), world_size=world_size, argv=argv)
+    else:
+        train(rank=device, world_size=world_size, argv=argv)
+
+
 if __name__ == "__main__":
-    app.run(train)
+    app.run(main)
