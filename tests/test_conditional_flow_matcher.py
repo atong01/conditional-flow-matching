@@ -110,7 +110,9 @@ def test_fm(method, sigma, shape, test_eps):
     eps = None
     if test_eps:
         eps = torch.randn_like(x0)
-    t, xt, ut, ret_eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True, eps=eps)
+    t, xt, ut, ret_eps = FM.sample_location_and_conditional_flow(
+        x0, x1, return_noise=True, eps=eps
+    )
     if test_eps:
         assert torch.allclose(ret_eps, eps)
     _ = FM.compute_lambda(t)

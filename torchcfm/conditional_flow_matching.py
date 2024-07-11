@@ -309,7 +309,9 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         """
         x0, x1, y0, y1 = self.ot_sampler.sample_plan_with_labels(x0, x1, y0, y1)
         if return_noise:
-            t, xt, ut, eps = super().sample_location_and_conditional_flow(x0, x1, t, return_noise, eps)
+            t, xt, ut, eps = super().sample_location_and_conditional_flow(
+                x0, x1, t, return_noise, eps
+            )
             return t, xt, ut, y0, y1, eps
         else:
             t, xt, ut = super().sample_location_and_conditional_flow(x0, x1, t, return_noise, eps)
@@ -548,7 +550,9 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         """
         x0, x1, y0, y1 = self.ot_sampler.sample_plan_with_labels(x0, x1, y0, y1)
         if return_noise:
-            t, xt, ut, eps = super().sample_location_and_conditional_flow(x0, x1, t, return_noise, eps)
+            t, xt, ut, eps = super().sample_location_and_conditional_flow(
+                x0, x1, t, return_noise, eps
+            )
             return t, xt, ut, y0, y1, eps
         else:
             t, xt, ut = super().sample_location_and_conditional_flow(x0, x1, t, return_noise, eps)
