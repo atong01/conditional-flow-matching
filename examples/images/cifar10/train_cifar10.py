@@ -2,8 +2,10 @@
 
 # Authors: Kilian Fatras
 #          Alexander Tong
+#          Imahn Shekhzadeh
 
 import copy
+import math
 import os
 
 import torch
@@ -99,6 +101,10 @@ def train(rank, total_num_gpus, argv):
 
     datalooper = infiniteloop(dataloader)
 
+    # Calculate number of epochs
+    steps_per_epoch = math.ceil(len(dataset) / FLAGS.batch_size)
+    num_epochs = math.ceil(FLAGS.total_steps / steps_per_epoch)
+
     # MODELS
     net_model = UNetModelWrapper(
         dim=(3, 32, 32),
@@ -147,34 +153,46 @@ def train(rank, total_num_gpus, argv):
     savedir = FLAGS.output_dir + FLAGS.model + "/"
     os.makedirs(savedir, exist_ok=True)
 
-    with trange(FLAGS.total_steps, dynamic_ncols=True) as pbar:
-        for step in pbar:
-            optim.zero_grad()
-            x1 = next(datalooper).to(rank)
-            x0 = torch.randn_like(x1)
-            t, xt, ut = FM.sample_location_and_conditional_flow(x0, x1)
-            vt = net_model(t, xt)
-            loss = torch.mean((vt - ut) ** 2)
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(net_model.parameters(), FLAGS.grad_clip)  # new
-            optim.step()
-            sched.step()
-            ema(net_model, ema_model, FLAGS.ema_decay)  # new
+    global_step = 0  # to keep track of the global step in training loop
 
-            # sample and Saving the weights
-            if FLAGS.save_step > 0 and step % FLAGS.save_step == 0:
-                generate_samples(net_model, FLAGS.parallel, savedir, step, net_="normal")
-                generate_samples(ema_model, FLAGS.parallel, savedir, step, net_="ema")
-                torch.save(
-                    {
-                        "net_model": net_model.state_dict(),
-                        "ema_model": ema_model.state_dict(),
-                        "sched": sched.state_dict(),
-                        "optim": optim.state_dict(),
-                        "step": step,
-                    },
-                    savedir + f"{FLAGS.model}_cifar10_weights_step_{step}.pt",
-                )
+    with trange(num_epochs, dynamic_ncols=True) as epoch_bar:
+        for epoch in epoch_bar:
+            epoch_bar.set_description(f"Epoch {epoch + 1}/{num_epochs}")
+
+            with trange(steps_per_epoch, dynamic_ncols=True) as step_pbar:
+                for step in step_pbar:
+                    global_step += step
+
+                    optim.zero_grad()
+                    x1 = next(datalooper).to(rank)
+                    x0 = torch.randn_like(x1)
+                    t, xt, ut = FM.sample_location_and_conditional_flow(x0, x1)
+                    vt = net_model(t, xt)
+                    loss = torch.mean((vt - ut) ** 2)
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(net_model.parameters(), FLAGS.grad_clip)  # new
+                    optim.step()
+                    sched.step()
+                    ema(net_model, ema_model, FLAGS.ema_decay)  # new
+
+                    # sample and Saving the weights
+                    if FLAGS.save_step > 0 and global_step % FLAGS.save_step == 0:
+                        generate_samples(
+                            net_model, FLAGS.parallel, savedir, global_step, net_="normal"
+                        )
+                        generate_samples(
+                            ema_model, FLAGS.parallel, savedir, global_step, net_="ema"
+                        )
+                        torch.save(
+                            {
+                                "net_model": net_model.state_dict(),
+                                "ema_model": ema_model.state_dict(),
+                                "sched": sched.state_dict(),
+                                "optim": optim.state_dict(),
+                                "step": global_step,
+                            },
+                            savedir + f"{FLAGS.model}_cifar10_weights_step_{global_step}.pt",
+                        )
 
 
 def main(argv):
