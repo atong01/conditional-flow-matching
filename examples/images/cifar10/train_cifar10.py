@@ -70,8 +70,10 @@ def train(rank, total_num_gpus, argv):
     if FLAGS.parallel and total_num_gpus > 1:
         # When using `DistributedDataParallel`, we need to divide the batch
         # size ourselves based on the total number of GPUs of the current node.
-        FLAGS.batch_size = int(FLAGS.batch_size / total_num_gpus)
+        batch_size_per_gpu = FLAGS.batch_size // total_num_gpus
         setup(rank, total_num_gpus, FLAGS.master_addr, FLAGS.master_port)
+    else:
+        batch_size_per_gpu = FLAGS.batch_size
 
     # DATASETS/DATALOADER
     dataset = datasets.CIFAR10(
@@ -88,7 +90,7 @@ def train(rank, total_num_gpus, argv):
     )
     dataloader = torch.utils.data.DataLoader(
         dataset,
-        batch_size=FLAGS.batch_size,
+        batch_size=batch_size_per_gpu,
         sampler=DistributedSampler(dataset) if FLAGS.parallel else None,
         shuffle=False if FLAGS.parallel else True,
         num_workers=FLAGS.num_workers,
