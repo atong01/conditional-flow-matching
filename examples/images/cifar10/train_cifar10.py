@@ -90,10 +90,11 @@ def train(rank, total_num_gpus, argv):
             ]
         ),
     )
+    sampler = DistributedSampler(dataset) if FLAGS.parallel else None
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=batch_size_per_gpu,
-        sampler=DistributedSampler(dataset) if FLAGS.parallel else None,
+        sampler=sampler,
         shuffle=False if FLAGS.parallel else True,
         num_workers=FLAGS.num_workers,
         drop_last=True,
@@ -155,9 +156,11 @@ def train(rank, total_num_gpus, argv):
 
     global_step = 0  # to keep track of the global step in training loop
 
-    with trange(num_epochs, dynamic_ncols=True) as epoch_bar:
-        for epoch in epoch_bar:
-            epoch_bar.set_description(f"Epoch {epoch + 1}/{num_epochs}")
+    with trange(num_epochs, dynamic_ncols=True) as epoch_pbar:
+        for epoch in epoch_pbar:
+            epoch_pbar.set_description(f"Epoch {epoch + 1}/{num_epochs}")
+            if sampler is not None:
+                sampler.set_epoch(epoch)
 
             with trange(steps_per_epoch, dynamic_ncols=True) as step_pbar:
                 for step in step_pbar:
