@@ -14,7 +14,7 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 def setup(
     rank: int,
-    world_size: int,
+    total_num_gpus: int,
     master_addr: str = "localhost",
     master_port: str = "12355",
     backend: str = "nccl",
@@ -23,7 +23,7 @@ def setup(
 
     Args:
         rank: Rank of the current process.
-        world_size: Number of processes participating in the job.
+        total_num_gpus: Number of GPUs used in the job.
         master_addr: IP address of the master node.
         master_port: Port number of the master node.
         backend: Backend to use.
@@ -36,7 +36,7 @@ def setup(
     dist.init_process_group(
         backend=backend,
         rank=rank,
-        world_size=world_size,
+        world_size=total_num_gpus,
     )
 
 

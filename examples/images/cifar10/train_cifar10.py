@@ -58,7 +58,7 @@ def warmup_lr(step):
     return min(step, FLAGS.warmup) / FLAGS.warmup
 
 
-def train(rank, world_size, argv):
+def train(rank, total_num_gpus, argv):
     print(
         "lr, total_steps, ema decay, save_step:",
         FLAGS.lr,
@@ -67,11 +67,11 @@ def train(rank, world_size, argv):
         FLAGS.save_step,
     )
 
-    if FLAGS.parallel and world_size > 1:
+    if FLAGS.parallel and total_num_gpus > 1:
         # When using `DistributedDataParallel`, we need to divide the batch
         # size ourselves based on the total number of GPUs of the current node.
-        FLAGS.batch_size = int(FLAGS.batch_size / world_size)
-        setup(rank, world_size, FLAGS.master_addr, FLAGS.master_port)
+        FLAGS.batch_size = int(FLAGS.batch_size / total_num_gpus)
+        setup(rank, total_num_gpus, FLAGS.master_addr, FLAGS.master_port)
 
     # DATASETS/DATALOADER
     dataset = datasets.CIFAR10(
@@ -177,14 +177,14 @@ def train(rank, world_size, argv):
 
 def main(argv):
     # get world size (number of GPUs)
-    world_size = int(os.getenv("WORLD_SIZE", 1))
+    total_num_gpus = int(os.getenv("WORLD_SIZE", 1))
 
-    if FLAGS.parallel and world_size > 1:
-        train(rank=int(os.getenv("RANK", 0)), world_size=world_size, argv=argv)
+    if FLAGS.parallel and total_num_gpus > 1:
+        train(rank=int(os.getenv("RANK", 0)), total_num_gpus=total_num_gpus, argv=argv)
     else:
         use_cuda = torch.cuda.is_available()
         device = torch.device("cuda" if use_cuda else "cpu")
-        train(rank=device, world_size=world_size, argv=argv)
+        train(rank=device, total_num_gpus=total_num_gpus, argv=argv)
 
 
 if __name__ == "__main__":
