@@ -1,7 +1,7 @@
 import math
 import warnings
 from functools import partial
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 import ot as pot
@@ -18,7 +18,7 @@ class OTPlanSampler:
         reg: float = 0.05,
         reg_m: float = 1.0,
         normalize_cost: bool = False,
-        num_threads: int | str = 1,
+        num_threads: Union[int, str] = 1,
         warn: bool = True,
     ) -> None:
         """Initialize the OTPlanSampler class.
