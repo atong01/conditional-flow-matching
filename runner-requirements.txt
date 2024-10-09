@@ -38,7 +38,7 @@ pytest            # tests
 # --------- pkg reqs -------- #
 lightning-bolts
 matplotlib
-numpy
+numpy<2.0.0 # Due to pandas incompatibility
 scipy
 scikit-learn
 scprep
