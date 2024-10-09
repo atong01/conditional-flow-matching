@@ -55,7 +55,7 @@ repos:
 
   # python docstring formatting
   - repo: https://github.com/myint/docformatter
-    rev: v1.7.5
+    rev: master
     hooks:
       - id: docformatter
         require_serial: true
