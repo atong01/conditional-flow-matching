@@ -9,7 +9,7 @@ install_requires = [
     "torchvision>=0.11.0",
     "lightning-bolts",
     "matplotlib",
-    "numpy<2.0.0", # Due to pandas incompatibility
+    "numpy<2.0.0",  # Due to pandas incompatibility
     "scipy",
     "scikit-learn",
     "scprep",
