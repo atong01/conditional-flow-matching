@@ -94,7 +94,8 @@ def sample_plan(method, x0, x1, sigma):
 # Test both integer and floating sigma
 @pytest.mark.parametrize("sigma", [0.0, 5e-4, 0.5, 1.5, 0, 1])
 @pytest.mark.parametrize("shape", [[1], [2], [1, 2], [3, 4, 5]])
-def test_fm(method, sigma, shape):
+@pytest.mark.parametrize("test_eps", [False, True])
+def test_fm(method, sigma, shape, test_eps):
     batch_size = TEST_BATCH_SIZE
 
     if method in SIGMA_CONDITION.keys() and SIGMA_CONDITION[method](sigma):
@@ -106,7 +107,14 @@ def test_fm(method, sigma, shape):
     x0, x1 = random_samples(shape, batch_size=batch_size)
     torch.manual_seed(TEST_SEED)
     np.random.seed(TEST_SEED)
-    t, xt, ut, eps = FM.sample_location_and_conditional_flow(x0, x1, return_noise=True)
+    eps = None
+    if test_eps:
+        eps = torch.randn_like(x0)
+    t, xt, ut, ret_eps = FM.sample_location_and_conditional_flow(
+        x0, x1, return_noise=True, eps=eps
+    )
+    if test_eps:
+        assert torch.allclose(ret_eps, eps)
     _ = FM.compute_lambda(t)
 
     if method in ["sb_cfm", "exact_ot_cfm"]:
@@ -115,13 +123,14 @@ def test_fm(method, sigma, shape):
         x0, x1 = sample_plan(method, x0, x1, sigma)
 
     torch.manual_seed(TEST_SEED)
+    if test_eps:
+        # compute to get same t seed
+        eps = torch.randn_like(x0)
     t_given_init = torch.rand(batch_size)
     t_given = t_given_init.reshape(-1, *([1] * (x0.dim() - 1)))
     sigma_pad = pad_t_like_x(sigma, x0)
-    epsilon = torch.randn_like(x0)
-    computed_xt, computed_ut = compute_xt_ut(method, x0, x1, t_given, sigma_pad, epsilon)
+    computed_xt, computed_ut = compute_xt_ut(method, x0, x1, t_given, sigma_pad, ret_eps)
 
     assert torch.all(ut.eq(computed_ut))
-    assert torch.all(xt.eq(computed_xt))
-    assert torch.all(eps.eq(epsilon))
+    assert torch.allclose(xt, computed_xt)
     assert any(t_given_init == t)
