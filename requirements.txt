@@ -3,7 +3,7 @@ torchvision>=0.11.0
 
 lightning-bolts
 matplotlib
-numpy
+numpy<2.0.0
 scipy
 scikit-learn
 scprep
