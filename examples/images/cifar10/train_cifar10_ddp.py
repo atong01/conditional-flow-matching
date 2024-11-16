@@ -15,7 +15,7 @@ from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DistributedSampler
 from torchdyn.core import NeuralODE
 from torchvision import datasets, transforms
-from utils_cifar import ema, generate_samples, infiniteloop, setup
+from utils_cifar import ema, generate_samples, setup
 
 from torchcfm.conditional_flow_matching import (
     ConditionalFlowMatcher,
@@ -101,8 +101,6 @@ def train(rank, total_num_gpus, argv):
         num_workers=FLAGS.num_workers,
         drop_last=True,
     )
-
-    datalooper = infiniteloop(dataloader)
 
     # Calculate number of epochs
     steps_per_epoch = math.ceil(len(dataset) / FLAGS.batch_size)
