@@ -164,7 +164,7 @@ def train(rank, total_num_gpus, argv):
 
             with trange(steps_per_epoch, dynamic_ncols=True) as step_pbar:
                 for step in step_pbar:
-                    global_step += 1
+                    global_step += step
 
                     optim.zero_grad()
                     x1 = next(datalooper).to(rank)
