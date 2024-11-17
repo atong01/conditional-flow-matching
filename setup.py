@@ -15,7 +15,7 @@ install_requires = [
     "scprep",
     "scanpy",
     "torchdyn",
-    "pot",
+    "pot<0.9.5",
     "torchdiffeq",
     "absl-py",
     "clean-fid",
