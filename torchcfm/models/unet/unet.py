@@ -270,7 +270,7 @@ class AttentionBlock(nn.Module):
         self.proj_out = zero_module(conv_nd(1, channels, channels, 1))
 
     def forward(self, x):
-        return checkpoint(self._forward, (x,), self.parameters(), True)
+        return checkpoint(self._forward, (x,), self.parameters(), self.use_checkpoint)
 
     def _forward(self, x):
         b, c, *spatial = x.shape
