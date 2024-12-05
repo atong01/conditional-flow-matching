@@ -201,6 +201,9 @@ Before making an issue, please verify that:
 
 Suggestions for improvements are always welcome!
 
+## Star History
+[![Star History Chart](https://api.star-history.com/svg?repos=atong01/conditional-flow-matching&type=Date)](https://star-history.com/#atong01/conditional-flow-matching&Date)
+
 ## Sponsors
 
 TorchCFM development and maintenance are financially supported by:
