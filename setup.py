@@ -14,6 +14,7 @@ install_requires = [
     "pot",
     "torchdiffeq",
     "absl-py",
+    "pandas>=2.2.2"
 ]
 
 version_py = os.path.join(os.path.dirname(__file__), "torchcfm", "version.py")
