@@ -9,15 +9,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .fp16_util import convert_module_to_f16, convert_module_to_f32
-from .nn import (
-    avg_pool_nd,
-    checkpoint,
-    conv_nd,
-    linear,
-    normalization,
-    timestep_embedding,
-    zero_module,
-)
+from .nn import (avg_pool_nd, checkpoint, conv_nd, linear, normalization,
+                 timestep_embedding, zero_module)
 
 
 class AttentionPool2d(nn.Module):
@@ -390,8 +383,10 @@ class UNetModel(nn.Module):
         upsampling. Deprecated.
     :param use_scale_shift_norm: use a FiLM-like conditioning mechanism.
     :param resblock_updown: use residual blocks for up/downsampling.
-    :param use_new_attention_order: use a different attention pattern for potentially increased
-        efficiency.
+    :param use_new_attention_order: use a different attention pattern for potentially
+                                    increased efficiency.
+    :param embedding_net: class to use for embedding. This is expected to be called like
+    `self.label_emb = embedding_net()` or `self.label_emb = embedding_net(num_classes, time_embed_dim)` for class-conditional generation
     """
 
     def __init__(
@@ -415,6 +410,7 @@ class UNetModel(nn.Module):
         use_scale_shift_norm=False,
         resblock_updown=False,
         use_new_attention_order=False,
+        embedding_net = nn.Identity
     ):
         super().__init__()
 
@@ -444,8 +440,12 @@ class UNetModel(nn.Module):
             linear(time_embed_dim, time_embed_dim),
         )
 
+        self.label_emb = embedding_net()
         if self.num_classes is not None:
-            self.label_emb = nn.Embedding(num_classes, time_embed_dim)
+            embedding_net = nn.Embedding if embedding_net == nn.Identity else embedding_net
+            self.label_emb = embedding_net(num_classes, time_embed_dim)
+            assert not isinstance(self.label_emb, nn.Identity), f"for class-conditional networks, provide an embedding please!"
+
 
         ch = input_ch = int(channel_mult[0] * model_channels)
         self.input_blocks = nn.ModuleList(
@@ -604,9 +604,9 @@ class UNetModel(nn.Module):
         :return: an [N x C x ...] Tensor of outputs.
         """
         timesteps = t
-        assert (y is not None) == (
-            self.num_classes is not None
-        ), "must specify y if and only if the model is class-conditional"
+        #assert (y is not None) == (
+        #    self.num_classes is not None
+        #), "must specify y if and only if the model is class-conditional"
         while timesteps.dim() > 1:
             print(timesteps.shape)
             timesteps = timesteps[:, 0]
@@ -614,11 +614,18 @@ class UNetModel(nn.Module):
             timesteps = timesteps.repeat(x.shape[0])
 
         hs = []
-        emb = self.time_embed(timestep_embedding(timesteps, self.model_channels))
+        # create sinusoidal timesteps proto embedding complying with creating
+        # a tensor of shape (batchsize, self.model_channels)
+        embedded_timesteps = timestep_embedding(timesteps, self.model_channels)
 
-        if self.num_classes is not None:
-            assert y.shape == (x.shape[0],)
-            emb = emb + self.label_emb(y)
+        # create NN based embedding that gives a emb tensor with shape
+        # (batchsize, 4*self.model_channels)
+        emb = self.time_embed(embedded_timesteps)
+
+        if (y is not None):
+            assert y.shape[0] == x.shape[0], f"batch dimension of y ({y.shape[0]}) does not match x ({x.shape[0]})"
+            labels = self.label_emb(y)
+            emb = emb + labels
 
         h = x.type(self.dtype)
         for module in self.input_blocks:
@@ -854,7 +861,7 @@ class EncoderUNetModel(nn.Module):
 
 NUM_CLASSES = 1000
 
-
+# this overwrites UNetModel in __init__.py
 class UNetModelWrapper(UNetModel):
     def __init__(
         self,
@@ -875,6 +882,7 @@ class UNetModelWrapper(UNetModel):
         resblock_updown=False,
         use_fp16=False,
         use_new_attention_order=False,
+            embedding_net = nn.Identity
     ):
         """Dim (tuple): (C, H, W)"""
         image_size = dim[-1]
@@ -918,6 +926,7 @@ class UNetModelWrapper(UNetModel):
             use_scale_shift_norm=use_scale_shift_norm,
             resblock_updown=resblock_updown,
             use_new_attention_order=use_new_attention_order,
+            embedding_net = embedding_net
         )
 
     def forward(self, t, x, y=None, *args, **kwargs):
