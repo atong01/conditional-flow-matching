@@ -27,7 +27,7 @@ from torchvision.transforms import ToPILImage
 from torchvision.utils import make_grid
 from tqdm import tqdm
 
-from torchcfm.conditional_flow_matching import *
+from torchcfm.conditional_flow_matching import ConditionalFlowMatcher, ExactOptimalTransportConditionalFlowMatcher, SchrodingerBridgeConditionalFlowMatcher
 from torchcfm.models.unet import UNetModel
 
 savedir = "models/cond_mnist"
@@ -52,12 +52,30 @@ train_loader = torch.utils.data.DataLoader(
 
 # %%
 #################################
-#    Class Conditional CFM
+#    Float Conditional CFM
 #################################
+
+class embed_condition(torch.nn.Module):
+    """ simple network to embed the condition, other architectures can be used too """
+
+    def __init__(self, input_dim=1, target_dim = 128):
+        super().__init__()
+
+        self.model = torch.nn.Sequential(
+            torch.nn.Linear(input_dim, target_dim),
+            torch.nn.GELU(),
+            torch.nn.Linear(target_dim, target_dim),
+        )
+
+    def forward(self, label):
+
+        return self.model(label)
+
+
 
 sigma = 0.0
 model = UNetModel(
-    dim=(1, 28, 28), num_channels=32, num_res_blocks=1, num_classes=10, class_cond=True
+    dim=(1, 28, 28), num_channels=32, num_res_blocks=1, embedding_net=embed_condition
 ).to(device)
 optimizer = torch.optim.Adam(model.parameters())
 FM = ConditionalFlowMatcher(sigma=sigma)
@@ -70,18 +88,19 @@ for epoch in range(n_epochs):
     for i, data in enumerate(train_loader):
         optimizer.zero_grad()
         x1 = data[0].to(device)
-        y = data[1].to(device)
+        y = data[1].float().to(device).reshape((batch_size, 1)) / 2. #just to have a floating point label
         x0 = torch.randn_like(x1)
         t, xt, ut = FM.sample_location_and_conditional_flow(x0, x1)
         vt = model(t, xt, y)
         loss = torch.mean((vt - ut) ** 2)
         loss.backward()
         optimizer.step()
-        print(f"epoch: {epoch}, steps: {i}, loss: {loss.item():.4}", end="\r")
+        print(f"cfm epoch: {epoch}, steps: {i}, loss: {loss.item():.4}", end="\r")
 
 # %%
 USE_TORCH_DIFFEQ = True
-generated_class_list = torch.arange(10, device=device).repeat(10)
+ntest = 10*10
+generated_class_list = torch.arange(10, device=device).repeat(10).reshape((ntest, 1)).float() / 2. #TODO: reshape
 with torch.no_grad():
     if USE_TORCH_DIFFEQ:
         traj = torchdiffeq.odeint(
@@ -102,7 +121,9 @@ grid = make_grid(
 )
 img = ToPILImage()(grid)
 plt.imshow(img)
-plt.show()
+cond_values = ", ".join([ f"{float(item):.2f}" for item in generated_class_list[0:10,0] ])
+plt.title(f"float conditional cfm\nlabels: {cond_values}")
+plt.savefig("floatconditional-cfm_noninteger.svg")
 
 # %%
 #################################
@@ -111,7 +132,7 @@ plt.show()
 
 sigma = 0.0
 model = UNetModel(
-    dim=(1, 28, 28), num_channels=32, num_res_blocks=1, num_classes=10, class_cond=True
+    dim=(1, 28, 28), num_channels=32, num_res_blocks=1, embedding_net=embed_condition
 ).to(device)
 optimizer = torch.optim.Adam(model.parameters())
 FM = ExactOptimalTransportConditionalFlowMatcher(sigma=sigma)
@@ -122,18 +143,17 @@ for epoch in range(n_epochs):
     for i, data in enumerate(train_loader):
         optimizer.zero_grad()
         x1 = data[0].to(device)
-        y = data[1].to(device)
+        y = data[1].float().to(device).reshape((batch_size, 1)) / 2. #just to have a floating point label
         x0 = torch.randn_like(x1)
         t, xt, ut, _, y1 = FM.guided_sample_location_and_conditional_flow(x0, x1, y1=y)
         vt = model(t, xt, y1)
         loss = torch.mean((vt - ut) ** 2)
         loss.backward()
         optimizer.step()
-        print(f"epoch: {epoch}, steps: {i}, loss: {loss.item():.4}", end="\r")
+        print(f"OT-CFM epoch: {epoch}, steps: {i}, loss: {loss.item():.4}", end="\r")
 
 # %%
 USE_TORCH_DIFFEQ = True
-generated_class_list = torch.arange(10, device=device).repeat(10)
 with torch.no_grad():
     if USE_TORCH_DIFFEQ:
         traj = torchdiffeq.odeint(
@@ -154,7 +174,8 @@ grid = make_grid(
 )
 img = ToPILImage()(grid)
 plt.imshow(img)
-plt.show()
+plt.title(f"optimal transport cfm\nlabels: {cond_values}")
+plt.savefig("ot-cfm_noninteger.svg")
 
 # %%
 #################################
@@ -166,10 +187,10 @@ sigma = 0.1
 
 
 model = UNetModel(
-    dim=(1, 28, 28), num_channels=32, num_res_blocks=1, num_classes=10, class_cond=True
+    dim=(1, 28, 28), num_channels=32, num_res_blocks=1, embedding_net=embed_condition
 ).to(device)
 score_model = UNetModel(
-    dim=(1, 28, 28), num_channels=32, num_res_blocks=1, num_classes=10, class_cond=True
+    dim=(1, 28, 28), num_channels=32, num_res_blocks=1, embedding_net=embed_condition
 ).to(device)
 
 optimizer = torch.optim.Adam(list(model.parameters()) + list(score_model.parameters()))
@@ -181,7 +202,7 @@ for epoch in range(n_epochs):
     for i, data in tqdm(enumerate(train_loader)):
         optimizer.zero_grad()
         x1 = data[0].to(device)
-        y = data[1].to(device)
+        y = data[1].float().to(device).reshape((batch_size, 1)) / 2. #just to have a floating point label
         x0 = torch.randn_like(x1)
         t, xt, ut, _, y1, eps = FM.guided_sample_location_and_conditional_flow(
             x0, x1, y1=y, return_noise=True
@@ -194,10 +215,10 @@ for epoch in range(n_epochs):
         loss = flow_loss + score_loss
         loss.backward()
         optimizer.step()
+        print(f"SF2M epoch: {epoch}, steps: {i}, loss: {loss.item():.4}", end="\r")
 
 # %%
 USE_TORCH_DIFFEQ = True
-generated_class_list = torch.arange(10, device=device).repeat(10)
 
 node = NeuralODE(model, solver="euler", sensitivity="adjoint", atol=1e-4, rtol=1e-4)
 # Evaluate the ODE
@@ -221,55 +242,56 @@ grid = make_grid(
 )
 img = ToPILImage()(grid)
 plt.imshow(img)
-
+plt.title(f"schrödinger bridge cfm\nlabels: {cond_values}")
+plt.savefig("sf2m_noninteger.svg")
 # %%
 # follows example from https://github.com/google-research/torchsde/blob/master/examples/cont_ddpm.py
 
 
-class SDE(torch.nn.Module):
-    noise_type = "diagonal"
-    sde_type = "ito"
+# class SDE(torch.nn.Module):
+#     noise_type = "diagonal"
+#     sde_type = "ito"
 
-    def __init__(self, ode_drift, score, labels=None, reverse=False, sigma=0.1):
-        super().__init__()
-        self.drift = ode_drift
-        self.score = score
-        self.reverse = reverse
-        self.labels = labels
-        self.sigma = sigma
+#     def __init__(self, ode_drift, score, labels=None, reverse=False, sigma=0.1):
+#         super().__init__()
+#         self.drift = ode_drift
+#         self.score = score
+#         self.reverse = reverse
+#         self.labels = labels
+#         self.sigma = sigma
 
-    # Drift
+#     # Drift
 
-    def f(self, t, y):
-        y = y.view(-1, 1, 28, 28)
-        if self.reverse:
-            t = 1 - t
-            return -self.drift(t, y, self.labels) + self.score(t, y, self.labels)
-        return self.drift(t, y, self.labels).flatten(start_dim=1) + self.score(
-            t, y, self.labels
-        ).flatten(start_dim=1)
+#     def f(self, t, y):
+#         y = y.view(-1, 1, 28, 28)
+#         if self.reverse:
+#             t = 1 - t
+#             return -self.drift(t, y, self.labels) + self.score(t, y, self.labels)
+#         return self.drift(t, y, self.labels).flatten(start_dim=1) + self.score(
+#             t, y, self.labels
+#         ).flatten(start_dim=1)
 
-    # Diffusion
-    def g(self, t, y):
-        return torch.ones_like(y) * self.sigma
+#     # Diffusion
+#     def g(self, t, y):
+#         return torch.ones_like(y) * self.sigma
 
 
-# %%
-sde = SDE(model, score_model, labels=torch.arange(10, device=device).repeat(10), sigma=0.1)
-with torch.no_grad():
-    sde_traj = torchsde.sdeint(
-        sde,
-        # x0.view(x0.size(0), -1),
-        torch.randn(100, 1 * 28 * 28, device=device),
-        ts=torch.linspace(0, 1, 2, device=device),
-        dt=0.01,
-    )
+# # %%
+# sde = SDE(model, score_model, labels=torch.arange(10, device=device).repeat(10), sigma=0.1)
+# with torch.no_grad():
+#     sde_traj = torchsde.sdeint(
+#         sde,
+#         # x0.view(x0.size(0), -1),
+#         torch.randn(100, 1 * 28 * 28, device=device),
+#         ts=torch.linspace(0, 1, 2, device=device),
+#         dt=0.01,
+#     )
 
-# %%
-grid = make_grid(
-    sde_traj[-1, :100].view([-1, 1, 28, 28]).clip(-1, 1), value_range=(-1, 1), padding=0, nrow=10
-)
-img = ToPILImage()(grid)
-plt.imshow(img)
+# # %%
+# grid = make_grid(
+#     sde_traj[-1, :100].view([-1, 1, 28, 28]).clip(-1, 1), value_range=(-1, 1), padding=0, nrow=10
+# )
+# img = ToPILImage()(grid)
+# plt.imshow(img)
 
 # %%
