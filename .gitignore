@@ -172,4 +172,6 @@ slurm*.out
 
 notebooks/figures/
 
+examples/single_cell/single_cell_sf2m_grn/Synthetic-I
+
 .DS_Store
