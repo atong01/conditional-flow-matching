@@ -6,6 +6,8 @@ name: Code Quality Main
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main, "release/*"]
 
 jobs:
   code-quality:
@@ -13,12 +15,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          python-version: "3.13"
 
       - name: Run pre-commits
-        uses: pre-commit/action@v2.0.3
+        uses: pre-commit/action@v3.0.1
