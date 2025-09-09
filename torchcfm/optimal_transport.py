@@ -144,6 +144,43 @@ class OTPlanSampler:
         i, j = self.sample_map(pi, x0.shape[0], replace=replace)
         return x0[i], x1[j]
 
+    def sample_plan_with_scipy(self, x0, x1):
+        r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
+        minibatch using scipy and draw source and target samples from pi $(x,z) \sim \pi$.
+
+        This sampler has two advantages:
+        * Reduced variance compared to sampling from the OT plan
+        * Preserves the order of x1 by construction
+        * Preserves entire batch if x0 and x1 have the same size
+
+        Parameters
+        ----------
+        x0 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+        x1 : Tensor, shape (bs, *dim)
+            represents the source minibatch
+
+        Returns
+        -------
+        x0[i] : Tensor, shape (bs, *dim)
+            represents the source minibatch drawn from $\pi$
+        x1[j] : Tensor, shape (bs, *dim)
+            represents the source minibatch drawn from $\pi$
+        """
+        import scipy
+        a, b = ot.unif(x0.shape[0]), ot.unif(x1.shape[0])
+        if x0.dim() > 2:
+            x0 = x0.reshape(x0.shape[0], -1)
+        if x1.dim() > 2:
+            x1 = x1.reshape(x1.shape[0], -1)
+        M = torch.cdist(x0.detach(), x1.detach()) ** 2
+        if self.normalize_cost:
+            M = M / M.max()
+        _, j = scipy.optimize.linear_sum_assignment(M.cpu().numpy())
+        pi_x0 = x0[j]
+        pi_x1 = x1
+        return pi_x0, pi_x1
+
     def sample_plan_with_labels(self, x0, x1, y0=None, y1=None, replace=True):
         r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
         minibatch and draw source and target labeled samples from pi $(x,z) \sim \pi$
