@@ -84,7 +84,7 @@ def test_wasserstein(batch_size=128, seed=1980):
     )
     eot = wasserstein(x0, x1, "sinkhorn", reg=0.01, power=1)
 
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError):
         eot = wasserstein(x0, x1, "noname", reg=0.01, power=1)
 
     assert pot_W2 == W2

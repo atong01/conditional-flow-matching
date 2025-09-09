@@ -120,7 +120,7 @@ class SCData:
         plt.show()
 
     def factory(name, args):
-        if type(args) == dict:
+        if type(args) is dict:
             from argparse import Namespace
 
             args = Namespace(**args)

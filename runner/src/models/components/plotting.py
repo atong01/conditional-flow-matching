@@ -77,7 +77,6 @@ def store_trajectories(obs: Union[torch.Tensor, list], model, title="trajs", sta
         batch_size, ts, dim = obs.shape
         start = obs[:n, start_time, :]
         obs = obs.reshape(-1, dim).detach().cpu().numpy()
-        tts = np.tile(np.arange(ts), batch_size)
     from torchdyn.core import NeuralODE
 
     with torch.no_grad():
@@ -108,11 +107,9 @@ def plot_trajectory(
         data = np.concatenate(data, axis=0)
         labels = np.concatenate(labels, axis=0)
         scprep.plot.scatter2d(data, c=labels)
-        start = obs[0][:n]
         ts = len(obs)
     else:
         batch_size, ts, dim = obs.shape
-        start = obs[:n, start_time, :]
         obs = obs.reshape(-1, dim).detach().cpu().numpy()
         tts = np.tile(np.arange(ts), batch_size)
         scprep.plot.scatter2d(obs, c=tts)

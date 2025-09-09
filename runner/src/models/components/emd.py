@@ -139,7 +139,7 @@ def interpolate_per_point_with_ot(p0, p1, tmap, interp_frac):
         )
 
     I = len(p0)
-    J = len(p1)
+    # J = len(p1)
     # Assume growth is exponential and retrieve growth rate at t_interpolate
     # If all sums are the same then this does not change anything
     # This only matters if sum is not the same for all rows

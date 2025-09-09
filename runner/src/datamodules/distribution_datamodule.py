@@ -57,7 +57,7 @@ class TrajectoryNetDistributionTrajectoryDataModule(LightningDataModule):
         """Split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
         train_val_test_split = self.hparams.train_val_test_split
         if isinstance(train_val_test_split, int):
-            self.split_timepoint_data = list(map(lambda x: (x, x, x), self.timepoint_data))
+            self.split_timepoint_data = [(x, x, x) for x in self.timepoint_data]
             return
         splitter = partial(
             random_split,
@@ -142,7 +142,7 @@ class CustomTrajectoryDataModule(LightningDataModule):
         """Split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
         train_val_test_split = self.hparams.train_val_test_split
         if isinstance(train_val_test_split, int):
-            self.split_timepoint_data = list(map(lambda x: (x, x, x), self.timepoint_data))
+            self.split_timepoint_data = [(x, x, x) for x in self.timepoint_data]
             return
         splitter = partial(
             random_split,
@@ -323,7 +323,7 @@ class DiffusionSchrodingerBridgeGaussians(LightningDataModule):
         """Split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
         train_val_test_split = self.hparams.train_val_test_split
         if isinstance(train_val_test_split, int):
-            self.split_timepoint_data = list(map(lambda x: (x, x, x), self.timepoint_data))
+            self.split_timepoint_data = [(x, x, x) for x in self.timepoint_data]
             return
         splitter = partial(
             random_split,
@@ -423,7 +423,7 @@ class TwoDimDataModule(LightningDataModule):
         """Split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
         train_val_test_split = self.hparams.train_val_test_split
         if isinstance(train_val_test_split, int):
-            self.split_timepoint_data = list(map(lambda x: (x, x, x), self.timepoint_data))
+            self.split_timepoint_data = [(x, x, x) for x in self.timepoint_data]
             return
         splitter = partial(
             random_split,
@@ -550,7 +550,7 @@ class ICNNDataModule(LightningDataModule):
         """Split requires self.hparams.train_val_test_split, timepoint_data, system, ulabels."""
         train_val_test_split = self.hparams.train_val_test_split
         if isinstance(train_val_test_split, int):
-            self.split_timepoint_data = list(map(lambda x: (x, x, x), self.timepoint_data))
+            self.split_timepoint_data = [(x, x, x) for x in self.timepoint_data]
             return
         splitter = partial(
             random_split,

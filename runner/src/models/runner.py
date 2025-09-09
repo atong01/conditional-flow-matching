@@ -112,7 +112,6 @@ class CFMLitModule(LightningModule):
     def forward_eval_integrate(self, ts, x0, x_rest, outputs, prefix):
         # Build a trajectory
         t_span = torch.linspace(0, 1, 101)
-        aug_dims = self.val_augmentations.aug_dims
         solver = self.solver(self.net, self.dim)
         solver.augmentations = self.val_augmentations
         traj, aug = solver.odeint(x0, t_span)

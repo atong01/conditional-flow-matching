@@ -388,7 +388,6 @@ class CFMLitModule(LightningModule):
     def forward_eval_integrate(self, ts, x0, x_rest, outputs, prefix):
         # Build a trajectory
         t_span = torch.linspace(0, 1, 101)
-        aug_dims = self.val_augmentations.aug_dims
         regs = []
         trajs = []
         full_trajs = []
@@ -1121,7 +1120,6 @@ class OneWaySF2MLitModule(SF2MLitModule):
     def forward_eval_integrate(self, ts, x0, x_rest, outputs, prefix):
         # Build a trajectory
         t_span = torch.linspace(0, 1, 101).type_as(x0)
-        aug_dims = self.val_augmentations.aug_dims
         regs = []
         trajs = []
         full_trajs = []
@@ -1231,7 +1229,6 @@ class DSBMLitModule(SF2MLitModule):
     def forward_eval_integrate(self, ts, x0, x_rest, outputs, prefix):
         # Build a trajectory
         t_span = torch.linspace(0, 1, 101)
-        aug_dims = self.val_augmentations.aug_dims
         regs = []
         trajs = []
         full_trajs = []
@@ -1424,7 +1421,6 @@ class CNFLitModule(CFMLitModule):
         obs = self.unpack_batch(batch)
         if not self.is_trajectory:
             obs = obs[:, None, :]
-        aug_dims = self.augmentations.aug_dims
         even_ts = torch.arange(obs.shape[1]).to(obs) + 1
         self.prior = MultivariateNormal(
             torch.zeros(self.dim).type_as(obs), torch.eye(self.dim).type_as(obs)
