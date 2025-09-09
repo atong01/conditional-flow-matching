@@ -7,7 +7,7 @@ import torch
 from pytorch_lightning import LightningDataModule
 from pytorch_lightning.trainer.supporters import CombinedLoader
 from sklearn.preprocessing import StandardScaler
-from torch.utils.data import DataLoader, Sampler, TensorDataset, random_split
+from torch.utils.data import DataLoader, TensorDataset, random_split
 from torchdyn.datasets import ToyDataset
 
 from src import utils
@@ -16,6 +16,7 @@ from .components.base import BaseLightningDataModule
 from .components.time_dataset import load_dataset
 from .components.tnet_dataset import SCData
 from .components.two_dim import data_distrib
+
 
 log = utils.get_pylogger(__name__)
 
@@ -338,9 +339,7 @@ class DiffusionSchrodingerBridgeGaussians(LightningDataModule):
         """
         a = self.a
         mean = (2 * a * t - a) * torch.ones(self.dim)
-        cov = (math.sqrt(4 + sigma**4) * t * (1 - t) + (1 - t) ** 2 + t**2) * torch.eye(
-            self.dim
-        )
+        cov = (math.sqrt(4 + sigma**4) * t * (1 - t) + (1 - t) ** 2 + t**2) * torch.eye(self.dim)
         return mean, cov
 
     def detailed_evaluation(self, xt, sigma, t):
@@ -644,7 +643,8 @@ class SKLearnDataModule(BaseLightningDataModule):
 
 
 class DistributionDataModule(BaseLightningDataModule):
-    """DEPRECATED: Implements loader for datasets taking the form of a sequence of distributions over time.
+    """DEPRECATED: Implements loader for datasets taking the form of a sequence of distributions
+    over time.
 
     Each batch is a 3-tuple of data (data, time, causal graph) ([b x d], [b], [b x d x d]).
     """

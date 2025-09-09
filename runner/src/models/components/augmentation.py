@@ -1,5 +1,3 @@
-from typing import Callable, List, Union
-
 import torch
 from torch import nn
 
@@ -213,16 +211,20 @@ class AugmentationModule(nn.Module):
 
 
 class Augmenter(nn.Module):
-    """Augmentation class. Can handle several types of augmentation strategies for Neural DEs.
+    """Augmentation class.
 
+    Can handle several types of augmentation strategies for Neural DEs.
     :param augment_dims: number of augmented dimensions to initialize
     :type augment_dims: int
     :param augment_idx: index of dimension to augment
     :type augment_idx: int
-    :param augment_func: nn.Module applied to the input datasets of dimension `d` to determine the augmented initial condition of dimension `d + a`.
-                        `a` is defined implicitly in `augment_func` e.g. augment_func=nn.Linear(2, 5) augments a 2 dimensional input with 3 additional dimensions.
+    :param augment_func: nn.Module applied to the input datasets of dimension `d` to determine the
+        augmented initial condition of dimension `d + a`. `a` is defined implicitly in
+        `augment_func` e.g. augment_func=nn.Linear(2, 5) augments a 2 dimensional input with 3
+        additional dimensions.
     :type augment_func: nn.Module
-    :param order: whether to augment before datasets [augmentation, x] or after [x, augmentation] along dimension `augment_idx`. Options: ('first', 'last')
+    :param order: whether to augment before datasets [augmentation, x] or after [x, augmentation]
+        along dimension `augment_idx`. Options: ('first', 'last')
     :type order: str
     """
 

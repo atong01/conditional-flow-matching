@@ -1,5 +1,6 @@
 import pyrootutils
 
+
 root = pyrootutils.setup_root(
     search_from=__file__,
     indicator=[".git", "pyproject.toml"],
@@ -41,6 +42,7 @@ from pytorch_lightning.loggers import LightningLoggerBase
 
 from src import utils
 
+
 log = utils.get_pylogger(__name__)
 
 
@@ -57,7 +59,6 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
     Returns:
         Tuple[dict, dict]: Dict with metrics and dict with all instantiated objects.
     """
-
     assert cfg.ckpt_path
 
     log.info(f"Instantiating datamodule <{cfg.datamodule._target_}>")

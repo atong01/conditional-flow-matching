@@ -12,7 +12,6 @@ import torch
 from absl import app, flags
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DistributedSampler
-from torchdyn.core import NeuralODE
 from torchvision import datasets, transforms
 from tqdm import trange
 from utils_cifar import ema, generate_samples, infiniteloop, setup
@@ -24,6 +23,7 @@ from torchcfm.conditional_flow_matching import (
     VariancePreservingConditionalFlowMatcher,
 )
 from torchcfm.models.unet.unet import UNetModelWrapper
+
 
 FLAGS = flags.FLAGS
 
@@ -116,9 +116,7 @@ def train(rank, total_num_gpus, argv):
         num_head_channels=64,
         attention_resolutions="16",
         dropout=0.1,
-    ).to(
-        rank
-    )  # new dropout + bs of 128
+    ).to(rank)  # new dropout + bs of 128
 
     ema_model = copy.deepcopy(net_model)
     optim = torch.optim.Adam(net_model.parameters(), lr=FLAGS.lr)
@@ -181,7 +179,11 @@ def train(rank, total_num_gpus, argv):
                     # sample and Saving the weights
                     if FLAGS.save_step > 0 and global_step % FLAGS.save_step == 0:
                         generate_samples(
-                            net_model, FLAGS.parallel, savedir, global_step, net_="normal"
+                            net_model,
+                            FLAGS.parallel,
+                            savedir,
+                            global_step,
+                            net_="normal",
                         )
                         generate_samples(
                             ema_model, FLAGS.parallel, savedir, global_step, net_="ema"

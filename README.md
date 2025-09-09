@@ -96,7 +96,7 @@ A. Tong, N. Malkin, K. Fatras, L. Atanackovic, Y. Zhang, G. Huguet, G. Wolf, Y. 
 
 Major Changes:
 
-- __Added cifar10 examples with an FID of 3.5__
+- **Added cifar10 examples with an FID of 3.5**
 - Added code for the new Simulation-free Score and Flow Matching (SF)2M preprint
 - Created `torchcfm` pip installable package
 - Moved `pytorch-lightning` implementation and experiments to `runner` directory

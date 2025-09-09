@@ -1,7 +1,6 @@
 from typing import Any, List, Union
 
 import pl_bolts
-import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms as transform_lib
 

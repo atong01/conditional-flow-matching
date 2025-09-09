@@ -2,7 +2,7 @@ import time
 import warnings
 from importlib.util import find_spec
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Callable, List
 
 import hydra
 from omegaconf import DictConfig
@@ -11,6 +11,7 @@ from pytorch_lightning.loggers import LightningLoggerBase
 from pytorch_lightning.utilities import rank_zero_only
 
 from src.utils import pylogger, rich_utils
+
 
 log = pylogger.get_pylogger(__name__)
 
@@ -60,7 +61,6 @@ def extras(cfg: DictConfig) -> None:
     - Setting tags from command line
     - Rich config printing
     """
-
     # return if no `extras` config
     if not cfg.get("extras"):
         log.warning("Extras config not found! <cfg.extras=null>")
@@ -134,7 +134,6 @@ def log_hyperparameters(object_dict: dict) -> None:
     Additionally saves:
     - Number of model parameters
     """
-
     hparams = {}
 
     cfg = object_dict["cfg"]
@@ -174,7 +173,6 @@ def log_hyperparameters(object_dict: dict) -> None:
 
 def get_metric_value(metric_dict: dict, metric_name: str) -> float:
     """Safely retrieves value of the metric logged in LightningModule."""
-
     if not metric_name:
         log.info("Metric name is None! Skipping metric value retrieval...")
         return None
@@ -194,7 +192,6 @@ def get_metric_value(metric_dict: dict, metric_name: str) -> float:
 
 def close_loggers() -> None:
     """Makes sure all loggers closed properly (prevents logging failure during multirun)."""
-
     log.info("Closing loggers...")
 
     if find_spec("wandb"):  # if wandb is installed

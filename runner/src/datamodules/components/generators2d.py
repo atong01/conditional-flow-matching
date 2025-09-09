@@ -3,6 +3,7 @@
 Largely from
 https://github.com/AmirTag/OT-ICNN/blob/6caa9b982596a101b90a8a947d10f35f18c7de4e/2_dim_experiments/W2-minimax-tf.py
 """
+
 import random
 
 import numpy as np

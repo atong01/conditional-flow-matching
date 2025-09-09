@@ -50,11 +50,12 @@ class ConditionalFlowMatcher:
     """
 
     def __init__(self, sigma: Union[float, int] = 0.0):
-        r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter $\sigma$.
+        r"""Initialize the ConditionalFlowMatcher class.
 
-        Parameters
-        ----------
-        sigma : Union[float, int]
+        It requires the hyper-parameter $\sigma$.
+                Parameters
+                ----------
+                sigma : Union[float, int]
         """
         self.sigma = sigma
 
@@ -217,19 +218,22 @@ class ConditionalFlowMatcher:
 
 
 class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
-    """Child class for optimal transport conditional flow matching method. This class implements
-    the OT-CFM methods from [1] and inherits the ConditionalFlowMatcher parent class.
+    """Child class for optimal transport conditional flow matching method.
+
+    This class implements the OT-CFM methods from [1] and inherits the ConditionalFlowMatcher
+    parent class.
 
     It overrides the sample_location_and_conditional_flow.
     """
 
     def __init__(self, sigma: Union[float, int] = 0.0):
-        r"""Initialize the ConditionalFlowMatcher class. It requires the hyper-parameter $\sigma$.
+        r"""Initialize the ConditionalFlowMatcher class.
 
-        Parameters
-        ----------
-        sigma : Union[float, int]
-        ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
+        It requires the hyper-parameter $\sigma$.
+                Parameters
+                ----------
+                sigma : Union[float, int]
+                ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
         """
         super().__init__(sigma)
         self.ot_sampler = OTPlanSampler(method="exact")
@@ -313,9 +317,11 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
 
 
 class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
-    """Lipman et al. 2023 style target OT conditional flow matching. This class inherits the
-    ConditionalFlowMatcher and override the compute_mu_t, compute_sigma_t and
-    compute_conditional_flow functions in order to compute [2]'s flow matching.
+    """Lipman et al.
+
+    2023 style target OT conditional flow matching. This class inherits the ConditionalFlowMatcher
+    and override the compute_mu_t, compute_sigma_t and compute_conditional_flow functions in order
+    to compute [2]'s flow matching.
 
     [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
     """
@@ -389,16 +395,19 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
 
 class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
-    """Child class for Schrödinger bridge conditional flow matching method. This class implements
-    the SB-CFM methods from [1] and inherits the ConditionalFlowMatcher parent class.
+    """Child class for Schrödinger bridge conditional flow matching method.
+
+    This class implements the SB-CFM methods from [1] and inherits the ConditionalFlowMatcher
+    parent class.
 
     It overrides the compute_sigma_t, compute_conditional_flow and
     sample_location_and_conditional_flow functions.
     """
 
     def __init__(self, sigma: Union[float, int] = 1.0, ot_method="exact"):
-        r"""Initialize the SchrodingerBridgeConditionalFlowMatcher class. It requires the hyper-
-        parameter $\sigma$ and the entropic OT map.
+        r"""Initialize the SchrodingerBridgeConditionalFlowMatcher class.
+
+        It requires the hyper- parameter $\sigma$ and the entropic OT map.
 
         Parameters
         ----------
@@ -548,9 +557,11 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
 
 class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
-    """Albergo et al. 2023 trigonometric interpolants class. This class inherits the
-    ConditionalFlowMatcher and override the compute_mu_t and compute_conditional_flow functions in
-    order to compute [3]'s trigonometric interpolants.
+    """Albergo et al.
+
+    2023 trigonometric interpolants class. This class inherits the ConditionalFlowMatcher and
+    override the compute_mu_t and compute_conditional_flow functions in order to compute [3]'s
+    trigonometric interpolants.
 
     [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
     """

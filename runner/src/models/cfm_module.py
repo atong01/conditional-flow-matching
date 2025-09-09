@@ -5,7 +5,6 @@ from typing import Any, List, Optional, Union
 
 import numpy as np
 import torch
-import torchsde
 from pytorch_lightning import LightningDataModule, LightningModule
 from torch.distributions import MultivariateNormal
 from torchdyn.core import NeuralODE
@@ -19,7 +18,6 @@ from .components.augmentation import (
 from .components.distribution_distances import compute_distribution_distances
 from .components.optimal_transport import OTPlanSampler
 from .components.plotting import (
-    plot_paths,
     plot_samples,
     plot_trajectory,
     store_trajectories,
@@ -226,7 +224,6 @@ class CFMLitModule(LightningModule):
 
     def calc_loc_and_target(self, x0, x1, t, t_select, training):
         """Computes the loss on a batch of data."""
-
         t_xshape = t.reshape(-1, *([1] * (x0.dim() - 1)))
         mu_t, sigma_t = self.calc_mu_sigma(x0, x1, t_xshape)
         eps_t = torch.randn_like(mu_t)
@@ -246,7 +243,6 @@ class CFMLitModule(LightningModule):
 
     def step(self, batch: Any, training: bool = False):
         """Computes the loss on a batch of data."""
-
         X = self.unpack_batch(batch)
         x0, x1, t_select = self.preprocess_batch(X, training)
         # Either randomly sample a single T or sample a batch of T's
@@ -280,9 +276,7 @@ class CFMLitModule(LightningModule):
 
     def image_eval_step(self, batch: Any, batch_idx: int, prefix: str):
         import os
-        from math import prod
 
-        from pl_bolts.transforms.dataset_normalizations import cifar10_normalization
         from torchvision.utils import save_image
 
         #        val_augmentations = AugmentationModule(
@@ -910,7 +904,8 @@ class SF2MLitModule(CFMLitModule):
         reg, vt, st = self.forward_flow_and_score(t, x)
         flow_loss = self.criterion(vt, ut)
         score_loss = self.criterion(
-            -sigma_t * st / (self.sigma(t_orig.reshape(sigma_t.shape)) ** 2) * 2, score_target
+            -sigma_t * st / (self.sigma(t_orig.reshape(sigma_t.shape)) ** 2) * 2,
+            score_target,
         )
         return torch.mean(reg) + self.hparams.score_weight * score_loss, flow_loss
 
@@ -1051,9 +1046,7 @@ class SF2MLitModule(CFMLitModule):
 
     def image_eval_step(self, batch: Any, batch_idx: int, prefix: str):
         import os
-        from math import prod
 
-        from pl_bolts.transforms.dataset_normalizations import cifar10_normalization
         from torchvision.utils import save_image
 
         solver = self.partial_solver(self.net, self.dim)
@@ -1337,11 +1330,11 @@ class DSBMSharedLitModule(SF2MLitModule):
 
 
 class FMLitModule(CFMLitModule):
-    """Implements a Lipman et al. 2023 style flow matching loss.
+    """Implements a Lipman et al.
 
-    This maps the standard normal distribution to the data distribution by using conditional flows
-    that are the optimal transport flow from a narrow Gaussian around a datapoint to a standard N(x
-    | 0, 1).
+    2023 style flow matching loss.     This maps the standard normal distribution to the data
+    distribution by using conditional flows     that are the optimal transport flow from a narrow
+    Gaussian around a datapoint to a standard N(x     | 0, 1).
     """
 
     def calc_mu_sigma(self, x0, x1, t):
@@ -1365,7 +1358,7 @@ class SplineCFMLitModule(CFMLitModule):
     def preprocess_batch(self, X, training=False):
         from torchcubicspline import NaturalCubicSpline, natural_cubic_spline_coeffs
 
-        """converts a batch of data into matched a random pair of (x0, x1)"""
+        """Converts a batch of data into matched a random pair of (x0, x1)"""
         lotp = self.hparams.leaveout_timepoint
         valid_times = torch.arange(X.shape[1]).type_as(X)
         t_select = torch.zeros(1)

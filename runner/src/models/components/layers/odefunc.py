@@ -1,12 +1,12 @@
 import copy
 
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 from . import diffeq_layers
 from .squeeze import squeeze, unsqueeze
+
 
 __all__ = ["ODEnet", "AutoencoderDiffEqNet"]
 

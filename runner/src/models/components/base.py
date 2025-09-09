@@ -568,9 +568,7 @@ class DibsLayer(nn.Module):
 
     def _get_kl(self, param_mean, sigma, prior_log_sigma):
         kl = torch.sum(
-            prior_log_sigma
-            - torch.log(sigma)
-            + 0.5 * (sigma**2) / (math.exp(prior_log_sigma * 2))
+            prior_log_sigma - torch.log(sigma) + 0.5 * (sigma**2) / (math.exp(prior_log_sigma * 2))
         )
         kl += 0.5 * torch.sum(param_mean**2) / math.exp(prior_log_sigma * 2)
         return kl

@@ -1,5 +1,3 @@
-import pytest
-
 from torchcfm.models import MLP
 from torchcfm.models.unet import UNetModel
 

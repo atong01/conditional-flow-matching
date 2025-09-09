@@ -7,13 +7,13 @@ import datetime
 import json
 import os
 import os.path as osp
-import shutil
 import sys
 import tempfile
 import time
 import warnings
 from collections import defaultdict
 from contextlib import contextmanager
+
 
 DEBUG = 10
 INFO = 20

@@ -6,6 +6,7 @@ best match the target distribution or vis versa. by setting reg_m_1 to something
 something large we can compute an unbalanced optimal transport where all the scaling is done on the
 source distribution and none is done on the target distribution.
 """
+
 import warnings
 
 import numpy as np

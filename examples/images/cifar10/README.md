@@ -1,6 +1,6 @@
 # CIFAR-10 experiments using TorchCFM
 
-This repository is used to reproduce the CIFAR-10 experiments from [1](https://arxiv.org/abs/2302.00482). We have designed a novel experimental procedure that helps us to reach an __FID of 3.5__ on the Cifar10 dataset.
+This repository is used to reproduce the CIFAR-10 experiments from [1](https://arxiv.org/abs/2302.00482). We have designed a novel experimental procedure that helps us to reach an **FID of 3.5** on the Cifar10 dataset.
 
 <p align="center">
 <img src="../../../assets/169_generated_samples_otcfm.png" width="600"/>

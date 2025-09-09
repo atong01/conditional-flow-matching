@@ -11,6 +11,7 @@ from rich.prompt import Prompt
 
 from src.utils import pylogger
 
+
 log = pylogger.get_pylogger(__name__)
 
 
@@ -37,7 +38,6 @@ def print_config_tree(
         resolve (bool, optional): Whether to resolve reference fields of DictConfig.
         save_to_file (bool, optional): Whether to export config to the hydra output folder.
     """
-
     style = "dim"
     tree = rich.tree.Tree("CONFIG", style=style, guide_style=style)
 
@@ -78,7 +78,6 @@ def print_config_tree(
 @rank_zero_only
 def enforce_tags(cfg: DictConfig, save_to_file: bool = False) -> None:
     """Prompts user to input tags from command line if no tags are provided in config."""
-
     if not cfg.get("tags"):
         if "id" in HydraConfig().cfg.hydra.job:
             raise ValueError("Specify tags before launching a multirun!")

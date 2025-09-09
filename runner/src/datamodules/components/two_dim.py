@@ -5,6 +5,7 @@ import torch
 from sklearn import datasets
 from torch.utils.data import TensorDataset
 
+
 # checker/pinwheel/8gaussians can be found at
 # https://github.com/rtqichen/ffjord/blob/994864ad0517db3549717c25170f9b71e96788b1/lib/toy_data.py#L8
 

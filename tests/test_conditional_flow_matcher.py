@@ -18,6 +18,7 @@ from torchcfm.conditional_flow_matching import (
 )
 from torchcfm.optimal_transport import OTPlanSampler
 
+
 TEST_SEED = 1994
 TEST_BATCH_SIZE = 128
 SIGMA_CONDITION = {

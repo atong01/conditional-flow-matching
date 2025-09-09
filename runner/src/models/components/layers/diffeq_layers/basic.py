@@ -438,7 +438,7 @@ class BlendConv2d(nn.Module):
         groups=1,
         bias=True,
         transpose=False,
-        **unused_kwargs
+        **unused_kwargs,
     ):
         super().__init__()
         module = nn.ConvTranspose2d if transpose else nn.Conv2d

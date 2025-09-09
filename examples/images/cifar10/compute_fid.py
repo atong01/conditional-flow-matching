@@ -3,17 +3,16 @@
 # Authors: Kilian Fatras
 #          Alexander Tong
 
-import os
 import sys
 
-import matplotlib.pyplot as plt
 import torch
-from absl import app, flags
+from absl import flags
 from cleanfid import fid
 from torchdiffeq import odeint
 from torchdyn.core import NeuralODE
 
 from torchcfm.models.unet.unet import UNetModelWrapper
+
 
 FLAGS = flags.FLAGS
 # UNet
@@ -81,7 +80,12 @@ def gen_1_img(unused_latent):
             print("Use method: ", FLAGS.integration_method)
             t_span = torch.linspace(0, 1, 2, device=device)
             traj = odeint(
-                new_net, x, t_span, rtol=FLAGS.tol, atol=FLAGS.tol, method=FLAGS.integration_method
+                new_net,
+                x,
+                t_span,
+                rtol=FLAGS.tol,
+                atol=FLAGS.tol,
+                method=FLAGS.integration_method,
             )
     traj = traj[-1, :]  # .view([-1, 3, 32, 32]).clip(-1, 1)
     img = (traj * 127.5 + 128).clip(0, 255).to(torch.uint8)  # .permute(1, 2, 0)

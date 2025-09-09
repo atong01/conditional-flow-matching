@@ -1,20 +1,11 @@
-from typing import Any, List, Optional, Union
+from typing import Any, List
 
 import torch
 import torch.nn.functional as F
 from pytorch_lightning import LightningDataModule, LightningModule
-from torch import autograd, nn
-from torch.distributions import MultivariateNormal
-from torchdyn.core import NeuralODE
+from torch import autograd
 
-from .components.augmentation import (
-    AugmentationModule,
-    AugmentedVectorField,
-    Sequential,
-)
 from .components.distribution_distances import compute_distribution_distances
-from .components.optimal_transport import OTPlanSampler
-from .components.plotting import plot_paths, plot_scatter_and_flow
 from .utils import get_wandb_logger
 
 
@@ -197,7 +188,12 @@ class ICNNLitModule(LightningModule):
 
         x_pred = y_to_x(x1)
         plot(
-            x0, x1, x_pred, pred, savename=f"{self.current_epoch}_match", wandb_logger=wandb_logger
+            x0,
+            x1,
+            x_pred,
+            pred,
+            savename=f"{self.current_epoch}_match",
+            wandb_logger=wandb_logger,
         )
 
     def validation_step(self, batch: Any, batch_idx: int):

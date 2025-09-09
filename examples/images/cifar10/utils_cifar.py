@@ -6,7 +6,8 @@ from torch import distributed as dist
 from torchdyn.core import NeuralODE
 
 # from torchvision.transforms import ToPILImage
-from torchvision.utils import make_grid, save_image
+from torchvision.utils import save_image
+
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
@@ -28,7 +29,6 @@ def setup(
         master_port: Port number of the master node.
         backend: Backend to use.
     """
-
     os.environ["MASTER_ADDR"] = master_addr
     os.environ["MASTER_PORT"] = master_port
 

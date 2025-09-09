@@ -4,6 +4,7 @@ import os
 
 from setuptools import find_packages, setup
 
+
 install_requires = [
     "torch>=1.11.0",
     "matplotlib",

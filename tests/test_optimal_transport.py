@@ -2,14 +2,13 @@
 
 # Author: Kilian Fatras <kilian.fatras@mila.quebec>
 
-import math
-
 import numpy as np
 import ot
 import pytest
 import torch
 
 from torchcfm.optimal_transport import OTPlanSampler, wasserstein
+
 
 ot_sampler = OTPlanSampler(method="exact")
 
@@ -77,7 +76,11 @@ def test_wasserstein(batch_size=128, seed=1980):
     W1 = wasserstein(x0, x1, "exact", power=1)
 
     pot_eot = ot.sinkhorn2(
-        ot.unif(x0.shape[0]), ot.unif(x1.shape[0]), M.numpy(), reg=0.01, numItermax=int(1e7)
+        ot.unif(x0.shape[0]),
+        ot.unif(x1.shape[0]),
+        M.numpy(),
+        reg=0.01,
+        numItermax=int(1e7),
     )
     eot = wasserstein(x0, x1, "sinkhorn", reg=0.01, power=1)
 

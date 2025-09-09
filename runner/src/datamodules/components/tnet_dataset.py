@@ -2,6 +2,7 @@
 
 Loads datasets into uniform format for learning continuous flows
 """
+
 import math
 
 import numpy as np
@@ -161,7 +162,6 @@ class SCData:
 
 def _get_data_points(adata, basis) -> np.ndarray:
     """Returns the data points corresponding to the selected basis."""
-
     if basis == "highly_variable":
         data_points = adata[:, adata.var[basis]].X.toarray()
     elif basis in adata.obsm.keys():
@@ -650,9 +650,10 @@ class TreeTestData(CircleTestDataV3):
 
 
 class CircleTestDataV5(TreeTestData):
-    """This builds on version 3 to include a better middle timepoint. Where instead of being
-    parametrically defined, the middle timepoint is defined in terms of the interpolant between the
-    first and last timepoints along the manifold.
+    """This builds on version 3 to include a better middle timepoint.
+
+    Where instead of being parametrically defined, the middle timepoint is defined in terms of the
+    interpolant between the first and last timepoints along the manifold.
 
     This is a useful thing to relate to in terms of transport along the manifold.
     """
