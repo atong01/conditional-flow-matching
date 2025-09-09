@@ -169,7 +169,6 @@ class OTPlanSampler:
         """
         import scipy
 
-        a, b = ot.unif(x0.shape[0]), ot.unif(x1.shape[0])
         if x0.dim() > 2:
             x0 = x0.reshape(x0.shape[0], -1)
         if x1.dim() > 2:
