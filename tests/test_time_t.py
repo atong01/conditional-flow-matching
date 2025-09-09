@@ -13,7 +13,6 @@ from torchcfm.conditional_flow_matching import (
     VariancePreservingConditionalFlowMatcher,
 )
 
-
 seed = 1994
 batch_size = 128
 

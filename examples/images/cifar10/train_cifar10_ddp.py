@@ -24,7 +24,6 @@ from torchcfm.conditional_flow_matching import (
 )
 from torchcfm.models.unet.unet import UNetModelWrapper
 
-
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string("model", "otcfm", help="flow matching model type")

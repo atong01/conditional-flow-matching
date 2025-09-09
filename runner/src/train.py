@@ -1,6 +1,5 @@
 import pyrootutils
 
-
 root = pyrootutils.setup_root(
     search_from=__file__,
     indicator=[".git", "pyproject.toml", "README.md"],
@@ -42,7 +41,6 @@ from pytorch_lightning import Callback, LightningDataModule, LightningModule, Tr
 from pytorch_lightning.loggers import LightningLoggerBase
 
 from src import utils
-
 
 log = utils.get_pylogger(__name__)
 

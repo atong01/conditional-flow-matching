@@ -3,7 +3,6 @@ from typing import List, Optional
 import torch
 from torch import nn
 
-
 ACTIVATION_MAP = {
     "relu": nn.ReLU,
     "sigmoid": nn.Sigmoid,

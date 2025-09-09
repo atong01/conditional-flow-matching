@@ -9,7 +9,6 @@ import torch
 
 from torchcfm.optimal_transport import OTPlanSampler, wasserstein
 
-
 ot_sampler = OTPlanSampler(method="exact")
 
 

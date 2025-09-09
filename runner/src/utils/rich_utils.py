@@ -11,7 +11,6 @@ from rich.prompt import Prompt
 
 from src.utils import pylogger
 
-
 log = pylogger.get_pylogger(__name__)
 
 

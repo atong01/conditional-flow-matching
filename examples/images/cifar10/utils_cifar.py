@@ -8,7 +8,6 @@ from torchdyn.core import NeuralODE
 # from torchvision.transforms import ToPILImage
 from torchvision.utils import save_image
 
-
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 

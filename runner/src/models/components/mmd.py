@@ -3,7 +3,6 @@
 
 import torch
 
-
 min_var_est = 1e-8
 
 

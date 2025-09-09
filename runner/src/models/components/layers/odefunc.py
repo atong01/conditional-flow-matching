@@ -7,7 +7,6 @@ import torch.nn.functional as F
 from . import diffeq_layers
 from .squeeze import squeeze, unsqueeze
 
-
 __all__ = ["ODEnet", "AutoencoderDiffEqNet"]
 
 

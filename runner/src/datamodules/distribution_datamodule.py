@@ -17,7 +17,6 @@ from .components.time_dataset import load_dataset
 from .components.tnet_dataset import SCData
 from .components.two_dim import data_distrib
 
-
 log = utils.get_pylogger(__name__)
 
 

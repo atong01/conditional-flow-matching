@@ -13,7 +13,6 @@ from torchdyn.core import NeuralODE
 
 from torchcfm.models.unet.unet import UNetModelWrapper
 
-
 FLAGS = flags.FLAGS
 # UNet
 flags.DEFINE_integer("num_channel", 128, help="base channel of UNet")

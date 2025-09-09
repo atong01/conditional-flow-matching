@@ -12,7 +12,6 @@ from pytorch_lightning.utilities import rank_zero_only
 
 from src.utils import pylogger, rich_utils
 
-
 log = pylogger.get_pylogger(__name__)
 
 
