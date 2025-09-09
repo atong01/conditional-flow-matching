@@ -35,6 +35,5 @@ select = ["C", "E", "F", "I", "W"]
 "__init__.py" = ["E402", "F401", "F403", "F811"]
 
 [tool.ruff.lint.isort]
-lines-after-imports = 2
 known-first-party = ["src"]
 known-third-party = ["torch", "transformers", "wandb"]
