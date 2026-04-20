@@ -369,7 +369,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
     def compute_conditional_flow(self, x0, x1, t, xt):
         """
-        Compute the conditional vector field ut(x1|x0) = (x1 - (1 - sigma) t)/(1 - (1 - sigma)t), see Eq.(21) [2].
+        Compute the conditional vector field ut(x1|x0) = (x1 - (1 - sigma) xt)/(1 - (1 - sigma)t), see Eq.(21) [2].
 
         Parameters
         ----------
@@ -383,7 +383,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
         Returns
         -------
-        ut : conditional vector field ut(x1|x0) = (x1 - (1 - sigma) t)/(1 - (1 - sigma)t)
+        ut : conditional vector field ut(x1|x0) = (x1 - (1 - sigma) xt)/(1 - (1 - sigma)t)
 
         References
         ----------
