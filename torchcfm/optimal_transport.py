@@ -177,8 +177,8 @@ class OTPlanSampler:
         if self.normalize_cost:
             M = M / M.max()
         _, j = scipy.optimize.linear_sum_assignment(M.cpu().numpy())
-        pi_x0 = x0[j]
-        pi_x1 = x1
+        pi_x0 = x0
+        pi_x1 = x1[j]
         return pi_x0, pi_x1
 
     def sample_plan_with_labels(self, x0, x1, y0=None, y1=None, replace=True):
