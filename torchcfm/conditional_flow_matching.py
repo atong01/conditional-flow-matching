@@ -47,6 +47,8 @@ class ConditionalFlowMatcher:
     - Drawing data from gaussian probability path N(t * x1 + (1 - t) * x0, sigma) function
     - conditional flow matching ut(x1|x0) = x1 - x0
     - score function $\nabla log p_t(x|x0, x1)$
+
+    [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
     """
 
     def __init__(self, sigma: Union[float, int] = 0.0):
@@ -77,7 +79,7 @@ class ConditionalFlowMatcher:
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         t = pad_t_like_x(t, x0)
         return t * x1 + (1 - t) * x0
@@ -96,7 +98,7 @@ class ConditionalFlowMatcher:
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         del t
         return self.sigma
@@ -121,7 +123,7 @@ class ConditionalFlowMatcher:
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         mu_t = self.compute_mu_t(x0, x1, t)
         sigma_t = self.compute_sigma_t(t)
@@ -148,7 +150,7 @@ class ConditionalFlowMatcher:
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         del t, xt
         return x1 - x0
@@ -184,7 +186,7 @@ class ConditionalFlowMatcher:
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         if t is None:
             t = torch.rand(x0.shape[0]).type_as(x0)
@@ -211,7 +213,7 @@ class ConditionalFlowMatcher:
 
         References
         ----------
-        [4] Simulation-free Schrodinger bridges via score and flow matching, Preprint, Tong et al.
+        [4] Tong et al., Simulation-free Schrodinger bridges via score and flow matching, https://arxiv.org/abs/2307.03672
         """
         sigma_t = self.compute_sigma_t(t)
         return 2 * sigma_t / (self.sigma**2 + 1e-8)
@@ -224,6 +226,8 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
     parent class.
 
     It overrides the sample_location_and_conditional_flow.
+
+    [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
     """
 
     def __init__(self, sigma: Union[float, int] = 0.0):
@@ -266,7 +270,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
         return super().sample_location_and_conditional_flow(x0, x1, t, return_noise)
@@ -305,7 +309,7 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         x0, x1, y0, y1 = self.ot_sampler.sample_plan_with_labels(x0, x1, y0, y1)
         if return_noise:
@@ -323,7 +327,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
     and override the compute_mu_t, compute_sigma_t and compute_conditional_flow functions in order
     to compute [2]'s flow matching.
 
-    [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+    [2] Lipman et al., Flow Matching for Generative Modelling, ICLR, https://arxiv.org/abs/2210.02747
     """
 
     def compute_mu_t(self, x0, x1, t):
@@ -343,7 +347,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        [2] Lipman et al., Flow Matching for Generative Modelling, ICLR, https://arxiv.org/abs/2210.02747
         """
         del x0
         t = pad_t_like_x(t, x1)
@@ -363,7 +367,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [2] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        [2] Lipman et al., Flow Matching for Generative Modelling, ICLR, https://arxiv.org/abs/2210.02747
         """
         return 1 - (1 - self.sigma) * t
 
@@ -387,7 +391,7 @@ class TargetConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Flow Matching for Generative Modelling, ICLR, Lipman et al.
+        [2] Lipman et al., Flow Matching for Generative Modelling, ICLR, https://arxiv.org/abs/2210.02747
         """
         del x0
         t = pad_t_like_x(t, x1)
@@ -402,6 +406,8 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
     It overrides the compute_sigma_t, compute_conditional_flow and
     sample_location_and_conditional_flow functions.
+
+    [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
     """
 
     def __init__(self, sigma: Union[float, int] = 1.0, ot_method="exact"):
@@ -441,7 +447,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         return self.sigma * torch.sqrt(t * (1 - t))
 
@@ -468,8 +474,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models
-        with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         t = pad_t_like_x(t, x0)
         mu_t = self.compute_mu_t(x0, x1, t)
@@ -506,7 +511,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
         return super().sample_location_and_conditional_flow(x0, x1, t, return_noise)
@@ -545,7 +550,7 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
+        [1] Tong et al., Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint https://arxiv.org/abs/2302.00482
         """
         x0, x1, y0, y1 = self.ot_sampler.sample_plan_with_labels(x0, x1, y0, y1)
         if return_noise:
@@ -563,7 +568,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
     override the compute_mu_t and compute_conditional_flow functions in order to compute [3]'s
     trigonometric interpolants.
 
-    [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
+    [3] Albergo et al., Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, https://arxiv.org/abs/2303.08797
     """
 
     def compute_mu_t(self, x0, x1, t):
@@ -583,7 +588,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
+        [3] Albergo et al., Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, https://arxiv.org/abs/2303.08797
         """
         t = pad_t_like_x(t, x0)
         return torch.cos(math.pi / 2 * t) * x0 + torch.sin(math.pi / 2 * t) * x1
@@ -611,7 +616,7 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
 
         References
         ----------
-        [3] Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, Albergo et al.
+        [3] Albergo et al., Stochastic Interpolants: A Unifying Framework for Flows and Diffusions, https://arxiv.org/abs/2303.08797
         """
         del xt
         t = pad_t_like_x(t, x0)
