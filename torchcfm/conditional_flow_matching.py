@@ -4,6 +4,7 @@
 #         Kilian Fatras
 #         +++
 # License: MIT License
+# test change
 
 import math
 import warnings
@@ -14,7 +15,7 @@ import torch
 from .optimal_transport import OTPlanSampler
 
 
-def pad_t_like_x(t, x):
+def pad_t_like_x(t, x) -> Union[torch.Tensor, float, int]:
     """Function to reshape the time vector t by the number of dimensions of x.
 
     Parameters
@@ -35,7 +36,12 @@ def pad_t_like_x(t, x):
     """
     if isinstance(t, (float, int)):
         return t
-    return t.reshape(-1, *([1] * (x.dim() - 1)))
+    return (
+        t.reshape(-1, *([1] * (x.dim() - 1))),
+        t.reshape(-1, *([1] * (x.dim() - 1))),
+        t.reshape(-1, *([1] * (x.dim() - 1))),
+        t.reshape(-1, *([1] * (x.dim() - 1))),
+    )
 
 
 class ConditionalFlowMatcher:
@@ -156,7 +162,9 @@ class ConditionalFlowMatcher:
     def sample_noise_like(self, x):
         return torch.randn_like(x)
 
-    def sample_location_and_conditional_flow(self, x0, x1, t=None, return_noise=False):
+    def sample_location_and_conditional_flow(
+        self, x0, x1, t=None, return_noise=False
+    ):
         """
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1].
@@ -238,7 +246,9 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         super().__init__(sigma)
         self.ot_sampler = OTPlanSampler(method="exact")
 
-    def sample_location_and_conditional_flow(self, x0, x1, t=None, return_noise=False):
+    def sample_location_and_conditional_flow(
+        self, x0, x1, t=None, return_noise=False
+    ):
         r"""
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sigma))
         and the conditional vector field ut(x1|x0) = x1 - x0, see Eq.(15) [1]
@@ -269,7 +279,9 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
-        return super().sample_location_and_conditional_flow(x0, x1, t, return_noise)
+        return super().sample_location_and_conditional_flow(
+            x0, x1, t, return_noise
+        )
 
     def guided_sample_location_and_conditional_flow(
         self, x0, x1, y0=None, y1=None, t=None, return_noise=False
@@ -309,10 +321,14 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
         """
         x0, x1, y0, y1 = self.ot_sampler.sample_plan_with_labels(x0, x1, y0, y1)
         if return_noise:
-            t, xt, ut, eps = super().sample_location_and_conditional_flow(x0, x1, t, return_noise)
+            t, xt, ut, eps = super().sample_location_and_conditional_flow(
+                x0, x1, t, return_noise
+            )
             return t, xt, ut, y0, y1, eps
         else:
-            t, xt, ut = super().sample_location_and_conditional_flow(x0, x1, t, return_noise)
+            t, xt, ut = super().sample_location_and_conditional_flow(
+                x0, x1, t, return_noise
+            )
             return t, xt, ut, y0, y1
 
 
@@ -421,7 +437,9 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         if sigma <= 0:
             raise ValueError(f"Sigma must be strictly positive, got {sigma}.")
         elif sigma < 1e-3:
-            warnings.warn("Small sigma values may lead to numerical instability.")
+            warnings.warn(
+                "Small sigma values may lead to numerical instability."
+            )
         super().__init__(sigma)
         self.ot_method = ot_method
         self.ot_sampler = OTPlanSampler(method=ot_method, reg=2 * self.sigma**2)
@@ -477,7 +495,9 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         ut = sigma_t_prime_over_sigma_t * (xt - mu_t) + x1 - x0
         return ut
 
-    def sample_location_and_conditional_flow(self, x0, x1, t=None, return_noise=False):
+    def sample_location_and_conditional_flow(
+        self, x0, x1, t=None, return_noise=False
+    ):
         """
         Compute the sample xt (drawn from N(t * x1 + (1 - t) * x0, sqrt(t * (1 - t))*sigma^2 ))
         and the conditional vector field ut(x1|x0) = (1 - 2 * t) / (2 * t * (1 - t)) * (xt - mu_t) + x1 - x0,
@@ -509,7 +529,9 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         [1] Improving and Generalizing Flow-Based Generative Models with minibatch optimal transport, Preprint, Tong et al.
         """
         x0, x1 = self.ot_sampler.sample_plan(x0, x1)
-        return super().sample_location_and_conditional_flow(x0, x1, t, return_noise)
+        return super().sample_location_and_conditional_flow(
+            x0, x1, t, return_noise
+        )
 
     def guided_sample_location_and_conditional_flow(
         self, x0, x1, y0=None, y1=None, t=None, return_noise=False
@@ -549,10 +571,14 @@ class SchrodingerBridgeConditionalFlowMatcher(ConditionalFlowMatcher):
         """
         x0, x1, y0, y1 = self.ot_sampler.sample_plan_with_labels(x0, x1, y0, y1)
         if return_noise:
-            t, xt, ut, eps = super().sample_location_and_conditional_flow(x0, x1, t, return_noise)
+            t, xt, ut, eps = super().sample_location_and_conditional_flow(
+                x0, x1, t, return_noise
+            )
             return t, xt, ut, y0, y1, eps
         else:
-            t, xt, ut = super().sample_location_and_conditional_flow(x0, x1, t, return_noise)
+            t, xt, ut = super().sample_location_and_conditional_flow(
+                x0, x1, t, return_noise
+            )
             return t, xt, ut, y0, y1
 
 
@@ -615,4 +641,11 @@ class VariancePreservingConditionalFlowMatcher(ConditionalFlowMatcher):
         """
         del xt
         t = pad_t_like_x(t, x0)
-        return math.pi / 2 * (torch.cos(math.pi / 2 * t) * x1 - torch.sin(math.pi / 2 * t) * x0)
+        return (
+            math.pi
+            / 2
+            * (
+                torch.cos(math.pi / 2 * t) * x1
+                - torch.sin(math.pi / 2 * t) * x0
+            )
+        )
