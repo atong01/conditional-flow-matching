@@ -1,10 +1,10 @@
 name: Runner Tests
 
-#on:
-#  push:
-#    branches: [main]
-#  pull_request:
-#    branches: [main, "release/*"]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, "release/*"]
 
 jobs:
   run_tests_ubuntu:
@@ -69,7 +69,7 @@ jobs:
         run: pytest runner --cov runner --cov-fail-under=30 # NEEDS TO BE UPDATED WHEN CHANGING THE NAME OF "src" FOLDER
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           name: codecov-runner
           verbose: true
