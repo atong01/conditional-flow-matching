@@ -1,0 +1,67 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both of the following papers."
+title: "TorchCFM: Conditional Flow Matching"
+abstract: "TorchCFM is a PyTorch library for training continuous normalizing flow models with Conditional Flow Matching (CFM). It implements flow matching variants including optimal transport, Schrodinger bridge, and variance-preserving couplings, with examples for image generation, single-cell dynamics, and tabular data."
+authors:
+  - family-names: Tong
+    given-names: Alexander
+  - family-names: Fatras
+    given-names: Kilian
+license: MIT
+repository-code: "https://github.com/atong01/conditional-flow-matching"
+version: "1.0.7"
+date-released: "2024-01-01"
+keywords:
+  - flow-matching
+  - generative-models
+  - optimal-transport
+  - pytorch
+  - schrodinger-bridges
+references:
+  - type: article
+    title: "Improving and generalizing flow-based generative models with minibatch optimal transport"
+    authors:
+      - family-names: Tong
+        given-names: Alexander
+      - family-names: Fatras
+        given-names: Kilian
+      - family-names: Malkin
+        given-names: Nikolay
+      - family-names: Huguet
+        given-names: Guillaume
+      - family-names: Zhang
+        given-names: Yanlei
+      - family-names: Rector-Brooks
+        given-names: Jarrid
+      - family-names: Wolf
+        given-names: Guy
+      - family-names: Bengio
+        given-names: Yoshua
+    journal: "Transactions on Machine Learning Research"
+    year: 2024
+    issn: "2835-8856"
+    url: "https://openreview.net/forum?id=CD9Snc73AW"
+    doi: "10.48550/arXiv.2302.00482"
+  - type: article
+    title: "Simulation-Free Schrödinger Bridges via Score and Flow Matching"
+    authors:
+      - family-names: Tong
+        given-names: Alexander
+      - family-names: Malkin
+        given-names: Nikolay
+      - family-names: Fatras
+        given-names: Kilian
+      - family-names: Atanackovic
+        given-names: Lazar
+      - family-names: Zhang
+        given-names: Yanlei
+      - family-names: Huguet
+        given-names: Guillaume
+      - family-names: Wolf
+        given-names: Guy
+      - family-names: Bengio
+        given-names: Yoshua
+    journal: "arXiv preprint"
+    year: 2023
+    url: "https://arxiv.org/abs/2307.03672"
+    doi: "10.48550/arXiv.2307.03672"

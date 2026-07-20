@@ -57,6 +57,8 @@ This repository contains the code to reproduce the main experiments and illustra
 
 If you find this code useful in your research, please cite the following papers (expand for BibTeX):
 
+This repository is also citable via [`CITATION.cff`](CITATION.cff). See the file for details.
+
 <details>
 <summary>
 A. Tong, N. Malkin, G. Huguet, Y. Zhang, J. Rector-Brooks, K. Fatras, G. Wolf, Y. Bengio. Improving and Generalizing Flow-Based Generative Models with Minibatch Optimal Transport, 2023.
@@ -186,6 +188,8 @@ The directory structure looks like this:
 ```
 
 ## ❤️  Code Contributions
+
+Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) and review the [Code of Conduct](CODE_OF_CONDUCT.md) before getting started.
 
 This toolbox has been created and is maintained by
 
