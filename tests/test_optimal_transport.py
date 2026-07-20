@@ -1,4 +1,4 @@
-"""Tests for Conditional Flow Matcher classers."""
+"""Tests for Conditional Flow Matcher classes."""
 
 # Author: Kilian Fatras <kilian.fatras@mila.quebec>
 
