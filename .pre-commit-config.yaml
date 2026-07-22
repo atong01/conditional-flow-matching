@@ -31,10 +31,10 @@ repos:
     hooks:
       - id: pyupgrade
         require_serial: true
-        args: [--py38-plus]
+        args: [--py39-plus]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.5
+    rev: v0.6.9
     hooks:
       - id: ruff
         args: [--fix]
