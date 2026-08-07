@@ -1,6 +1,5 @@
 import math
 
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torchdyn.datasets import generate_moons
@@ -9,10 +8,12 @@ from torchdyn.datasets import generate_moons
 
 
 def eight_normal_sample(n, dim, scale=1, var=1):
+    if dim < 2:
+        raise ValueError(f"dim must be >= 2 (the eight normals are 2D), got {dim}")
     m = torch.distributions.multivariate_normal.MultivariateNormal(
         torch.zeros(dim), math.sqrt(var) * torch.eye(dim)
     )
-    centers = [
+    centers_2d = [
         (1, 0),
         (-1, 0),
         (0, 1),
@@ -22,7 +23,8 @@ def eight_normal_sample(n, dim, scale=1, var=1):
         (-1.0 / np.sqrt(2), 1.0 / np.sqrt(2)),
         (-1.0 / np.sqrt(2), -1.0 / np.sqrt(2)),
     ]
-    centers = torch.tensor(centers) * scale
+    centers = torch.zeros(8, dim)
+    centers[:, :2] = torch.tensor(centers_2d) * scale
     noise = m.sample((n,))
     multi = torch.multinomial(torch.ones(8), n, replacement=True)
     data = []
@@ -54,6 +56,8 @@ class torch_wrapper(torch.nn.Module):
 
 def plot_trajectories(traj):
     """Plot trajectories of some selected samples."""
+    import matplotlib.pyplot as plt
+
     n = 2000
     plt.figure(figsize=(6, 6))
     plt.scatter(traj[0, :n, 0], traj[0, :n, 1], s=10, alpha=0.8, c="black")

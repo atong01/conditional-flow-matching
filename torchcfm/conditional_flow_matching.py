@@ -214,7 +214,15 @@ class ConditionalFlowMatcher:
         [4] Simulation-free Schrodinger bridges via score and flow matching, Preprint, Tong et al.
         """
         sigma_t = self.compute_sigma_t(t)
-        return 2 * sigma_t / (self.sigma**2 + 1e-8)
+        if self.sigma == 0:
+            # Avoid division by zero when sigma=0 (the default).
+            # When sigma=0 the path is deterministic and lambda is not well-defined;
+            # return ones so downstream loss weighting is a no-op.
+            # Use `t` (always a tensor per the docstring) rather than `sigma_t`,
+            # because the base class's `compute_sigma_t` returns the scalar
+            # `self.sigma` when sigma=0, and `torch.ones_like` requires a tensor.
+            return torch.ones_like(t)
+        return 2 * sigma_t / (self.sigma**2)
 
 
 class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
@@ -226,17 +234,19 @@ class ExactOptimalTransportConditionalFlowMatcher(ConditionalFlowMatcher):
     It overrides the sample_location_and_conditional_flow.
     """
 
-    def __init__(self, sigma: Union[float, int] = 0.0):
+    def __init__(self, sigma: Union[float, int] = 0.0, ot_method="exact"):
         r"""Initialize the ConditionalFlowMatcher class.
 
         It requires the hyper-parameter $\sigma$.
                 Parameters
                 ----------
                 sigma : Union[float, int]
-                ot_sampler: exact OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
+                ot_method: OT method to draw couplings (x0, x1) (see Eq.(17) [1]).
+                    "exact" computes the exact OT plan; other solvers (e.g.
+                    "sinkhorn") can be passed through to ``OTPlanSampler``.
         """
         super().__init__(sigma)
-        self.ot_sampler = OTPlanSampler(method="exact")
+        self.ot_sampler = OTPlanSampler(method=ot_method)
 
     def sample_location_and_conditional_flow(self, x0, x1, t=None, return_noise=False):
         r"""

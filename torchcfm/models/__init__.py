@@ -1,1 +1,1 @@
-from .models import MLP
+from .models import MLP, GradModel

@@ -86,10 +86,11 @@ class OTPlanSampler:
             M = M / M.max()  # should not be normalized when using minibatches
         p = self.ot_fn(a, b, M.detach().cpu().numpy())
         if not np.all(np.isfinite(p)):
-            print("ERROR: p is not finite")
-            print(p)
-            print("Cost mean, max", M.mean(), M.max())
-            print(x0, x1)
+            warnings.warn(
+                "Non-finite values in OT plan p. "
+                f"p={p}. Cost mean={M.mean()}, max={M.max()}. "
+                f"x0={x0}, x1={x1}."
+            )
         if np.abs(p.sum()) < 1e-8:
             if self.warn:
                 warnings.warn("Numerical errors in OT plan, reverting to uniform plan.")
@@ -279,7 +280,8 @@ def wasserstein(
     ret : float
         Wasserstein distance
     """
-    assert power == 1 or power == 2
+    if power not in (1, 2):
+        raise ValueError(f"power must be 1 or 2, got {power}")
     # ot_fn should take (a, b, M) as arguments where a, b are marginals and
     # M is a cost matrix
     if method == "exact" or method is None:
