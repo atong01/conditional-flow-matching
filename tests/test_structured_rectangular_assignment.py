@@ -74,3 +74,43 @@ def test_assignment_preserves_structure_matching_and_gradients(
     torch.testing.assert_close(
         actual_target_gradient, expected_target_gradient, rtol=1e-6, atol=1e-6
     )
+
+
+@pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+@pytest.mark.parametrize(
+    "endpoint_shapes",
+    [
+        ((4,), (4,)),
+        ((1, 2, 2), (1, 2, 2)),
+        ((4,), (1, 2, 2)),
+        ((0,), (0,)),
+        ((1, 0, 2), (1, 0, 2)),
+    ],
+)
+@pytest.mark.parametrize("sizes", [(0, 3), (3, 0), (0, 0)])
+@pytest.mark.parametrize("normalize", [False, True])
+def test_empty_assignment_preserves_endpoint_shapes_and_zero_gradients(
+    dtype, endpoint_shapes, sizes, normalize
+):
+    """A matching with an empty endpoint has zero pairs and zero gather gradients."""
+    source_shape, target_shape = endpoint_shapes
+    source = torch.ones((sizes[0], *source_shape), dtype=dtype, requires_grad=True)
+    target = torch.ones((sizes[1], *target_shape), dtype=dtype, requires_grad=True)
+    paired_source, paired_target = OTPlanSampler(
+        method="exact", normalize_cost=normalize
+    ).sample_plan_with_scipy(source, target)
+
+    # Cardinality follows the matching definition, independent of a cost solver.
+    assert min(sizes) == 0
+    assert paired_source.shape == (0, *source_shape)
+    assert paired_target.shape == (0, *target_shape)
+    assert paired_source.dtype == paired_target.dtype == dtype
+    assert paired_source.device == source.device
+    assert paired_target.device == target.device
+    assert paired_source.numel() == paired_target.numel() == 0
+
+    source_gradient, target_gradient = torch.autograd.grad(
+        paired_source.sum() + paired_target.sum(), (source, target)
+    )
+    torch.testing.assert_close(source_gradient, torch.zeros_like(source), rtol=0.0, atol=0.0)
+    torch.testing.assert_close(target_gradient, torch.zeros_like(target), rtol=0.0, atol=0.0)

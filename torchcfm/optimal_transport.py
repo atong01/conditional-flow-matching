@@ -170,10 +170,10 @@ class OTPlanSampler:
         import scipy
 
         # Flatten only for the cost: return samples with their original structure.
-        flat_x0 = x0.reshape(x0.shape[0], -1)
-        flat_x1 = x1.reshape(x1.shape[0], -1)
+        flat_x0 = x0.flatten(start_dim=1)
+        flat_x1 = x1.flatten(start_dim=1)
         M = torch.cdist(flat_x0.detach(), flat_x1.detach()) ** 2
-        if self.normalize_cost:
+        if self.normalize_cost and M.numel() > 0:
             M = M / M.max()
         i, j = scipy.optimize.linear_sum_assignment(M.cpu().numpy())
         return x0[i], x1[j]
