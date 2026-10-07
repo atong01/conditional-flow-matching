@@ -150,7 +150,7 @@ class OTPlanSampler:
 
         This sampler has two advantages:
         * Reduced variance compared to sampling from the OT plan
-        * Preserves the order of x1 by construction
+        * Preserves the source order of the matched samples
         * Preserves entire batch if x0 and x1 have the same size
 
         Parameters
@@ -169,17 +169,14 @@ class OTPlanSampler:
         """
         import scipy
 
-        if x0.dim() > 2:
-            x0 = x0.reshape(x0.shape[0], -1)
-        if x1.dim() > 2:
-            x1 = x1.reshape(x1.shape[0], -1)
-        M = torch.cdist(x0.detach(), x1.detach()) ** 2
-        if self.normalize_cost:
+        # Flatten only for the cost: return samples with their original structure.
+        flat_x0 = x0.flatten(start_dim=1)
+        flat_x1 = x1.flatten(start_dim=1)
+        M = torch.cdist(flat_x0.detach(), flat_x1.detach()) ** 2
+        if self.normalize_cost and M.numel() > 0:
             M = M / M.max()
-        _, j = scipy.optimize.linear_sum_assignment(M.cpu().numpy())
-        pi_x0 = x0
-        pi_x1 = x1[j]
-        return pi_x0, pi_x1
+        i, j = scipy.optimize.linear_sum_assignment(M.cpu().numpy())
+        return x0[i], x1[j]
 
     def sample_plan_with_labels(self, x0, x1, y0=None, y1=None, replace=True):
         r"""Compute the OT plan $\pi$ (wrt squared Euclidean cost) between a source and a target
