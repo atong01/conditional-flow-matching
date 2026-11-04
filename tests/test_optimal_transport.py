@@ -38,11 +38,7 @@ def test_sample_trajectory_preserves_sample_gradients():
         dtype=torch.float64,
         requires_grad=True,
     )
-    rng_state = np.random.get_state()
-    try:
-        trajectories = ot_sampler.sample_trajectory(x)
-    finally:
-        np.random.set_state(rng_state)
+    trajectories = ot_sampler.sample_trajectory(x)
 
     expected = torch.tensor(
         [
