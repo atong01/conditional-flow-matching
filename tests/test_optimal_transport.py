@@ -29,6 +29,35 @@ def test_sample_map(batch_size=128):
     assert np.array_equal(reconstructed_map, permuted_map)
 
 
+def test_sample_trajectory_preserves_sample_gradients():
+    x = torch.tensor(
+        [
+            [[[0.0, 0.0]], [[10.0, 10.0]], [[1.0, 1.0]]],
+            [[[10.0, 10.0]], [[0.0, 0.0]], [[11.0, 11.0]]],
+        ],
+        dtype=torch.float64,
+        requires_grad=True,
+    )
+    rng_state = np.random.get_state()
+    try:
+        trajectories = ot_sampler.sample_trajectory(x)
+    finally:
+        np.random.set_state(rng_state)
+
+    expected = torch.tensor(
+        [
+            [[[0.0, 0.0]], [[0.0, 0.0]], [[1.0, 1.0]]],
+            [[[10.0, 10.0]], [[10.0, 10.0]], [[11.0, 11.0]]],
+        ],
+        dtype=torch.float64,
+    )
+    torch.testing.assert_close(trajectories, expected)
+
+    (2 * trajectories[0].sum() + 3 * trajectories[1].sum()).backward()
+    expected_grad = torch.tensor([[2.0, 3.0, 2.0], [3.0, 2.0, 3.0]], dtype=x.dtype)
+    torch.testing.assert_close(x.grad, expected_grad[:, :, None, None].expand_as(x))
+
+
 def test_get_map(batch_size=128):
     x0 = torch.randn(batch_size, 2, 2, 2)
     x1 = torch.randn(batch_size, 2, 2, 2)
