@@ -230,7 +230,9 @@ class OTPlanSampler:
         Returns
         -------
         to_return : Tensor, (bs, times, *dim)
-            represents the OT sampled trajectories over time.
+            represents the OT sampled trajectories over time, preserving the input tensor's
+            dtype, device and gradients through the selected sample values. The discrete
+            transport assignments are not differentiated.
         """
         times = X.shape[1]
         pis = []
@@ -247,7 +249,7 @@ class OTPlanSampler:
         to_return = []
         for t in range(times):
             to_return.append(X[:, t][indices[t]])
-        to_return = np.stack(to_return, axis=1)
+        to_return = torch.stack(to_return, dim=1)
         return to_return
 
 
